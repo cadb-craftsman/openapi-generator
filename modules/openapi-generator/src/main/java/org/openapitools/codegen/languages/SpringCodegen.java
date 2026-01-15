@@ -511,6 +511,15 @@ public class SpringCodegen extends AbstractJavaCodegen
                 supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache",
                         (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator),
                         "RFC3339DateFormat.java"));
+                /*
+                supportingFiles.add(new SupportingFile("service.mustache",
+                        (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "Service.java"));
+				*/
+                supportingFiles.add(new SupportingFile("serviceImpl.mustache",
+                        (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "ServiceImpl.java"));
+                
+                supportingFiles.add(new SupportingFile("repository.mustache",
+                        (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "Repository.java"));                
             }
             if (SPRING_CLOUD_LIBRARY.equals(library)) {
 
