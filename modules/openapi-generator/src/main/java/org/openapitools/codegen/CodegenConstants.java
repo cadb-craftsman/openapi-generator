@@ -49,6 +49,15 @@ public class CodegenConstants {
     public static final String MODEL_PACKAGE = "modelPackage";
     public static final String MODEL_PACKAGE_DESC = "package for generated models";
 
+    public static final String SERVICE_PACKAGE = "servicePackage";
+    public static final String SERVICE_PACKAGE_DESC = "package for generated services";
+
+    public static final String REPOSITORY_PACKAGE = "repositoryPackage";
+    public static final String REPOSITORY_PACKAGE_DESC = "package for generated package";
+    
+    public static final String WEBCLIENTS_PACKAGE = "webClientsPackage";
+    public static final String WEBCLIENTS_PACKAGE_DESC = "package for generated webclients";
+
     public static final String TEMPLATE_DIR = "templateDir";
 
     public static final String ALLOW_UNICODE_IDENTIFIERS = "allowUnicodeIdentifiers";

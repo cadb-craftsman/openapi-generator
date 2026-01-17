@@ -83,6 +83,24 @@ public interface CodegenConfig {
     String modelDocFileFolder();
 
     String modelPackage();
+    
+    String servicePackage();
+    
+    String serviceFileFolder();
+    
+    String serviceTestFileFolder();
+    
+    String repositoryPackage();
+    
+    String repositoryFileFolder();
+    
+    String repositoryTestFileFolder();
+    
+    String webClientsPackage();
+    
+    String webClientsFileFolder();
+    
+    String webClientsTestFileFolder();
 
     String toApiName(String name);
 
@@ -165,10 +183,22 @@ public interface CodegenConfig {
     Map<String, String> apiTemplateFiles();
 
     Map<String, String> modelTemplateFiles();
+    
+    Map<String, String> serviceTemplateFiles();
+    
+    Map<String, String> repositoryTemplateFiles();
+    
+    Map<String, String> webClientsTemplateFiles();
 
     Map<String, String> apiTestTemplateFiles();
 
     Map<String, String> modelTestTemplateFiles();
+    
+    Map<String, String> serviceTestTemplateFiles();
+    
+    Map<String, String> repositoryTestTemplateFiles();
+    
+    Map<String, String> webClientsTestTemplateFiles();
 
     Map<String, String> apiDocTemplateFiles();
 
@@ -189,10 +219,21 @@ public interface CodegenConfig {
     TemplatingEngineAdapter processTemplatingEngine(TemplatingEngineAdapter templatingEngine);
 
     String sanitizeTag(String tag);
+    
+    /***
+     * @Craftsman
+     * Definition of api, model, service, repository, webClients file name  
+     */
 
     String toApiFilename(String name);
 
     String toModelFilename(String name);
+
+    String toServiceFilename(String name);
+
+    String toRepositoryFilename(String name);
+
+    String toWebClientsFilename(String name);
 
     String toApiTestFilename(String name);
 
@@ -230,6 +271,11 @@ public interface CodegenConfig {
 
     void postProcessParameter(CodegenParameter parameter);
 
+    /***
+     * @Craftsman
+     * Definition of api, model, service, repository, webClients file name  
+     */
+
     String modelFilename(String templateName, String modelName);
 
     String modelFilename(String templateName, String modelName, String outputDir);
@@ -241,6 +287,18 @@ public interface CodegenConfig {
     String apiTestFilename(String templateName, String tag);
 
     String apiDocFilename(String templateName, String tag);
+
+    String serviceFilename(String templateName, String serviceName);
+
+    String serviceFilename(String templateName, String serviceName, String outputDir);
+
+    String repositoryFilename(String templateName, String repositoryName);
+
+    String repositoryFilename(String templateName, String repositoryName, String outputDir);
+    
+    String webClientsFilename(String templateName, String webClientsName);
+
+    String webClientsFilename(String templateName, String webClientsName, String outputDir);
 
     boolean shouldOverwrite(String filename);
 

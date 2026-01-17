@@ -190,7 +190,7 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> operationIdNameMapping = new HashMap<>();
     // a map to store the rules in OpenAPI Normalizer
     protected Map<String, String> openapiNormalizer = new HashMap<>();
-    @Setter protected String modelPackage = "", apiPackage = "";
+    @Setter protected String modelPackage = "", apiPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
     protected String fileSuffix;
     @Getter @Setter
     protected String modelNamePrefix = "", modelNameSuffix = "";
@@ -205,11 +205,20 @@ public class DefaultCodegen implements CodegenConfig {
     */
     protected Map<String, String> apiTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTemplateFiles = new HashMap<>();
+    protected Map<String, String> serviceTemplateFiles = new HashMap<>();
+    protected Map<String, String> repositoryTemplateFiles = new HashMap<>();
+    protected Map<String, String> webClientsTemplateFiles = new HashMap<>();
+    
     protected Map<String, String> apiTestTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTestTemplateFiles = new HashMap<>();
+    protected Map<String, String> serviceTestTemplateFiles = new HashMap<>();
+    protected Map<String, String> repositoryTestTemplateFiles = new HashMap<>();
+    protected Map<String, String> webClientsTestTemplateFiles = new HashMap<>();
+    
     protected Map<String, String> apiDocTemplateFiles = new HashMap<>();
     protected Map<String, String> modelDocTemplateFiles = new HashMap<>();
     protected Map<String, String> reservedWordsMappings = new HashMap<>();
+    
     @Setter protected String templateDir;
     protected String embeddedTemplateDir;
     protected Map<String, Object> additionalProperties = new HashMap<>();
@@ -225,8 +234,10 @@ public class DefaultCodegen implements CodegenConfig {
     protected List<CliOption> cliOptions = new ArrayList<>();
     protected boolean skipOverwrite;
     protected boolean removeOperationIdPrefix;
+    
     @Getter @Setter
     protected String removeOperationIdPrefixDelimiter = "_";
+    
     @Getter @Setter
     protected int removeOperationIdPrefixCount = 1;
     protected boolean skipOperationExample;
@@ -373,6 +384,9 @@ public class DefaultCodegen implements CodegenConfig {
         convertPropertyToStringAndWriteBack(CodegenConstants.TEMPLATE_DIR, this::setTemplateDir);
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.WEBCLIENTS_PACKAGE, this::setWebClientsPackage);
 
         convertPropertyToBooleanAndWriteBack(CodegenConstants.HIDE_GENERATION_TIMESTAMP, this::setHideGenerationTimestamp);
         // put the value back in additionalProperties for backward compatibility with generators not using yet convertPropertyToBooleanAndWriteBack
@@ -1321,6 +1335,21 @@ public class DefaultCodegen implements CodegenConfig {
     public String apiPackage() {
         return apiPackage;
     }
+    
+	@Override
+	public String servicePackage() {		
+		return servicePackage;
+	}
+
+	@Override
+	public String repositoryPackage() {
+		return repositoryPackage;
+	}
+
+	@Override
+	public String webClientsPackage() {
+		return webClientsPackage;
+	}
 
     @Override
     public String fileSuffix() {
@@ -1375,6 +1404,36 @@ public class DefaultCodegen implements CodegenConfig {
     public Map<String, String> modelTemplateFiles() {
         return modelTemplateFiles;
     }
+    
+	@Override
+	public Map<String, String> serviceTemplateFiles() {
+		return serviceTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> repositoryTemplateFiles() {
+		return repositoryTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> webClientsTemplateFiles() {
+		return webClientsTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> serviceTestTemplateFiles() {
+        return serviceTestTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> repositoryTestTemplateFiles() {
+        return repositoryTestTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> webClientsTestTemplateFiles() {
+        return webClientsTestTemplateFiles;
+	}
 
     @Override
     public String apiFileFolder() {
@@ -1385,6 +1444,21 @@ public class DefaultCodegen implements CodegenConfig {
     public String modelFileFolder() {
         return outputFolder + File.separator + modelPackage().replace('.', File.separatorChar);
     }
+    
+	@Override
+	public String serviceFileFolder() {
+        return outputFolder + File.separator + servicePackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String repositoryFileFolder() {
+		return outputFolder + File.separator + repositoryPackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String webClientsFileFolder() {
+		return outputFolder + File.separator + webClientsPackage().replace('.', File.separatorChar);
+	}
 
     @Override
     public String apiTestFileFolder() {
@@ -1395,6 +1469,21 @@ public class DefaultCodegen implements CodegenConfig {
     public String modelTestFileFolder() {
         return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
     }
+    
+	@Override
+	public String serviceTestFileFolder() {
+        return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String repositoryTestFileFolder() {
+		return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String webClientsTestFileFolder() {
+		return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
+	}
 
     @Override
     public String apiDocFileFolder() {
@@ -1551,6 +1640,39 @@ public class DefaultCodegen implements CodegenConfig {
         return camelize(name);
     }
 
+    /**
+     * Return the capitalized file name of the model
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toServiceFilename(String name) {
+        return camelize(name);
+    }
+    
+    /**
+     * Return the capitalized file name of the model
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toRepositoryFilename(String name) {
+        return camelize(name);
+    }
+    
+    /**
+     * Return the capitalized file name of the model
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toWebClientsFilename(String name) {
+        return camelize(name);
+    }
+    
     /**
      * Return the capitalized file name of the model test
      *
@@ -6307,7 +6429,11 @@ public class DefaultCodegen implements CodegenConfig {
     }
 
     private final Map<String, String> seenApiFilenames = new HashMap<String, String>();
-
+    
+    /***
+     * @Craftsman
+     * Implementation of api, model, service, repository, webClients file name  
+     */
     @Override
     public String apiFilename(String templateName, String tag) {
         String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
@@ -6337,6 +6463,49 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = modelTemplateFiles().get(templateName);
         return outputDir + File.separator + toModelFilename(uniqueModelName) + suffix;
     }
+    
+	@Override
+	public String serviceFilename(String templateName, String serviceName) {
+        String uniqueServiceName = uniqueCaseInsensitiveString(serviceName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return modelFileFolder() + File.separator + toServiceFilename(uniqueServiceName) + suffix;
+	}
+
+	@Override
+	public String serviceFilename(String templateName, String serviceName, String outputDir) {
+        String uniqueServiceName = uniqueCaseInsensitiveString(serviceName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return outputDir + File.separator + toServiceFilename(uniqueServiceName) + suffix;
+	}
+
+	@Override
+	public String repositoryFilename(String templateName, String repositoryName) {
+        String uniqueRepositoryName = uniqueCaseInsensitiveString(repositoryName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return modelFileFolder() + File.separator + toRepositoryFilename(uniqueRepositoryName) + suffix;
+	}
+
+	@Override
+	public String repositoryFilename(String templateName, String repositoryName, String outputDir) {
+        String uniqueRepositoryName = uniqueCaseInsensitiveString(repositoryName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return outputDir + File.separator + toRepositoryFilename(uniqueRepositoryName) + suffix;
+	}
+
+	@Override
+	public String webClientsFilename(String templateName, String webClientsName) {
+        String uniqueWebClientsName = uniqueCaseInsensitiveString(webClientsName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return modelFileFolder() + File.separator + toWebClientsFilename(uniqueWebClientsName) + suffix;
+	}
+
+	@Override
+	public String webClientsFilename(String templateName, String webClientsName, String outputDir) {
+        String uniqueWebClientsName = uniqueCaseInsensitiveString(webClientsName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return outputDir + File.separator + toWebClientsFilename(uniqueWebClientsName) + suffix;
+	}    
+    
 
     private final Map<String, String> seenApiDocFilenames = new HashMap<String, String>();
 

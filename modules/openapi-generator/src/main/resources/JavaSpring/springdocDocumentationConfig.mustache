@@ -11,7 +11,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
-public class {{classname}}Config {
+public class SpringBootDocConfig {
 
     @Bean(name = "{{configPackage}}.SpringDocConfiguration.apiInfo")
     OpenAPI apiInfo() {
@@ -51,4 +51,14 @@ public class {{classname}}Config {
                 ){{/hasAuthMethods}}
         ;
     }
+    
+    @Bean
+    {{classname}}FactoryMapperImpl getFactoryMapper() {
+	return new {{classname}}FactoryMapperImpl();
+    }
+
+    @Bean
+    {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, SpringBootWebClientProperties clientProperties) {
+        return new {{classname}}WebClient(webClients.get(clientProperties.getClients().get(0).name()), clientProperties.getClients().get(0));
+    }    
 }

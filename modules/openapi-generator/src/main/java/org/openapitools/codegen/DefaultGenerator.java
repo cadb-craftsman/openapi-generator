@@ -712,6 +712,9 @@ public class DefaultGenerator implements Generator {
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
                 operation.put("modelPackage", config.modelPackage());
+                operation.put("servicePackage", config.servicePackage());
+                operation.put("repositoryPackage", config.repositoryPackage());
+                operation.put("webClientsPackage", config.webClientsPackage());
                 operation.putAll(config.additionalProperties());
                 operation.put("classname", config.toApiName(tag));
                 operation.put("classVarName", config.toApiVarName(tag));
