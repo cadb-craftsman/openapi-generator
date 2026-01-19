@@ -112,6 +112,7 @@ public class DefaultGenerator implements Generator {
     public Generator opts(ClientOptInput opts) {
         this.opts = opts;
         this.openAPI = opts.getOpenAPI();
+        this.openAPI.setOpenapi("3.0.4");
         this.config = opts.getConfig();
 
         List<TemplateDefinition> userFiles = opts.getUserDefinedTemplates();
@@ -233,6 +234,7 @@ public class DefaultGenerator implements Generator {
 
         config.additionalProperties().put(CodegenConstants.GENERATE_APIS, generateApis);
         config.additionalProperties().put(CodegenConstants.GENERATE_MODELS, generateModels);
+
         config.additionalProperties().put(CodegenConstants.GENERATE_WEBHOOKS, generateWebhooks);
         config.additionalProperties().put(CodegenConstants.GENERATE_RECURSIVE_DEPENDENT_MODELS, generateRecursiveDependentModels);
 
@@ -547,7 +549,11 @@ public class DefaultGenerator implements Generator {
         // generate files based on processed models
         for (String modelName : allProcessedModels.keySet()) {
             ModelsMap models = allProcessedModels.get(modelName);
+            
             models.put("modelPackage", config.modelPackage());
+            //models.put("modelServicePackage", config.modelServicePackage());
+            //models.put("modelPersistencePackage", config.modelPersistencePackage());
+            
             try {
                 //don't generate models that have a schema mapping
                 if (config.schemaMapping().containsKey(modelName)) {
@@ -712,6 +718,10 @@ public class DefaultGenerator implements Generator {
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
                 operation.put("modelPackage", config.modelPackage());
+                
+                operation.put("modelServicePackage", config.modelServicePackage());
+                operation.put("modelPersistencePackage", config.modelPersistencePackage());
+                
                 operation.put("servicePackage", config.servicePackage());
                 operation.put("repositoryPackage", config.repositoryPackage());
                 operation.put("webClientsPackage", config.webClientsPackage());
@@ -874,6 +884,11 @@ public class DefaultGenerator implements Generator {
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
                 operation.put("modelPackage", config.modelPackage());
+                
+                operation.put("modelServicePackage", config.modelServicePackage());
+                operation.put("modelPersistencePackage", config.modelPersistencePackage());
+                
+                
                 operation.putAll(config.additionalProperties());
                 operation.put("classname", config.toApiName(tag));
                 operation.put("classVarName", config.toApiVarName(tag));
@@ -1168,6 +1183,10 @@ public class DefaultGenerator implements Generator {
         bundle.put("aliasModels", aliasModels);
         bundle.put("apiFolder", config.apiPackage().replace('.', File.separatorChar));
         bundle.put("modelPackage", config.modelPackage());
+        
+        bundle.put("modelServicePackage", config.modelServicePackage());
+        bundle.put("modelPersistencePackage", config.modelPersistencePackage());
+
         bundle.put("library", config.getLibrary());
         bundle.put("generatorLanguageVersion", config.generatorLanguageVersion());
         // todo verify support and operation bundles have access to the common variables

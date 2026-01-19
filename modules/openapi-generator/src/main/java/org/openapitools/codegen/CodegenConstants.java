@@ -49,6 +49,13 @@ public class CodegenConstants {
     public static final String MODEL_PACKAGE = "modelPackage";
     public static final String MODEL_PACKAGE_DESC = "package for generated models";
 
+    public static final String MODEL_SERVICE_PACKAGE = "modelServicePackage";
+    public static final String MODEL_SERVICE_PACKAGE_DESC = "package for generated models";
+
+    public static final String MODEL_PERSISTENCE_PACKAGE = "modelPersistencePackage";
+    public static final String MODEL_PERSISTENCE_PACKAGE_DESC = "package for generated models";
+
+    
     public static final String SERVICE_PACKAGE = "servicePackage";
     public static final String SERVICE_PACKAGE_DESC = "package for generated services";
 

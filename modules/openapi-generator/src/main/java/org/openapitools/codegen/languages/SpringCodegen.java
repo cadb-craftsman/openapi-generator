@@ -213,6 +213,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		embeddedTemplateDir = templateDir = "JavaSpring";
 		apiPackage = "org.openapitools.api";
 		modelPackage = "org.openapitools.model";
+		modelServicePackage = "org.openapitools.model.service";
+		modelPersistencePackage = "org.openapitools.model.persistence";
 		servicePackage = "org.openapitools.service";
 		repositoryPackage = "org.openapitools.repository";
 		webClientsPackage = "org.openapitools.webclients";
@@ -224,6 +226,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		updateOption(CodegenConstants.ARTIFACT_ID, this.getArtifactId());
 		updateOption(CodegenConstants.API_PACKAGE, apiPackage);
 		updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
+		updateOption(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
+		updateOption(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
 		updateOption(CodegenConstants.SERVICE_PACKAGE, servicePackage);
 		updateOption(CodegenConstants.REPOSITORY_PACKAGE, repositoryPackage);
 		updateOption(CodegenConstants.WEBCLIENTS_PACKAGE, webClientsPackage);
@@ -561,20 +565,19 @@ public class SpringCodegen extends AbstractJavaCodegen
 				supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache",
 						(sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator),
 						"RFC3339DateFormat.java"));
-				/*
-				 * supportingFiles.add(new SupportingFile("service.mustache", (sourceFolder +
-				 * File.separator + basePackage).replace(".", java.io.File.separator),
-				 * "Service.java"));
-				 */
-				supportingFiles.add(new SupportingFile("serviceImpl.mustache",
-						(sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator),
-						"ServiceImpl.java"));
-
-				/*
-				 * supportingFiles.add(new SupportingFile("repository.mustache", (sourceFolder +
-				 * File.separator + basePackage).replace(".", java.io.File.separator),
-				 * "Repository.java"));
-				 */
+				supportingFiles.add(new SupportingFile("service.mustache",
+						(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
+						"Service.java"));
+				//supportingFiles.add(new SupportingFile("serviceImpl.mustache",
+				//		(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
+				//		"ServiceImpl.java"));
+				//supportingFiles.add(new SupportingFile("repository.mustache",
+				//		(sourceFolder + File.separator + repositoryPackage).replace(".", java.io.File.separator),
+				//		"Repository.java"));
+				supportingFiles.add(new SupportingFile("webclients.mustache",
+						(sourceFolder + File.separator + webClientsPackage).replace(".", java.io.File.separator),
+						"WebClients.java"));				
+				 
 			}
 			if (SPRING_CLOUD_LIBRARY.equals(library)) {
 
@@ -605,20 +608,27 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 				apiTemplateFiles.put("apiController.mustache", "Controller.java");
 				serviceTemplateFiles.put("serviceImpl.mustache", "ServiceImpl.java");
-				repositoryTemplateFiles.put("repository.mustache", "Repository.java");
-				webClientsTemplateFiles.put("webclients.mustache", "WebClients.java");
+				//repositoryTemplateFiles.put("repository.mustache", "Repository.java");
+				//webClientsTemplateFiles.put("webclients.mustache", "WebClients.java");
 				
 				// @Application with yml extension
 				// supportingFiles.add(new SupportingFile("application.mustache",
 				// ("src.main.resources").replace(".", java.io.File.separator),
 				// "application.properties"));
+			    /***
+			     * @Craftsman
+			     * Import application.mustache and generate application.yml  
+			     */
 				supportingFiles.add(new SupportingFile("application.mustache",
 						("src.main.resources").replace(".", java.io.File.separator), "application.yml"));
+
 				supportingFiles.add(new SupportingFile("homeController.mustache",
-						(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-						"HomeController.java"));
+						(sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator),
+						"HttpController.java"));
+				
 				supportingFiles.add(new SupportingFile("openapi.mustache",
 						("src/main/resources").replace("/", java.io.File.separator), "openapi.yaml"));
+				
 				if (!reactive && !apiFirst) {
 				    /***
 				     * @Craftsman
@@ -1304,5 +1314,23 @@ public class SpringCodegen extends AbstractJavaCodegen
 		extensions.add(VendorExtension.X_MAXIMUM_MESSAGE);
 		extensions.add(VendorExtension.X_SPRING_API_VERSION);
 		return extensions;
+	}
+
+	@Override
+	public String toServiceName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toRepositoryName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toWebClientsName(String name) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -84,6 +84,10 @@ public interface CodegenConfig {
 
     String modelPackage();
     
+    String modelServicePackage();
+    
+    String modelPersistencePackage();
+    
     String servicePackage();
     
     String serviceFileFolder();
@@ -107,6 +111,12 @@ public interface CodegenConfig {
     String toApiVarName(String name);
 
     String toModelName(String name);
+    
+    String toServiceName(String name);
+    
+    String toRepositoryName(String name);
+    
+    String toWebClientsName(String name);
 
     String toParamName(String name);
 
@@ -238,6 +248,12 @@ public interface CodegenConfig {
     String toApiTestFilename(String name);
 
     String toModelTestFilename(String name);
+
+    String toServiceTestFilename(String name);
+
+    String toRepositoryTestFilename(String name);
+    
+    String toWebClientsTestFilename(String name);
 
     String toApiDocFilename(String name);
 

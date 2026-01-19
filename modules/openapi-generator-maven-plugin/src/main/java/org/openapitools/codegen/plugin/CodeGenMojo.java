@@ -212,6 +212,30 @@ public class CodeGenMojo extends AbstractMojo {
      */
     @Parameter(name = "modelPackage", property = "openapi.generator.maven.plugin.modelPackage")
     private String modelPackage;
+    
+    /**
+     * The package to use for generated modelService objects/classes
+     */
+    @Parameter(name = "modelServicePackage", property = "openapi.generator.maven.plugin.modelServicePackage")
+    private String modelServicePackage;
+    
+    /**
+     * The package to use for generated modelService objects/classes
+     */
+    @Parameter(name = "modelPersistencePackage", property = "openapi.generator.maven.plugin.modelPersistencePackage")
+    private String modelPersistencePackage;
+    
+    /**
+     * The package to use for generated service objects/classes
+     */
+    @Parameter(name = "servicePackage", property = "openapi.generator.maven.plugin.servicePackage")
+    private String servicePackage;
+    
+    /**
+     * The package to use for generated repository objects/classes
+     */
+    @Parameter(name = "repositoryPackage", property = "openapi.generator.maven.plugin.repositoryPackage")
+    private String repositoryPackage;
 
     /**
      * The package to use for the generated invoker objects
@@ -728,6 +752,22 @@ public class CodeGenMojo extends AbstractMojo {
             if (isNotEmpty(modelPackage)) {
                 configurator.setModelPackage(modelPackage);
             }
+            
+            if (isNotEmpty(modelServicePackage)) {
+                configurator.setModelServicePackage(modelServicePackage);
+            }
+            
+            if (isNotEmpty(modelPersistencePackage)) {
+                configurator.setModelPersistencePackage(modelPersistencePackage);
+            }
+            
+            if (isNotEmpty(servicePackage)) {
+                configurator.setServicePackage(servicePackage);
+            }
+            
+            if (isNotEmpty(repositoryPackage)) {
+                configurator.setRepositoryPackage(repositoryPackage);
+            }            
 
             if (isNotEmpty(invokerPackage)) {
                 configurator.setInvokerPackage(invokerPackage);

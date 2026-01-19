@@ -39,7 +39,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
  * Home redirection to OpenAPI api documentation
  */
 @Controller
-public class HomeController {
+public class HttpController {
 {{#sourceDocumentationProvider}}
 
     private static YAMLMapper yamlMapper = new YAMLMapper();
@@ -94,10 +94,16 @@ public class HomeController {
 {{/reactive}}
 {{^reactive}}
 
-    @RequestMapping("/")
-    public String index() {
-        return "redirect:swagger-ui.html";
-    }
+	/**
+	 * Index.
+	 *
+	 * @return the string
+	 */
+	@GetMapping("/")	
+	public String index() {
+		return "/openapi/swagger-ui.html";
+	}
+
 {{/reactive}}
 {{/useSwaggerUI}}
 

@@ -236,6 +236,11 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         supportsInheritance = true;
         modelTemplateFiles.put("model.mustache", ".java");
         apiTemplateFiles.put("api.mustache", ".java");
+        
+        serviceTemplateFiles.put("service.mustache", ".java");
+        repositoryTemplateFiles.put("repository.mustache", ".java");
+        webClientsTemplateFiles.put("webclients.mustache", ".java");
+        
         apiTestTemplateFiles.put("api_test.mustache", ".java");
         modelDocTemplateFiles.put("model_doc.mustache", ".md");
         apiDocTemplateFiles.put("api_doc.mustache", ".md");
@@ -300,6 +305,9 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
         cliOptions.add(new CliOption(CodegenConstants.MODEL_PACKAGE, CodegenConstants.MODEL_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.API_PACKAGE, CodegenConstants.API_PACKAGE_DESC));
+        cliOptions.add(new CliOption(CodegenConstants.SERVICE_PACKAGE, CodegenConstants.SERVICE_PACKAGE_DESC));
+        cliOptions.add(new CliOption(CodegenConstants.REPOSITORY_PACKAGE, CodegenConstants.REPOSITORY_PACKAGE_DESC));
+        cliOptions.add(new CliOption(CodegenConstants.WEBCLIENTS_PACKAGE, CodegenConstants.WEBCLIENTS_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.INVOKER_PACKAGE, CodegenConstants.INVOKER_PACKAGE_DESC).defaultValue(this.getInvokerPackage()));
         cliOptions.add(new CliOption(CodegenConstants.GROUP_ID, CodegenConstants.GROUP_ID_DESC).defaultValue(this.getGroupId()));
         cliOptions.add(new CliOption(CodegenConstants.ARTIFACT_ID, CodegenConstants.ARTIFACT_ID_DESC).defaultValue(this.getArtifactId()));
@@ -316,6 +324,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         cliOptions.add(new CliOption(CodegenConstants.LICENSE_NAME, CodegenConstants.LICENSE_NAME_DESC).defaultValue(this.getLicenseName()));
         cliOptions.add(new CliOption(CodegenConstants.LICENSE_URL, CodegenConstants.LICENSE_URL_DESC).defaultValue(this.getLicenseUrl()));
         cliOptions.add(new CliOption(CodegenConstants.SOURCE_FOLDER, CodegenConstants.SOURCE_FOLDER_DESC).defaultValue(this.getSourceFolder()));
+
         cliOptions.add(CliOption.newBoolean(CodegenConstants.SERIALIZABLE_MODEL, CodegenConstants.SERIALIZABLE_MODEL_DESC, this.getSerializableModel()));
         cliOptions.add(CliOption.newBoolean(CodegenConstants.SERIALIZE_BIG_DECIMAL_AS_STRING, CodegenConstants.SERIALIZE_BIG_DECIMAL_AS_STRING_DESC, serializeBigDecimalAsString));
         cliOptions.add(CliOption.newBoolean(DISCRIMINATOR_CASE_SENSITIVE, "Whether the discriminator value lookup should be case-sensitive or not. This option only works for Java API client", discriminatorCaseSensitive));
@@ -471,7 +480,19 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         if (!additionalProperties.containsKey(CodegenConstants.API_PACKAGE)) {
             additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
         }
+        
+        if (!additionalProperties.containsKey(CodegenConstants.SERVICE_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.SERVICE_PACKAGE, servicePackage);
+        }
 
+        if (!additionalProperties.containsKey(CodegenConstants.REPOSITORY_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.REPOSITORY_PACKAGE, repositoryPackage);
+        }        
+
+        if (!additionalProperties.containsKey(CodegenConstants.WEBCLIENTS_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.WEBCLIENTS_PACKAGE, repositoryPackage);
+        }        
+        
         if (additionalProperties.containsKey(CodegenConstants.GROUP_ID)) {
             this.setGroupId((String) additionalProperties.get(CodegenConstants.GROUP_ID));
         } else {
@@ -542,6 +563,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.WEBCLIENTS_PACKAGE, this::setWebClientsPackage);
+        
         convertPropertyToStringAndWriteBack(CodegenConstants.GROUP_ID, this::setGroupId);
         convertPropertyToStringAndWriteBack(CodegenConstants.ARTIFACT_ID, this::setArtifactId);
         convertPropertyToStringAndWriteBack(CodegenConstants.ARTIFACT_URL, this::setArtifactUrl);
@@ -809,11 +834,20 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     private void sanitizeConfig() {
         // Sanitize any config options here. We also have to update the additionalProperties because
         // the whole additionalProperties object is injected into the main object passed to the mustache layer
-
+	    /***
+	     * @Craftsman
+	     * Sanitize package name of service, repository and webcllients.
+	     */
         this.setApiPackage(sanitizePackageName(apiPackage));
         additionalProperties.remove(CodegenConstants.API_PACKAGE);
         this.setModelPackage(sanitizePackageName(modelPackage));
         additionalProperties.remove(CodegenConstants.MODEL_PACKAGE);
+        this.setServicePackage(sanitizePackageName(servicePackage));
+        additionalProperties.remove(CodegenConstants.SERVICE_PACKAGE);
+        this.setRepositoryPackage(sanitizePackageName(repositoryPackage));
+        additionalProperties.remove(CodegenConstants.REPOSITORY_PACKAGE);
+        this.setWebClientsPackage(sanitizePackageName(webClientsPackage));
+        additionalProperties.remove(CodegenConstants.WEBCLIENTS_PACKAGE);
         this.setInvokerPackage(sanitizePackageName(invokerPackage));
         additionalProperties.remove(CodegenConstants.INVOKER_PACKAGE);
     }
@@ -834,6 +868,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         return "_" + name;
     }
 
+    /***
+     * @Craftsman
+     * Generate package api, model, service, repository and webcllients.
+     */
     @Override
     public String apiFileFolder() {
         return (outputFolder + File.separator + sourceFolder + File.separator + apiPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
@@ -853,6 +891,36 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     public String modelFileFolder() {
         return (outputFolder + File.separator + sourceFolder + File.separator + modelPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
+    
+    @Override
+    public String serviceTestFileFolder() {
+        return (outputTestFolder + File.separator + testFolder + File.separator + servicePackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+
+    @Override
+    public String serviceFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + servicePackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+    
+    @Override
+    public String repositoryTestFileFolder() {
+        return (outputTestFolder + File.separator + testFolder + File.separator + repositoryPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+
+    @Override
+    public String repositoryFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + repositoryPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+    
+    @Override
+    public String webClientsTestFileFolder() {
+        return (outputTestFolder + File.separator + testFolder + File.separator + webClientsPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+
+    @Override
+    public String webClientsFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + webClientsPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }    
 
     @Override
     public String apiDocFileFolder() {
@@ -872,8 +940,23 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     @Override
     public String toModelDocFilename(String name) {
         return toModelName(name);
-    }
+    } 
 
+    @Override
+    public String toServiceFilename(String name) {
+        return toServiceName(name);
+    } 
+
+    @Override
+    public String toRepositoryFilename(String name) {
+        return toRepositoryName(name);
+    } 
+    
+    @Override
+    public String toWebClientsFilename(String name) {
+        return toWebClientsName(name);
+    } 
+    
     @Override
     public String toApiTestFilename(String name) {
         return toApiName(name) + "Test";
@@ -883,6 +966,21 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     public String toModelTestFilename(String name) {
         return toModelName(name) + "Test";
     }
+    
+    @Override
+    public String toServiceTestFilename(String name) {
+        return toServiceName(name) + "Test";
+    }
+    
+    @Override
+    public String toRepositoryTestFilename(String name) {
+        return toRepositoryName(name) + "Test";
+    }
+    
+    @Override
+    public String toWebClientsTestFilename(String name) {
+        return toWebClientsName(name) + "Test";
+    }     
 
     @Override
     public String toApiFilename(String name) {

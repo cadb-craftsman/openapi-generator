@@ -184,18 +184,39 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> parameterNameMapping = new HashMap<>();
     // a map to store the mapping between model name and the name provided by the user
     protected Map<String, String> modelNameMapping = new HashMap<>();
+
+    /***
+     * @Craftsman
+     * Add mappings for service, repository and webClients.  
+     */
+    // a map to store the mapping between service name and the name provided by the user
+    protected Map<String, String> serviceNameMapping = new HashMap<>();
+    // a map to store the mapping between service name and the name provided by the user
+    protected Map<String, String> repositoryNameMapping = new HashMap<>();
+    // a map to store the mapping between service name and the name provided by the user
+    protected Map<String, String> webClientsNameMapping = new HashMap<>();
+
     // a map to store the mapping between enum name and the name provided by the user
     protected Map<String, String> enumNameMapping = new HashMap<>();
     // a map to store the mapping between operation id name and the name provided by the user
     protected Map<String, String> operationIdNameMapping = new HashMap<>();
     // a map to store the rules in OpenAPI Normalizer
     protected Map<String, String> openapiNormalizer = new HashMap<>();
-    @Setter protected String modelPackage = "", apiPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
+    @Setter protected String modelPackage = "", modelServicePackage = "", modelPersistencePackage = "", apiPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
     protected String fileSuffix;
     @Getter @Setter
     protected String modelNamePrefix = "", modelNameSuffix = "";
     @Getter @Setter
     protected String apiNamePrefix = "", apiNameSuffix = "Api";
+
+    @Getter @Setter
+    protected String serviceNamePrefix = "", serviceNameSuffix = "";
+    @Getter @Setter
+    protected String repositoryNamePrefix = "", repositoryNameSuffix = "";
+    @Getter @Setter
+    protected String webClientsNamePrefix = "", webClientsNameSuffix = "";
+
+    
     protected String testPackage = "";
     @Setter protected String filesMetadataFilename = "FILES";
     @Setter protected String versionMetadataFilename = "VERSION";
@@ -332,7 +353,19 @@ public class DefaultCodegen implements CodegenConfig {
 
     // A cache to efficiently lookup schema `toModelName()` based on the schema Key
     private final Map<String, String> schemaKeyToModelNameCache = new HashMap<>();
+    
+    /***
+     * @Craftsman
+     * Add cache for service, repository and webClients  
+     */
+    // A cache to efficiently lookup schema `toServiceName()` based on the schema Key
+    private final Map<String, String> schemaKeyToServiceNameCache = new HashMap<>();
 
+    // A cache to efficiently lookup schema `toRepositoryName()` based on the schema Key
+    private final Map<String, String> schemaKeyToRepositoryNameCache = new HashMap<>();
+
+    // A cache to efficiently lookup schema `toWebClientsName()` based on the schema Key
+    private final Map<String, String> schemaKeyToWebClientsNameCache = new HashMap<>();
     protected boolean loadDeepObjectIntoItems = true;
 
     // if true then baseTypes will be imported
@@ -1330,6 +1363,16 @@ public class DefaultCodegen implements CodegenConfig {
     public String modelPackage() {
         return modelPackage;
     }
+    
+	@Override
+	public String modelServicePackage() {
+        return modelServicePackage;
+	}
+
+	@Override
+	public String modelPersistencePackage() {
+        return modelPersistencePackage;
+	}    
 
     @Override
     public String apiPackage() {
@@ -1681,6 +1724,39 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toModelTestFilename(String name) {
+        return camelize(name) + "Test";
+    }
+    
+    /**
+     * Return the capitalized file name of the model test
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toServiceTestFilename(String name) {
+        return camelize(name) + "Test";
+    }
+    
+    /**
+     * Return the capitalized file name of the model test
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toRepositoryTestFilename(String name) {
+        return camelize(name) + "Test";
+    }
+    
+    /**
+     * Return the capitalized file name of the model test
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toWebClientsTestFilename(String name) {
         return camelize(name) + "Test";
     }
 
@@ -2751,6 +2827,78 @@ public class DefaultCodegen implements CodegenConfig {
         schemaKeyToModelNameCache.put(name, camelizedName);
         return camelizedName;
     }
+    
+    /**
+     * Converts the OpenAPI schema name to a service name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */	
+    @Override
+	public String toServiceName(String name) {
+         // obtain the name from serviceNameMapping directly if provided
+         if (serviceNameMapping.containsKey(name)) {
+             return serviceNameMapping.get(name);
+         }
+
+         if (schemaKeyToServiceNameCache.containsKey(name)) {
+             return schemaKeyToServiceNameCache.get(name);
+         }
+
+         String camelizedName = camelize(serviceNamePrefix + "_" + name + "_" + serviceNameSuffix);
+         schemaKeyToServiceNameCache.put(name, camelizedName);
+         return camelizedName;
+	}
+
+    /**
+     * Converts the OpenAPI schema name to a repository name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */	    
+	@Override
+	public String toRepositoryName(String name) {
+        // obtain the name from serviceNameMapping directly if provided
+        if (repositoryNameMapping.containsKey(name)) {
+            return repositoryNameMapping.get(name);
+        }
+
+        if (schemaKeyToRepositoryNameCache.containsKey(name)) {
+            return schemaKeyToRepositoryNameCache.get(name);
+        }
+
+        String camelizedName = camelize(repositoryNamePrefix + "_" + name + "_" + repositoryNameSuffix);
+        schemaKeyToRepositoryNameCache.put(name, camelizedName);
+        return camelizedName;
+	}
+
+    /**
+     * Converts the OpenAPI schema name to a webClients name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */	
+	@Override
+	public String toWebClientsName(String name) {
+        // obtain the name from serviceNameMapping directly if provided
+        if (webClientsNameMapping.containsKey(name)) {
+            return webClientsNameMapping.get(name);
+        }
+
+        if (schemaKeyToWebClientsNameCache.containsKey(name)) {
+            return schemaKeyToWebClientsNameCache.get(name);
+        }
+
+        String camelizedName = camelize(webClientsNamePrefix + "_" + name + "_" + webClientsNameSuffix);
+        schemaKeyToWebClientsNameCache.put(name, camelizedName);
+        return camelizedName;
+	}
 
     private static class NamedSchema {
         private NamedSchema(String name, Schema s, boolean required, boolean schemaIsFromAdditionalProperties) {
