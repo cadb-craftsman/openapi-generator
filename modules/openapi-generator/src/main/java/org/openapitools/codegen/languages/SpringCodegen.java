@@ -101,6 +101,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String USE_SPRING_BUILT_IN_VALIDATION = "useSpringBuiltInValidation";
 	public static final String USE_DEDUCTION_FOR_ONE_OF_INTERFACES = "useDeductionForOneOfInterfaces";
 	public static final String SPRING_API_VERSION = "springApiVersion";
+	
+	public static final String REPOSITORY_HANDLERS_PACKAGE = ".handlers";
 
 	@Getter
 	public enum RequestMappingMode {
@@ -471,6 +473,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		convertPropertyToBooleanAndWriteBack(SINGLE_CONTENT_TYPES, this::setSingleContentTypes);
 		convertPropertyToBooleanAndWriteBack(SKIP_DEFAULT_INTERFACE, this::setSkipDefaultInterface);
 		convertPropertyToBooleanAndWriteBack(ASYNC, this::setAsync);
+		
 		if (additionalProperties.containsKey(REACTIVE)) {
 			if (SPRING_CLOUD_LIBRARY.equals(library)) {
 				throw new IllegalArgumentException("Currently, reactive option doesn't supported by Spring Cloud");
@@ -568,15 +571,27 @@ public class SpringCodegen extends AbstractJavaCodegen
 				supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache",
 						(sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator),
 						"RFC3339DateFormat.java"));
+			    /***
+			     * @Craftsman
+			     * Generate service, repository, repository handler and webclients packages.  
+			     */
 				supportingFiles.add(new SupportingFile("service.mustache",
 						(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
 						"Service.java"));
+				/*
 				supportingFiles.add(new SupportingFile("serviceImpl.mustache",
 						(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
 						"Impl.java"));
+				*/
 				supportingFiles.add(new SupportingFile("repository.mustache",
 						(sourceFolder + File.separator + repositoryPackage).replace(".", java.io.File.separator),
 						"Repository.java"));
+				supportingFiles.add(new SupportingFile("stringTrimTypeHandler.mustache",
+						(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
+						"StringTrimTypeHandler.java"));
+				supportingFiles.add(new SupportingFile("yesNoTypeHandler.mustache",
+						(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
+						"YesNoTypeHandler.java"));
 				supportingFiles.add(new SupportingFile("webclients.mustache",
 						(sourceFolder + File.separator + webClientsPackage).replace(".", java.io.File.separator),
 						"WebClients.java"));				
@@ -612,7 +627,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			} else if (SPRING_BOOT.equals(library)) {
 
 				apiTemplateFiles.put("apiController.mustache", "Controller.java");
-				//serviceTemplateFiles.put("serviceImpl.mustache", "ServiceImpl.java");
+				serviceTemplateFiles.put("serviceImpl.mustache", "Impl.java");
 				//repositoryTemplateFiles.put("repository.mustache", "Repository.java");
 				//webClientsTemplateFiles.put("webclients.mustache", "WebClients.java");
 				
