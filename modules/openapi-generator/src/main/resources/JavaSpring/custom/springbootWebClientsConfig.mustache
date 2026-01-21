@@ -1,0 +1,43 @@
+package {{configPackage}};
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+
+@Configuration
+public class SpringBootWebClientsConfig {
+
+    Map<String, WebClient> webClients = null;
+
+    @Bean("webClients")
+    Map<String, WebClient> getWebClients(SpringBootWebClientProperties clientProperties, WebClient.Builder webClientBuilder){
+        if(webClients == null) {
+            webClients = new HashMap<>();
+
+            for(KTemplateWebClientProperties.Client client: clientProperties.getClients()) {
+                if(client.trace()) {
+                    log.info(client.name() + " method url: " + client.url());
+                }
+
+                WebClient wc = webClientBuilder
+                        .baseUrl(client.url().toString())
+                        // NOTE clienConnector para llamadas https seguras
+                        //.clientConnector(clientConnector.getClientHttpConnector())
+                        //NOTE Only for more than 500BK
+                        //.exchangeStrategies(ExchangeStrategies.builder().codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(500 * 1024)).build())
+                        .build();
+
+                webClients.put(client.name(), wc);
+
+            }
+        }
+        return webClients;
+    }
+    
+}

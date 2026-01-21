@@ -1,0 +1,43 @@
+package {{configPackage}};
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.stream.Stream;
+
+import org.springframework.aot.hint.MemberCategory;
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.RuntimeHintsRegistrar;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * This configuration to use spring-native.
+ */
+@Configuration(proxyBeanMethods = false)
+@ImportRuntimeHints(SpringBootNativeConfig.SpringBootRuntimeHintsRegistrar.class)
+public class SpringBootNativeConfig {
+
+  static class SpringBootRuntimeHintsRegistrar implements RuntimeHintsRegistrar {
+	  
+	private String pkgCert = "{{configPackage}}.webclients.";
+
+    @Override
+    public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+      Stream.of(
+          ArrayList.class,
+          HashMap.class,
+          TreeSet.class,
+          HashSet.class
+      ).forEach(x -> hints.reflection().registerType(x, MemberCategory.values()));
+      
+      Stream.of(
+    		  pkgCert.replace(".","/").concat("cacerts.pem")
+          ).forEach(hints.resources()::registerPattern);     
+    }
+  }
+}

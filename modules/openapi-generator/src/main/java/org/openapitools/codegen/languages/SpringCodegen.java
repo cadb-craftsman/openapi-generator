@@ -103,6 +103,9 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String SPRING_API_VERSION = "springApiVersion";
 	
 	public static final String REPOSITORY_HANDLERS_PACKAGE = ".handlers";
+	
+	public static String TEMPLATE_DIR_CUSTOM = "";
+	public static String TEMPLATE_DIR_MYBATIS = "";
 
 	@Getter
 	public enum RequestMappingMode {
@@ -213,6 +216,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 		useBeanValidation = true;
 		outputFolder = "generated-code/javaSpring";
 		embeddedTemplateDir = templateDir = "JavaSpring";
+		//TEMPLATE_DIR_CUSTOM =  "src/main/resources/" + embeddedTemplateDir + "/libraries/spring-boot/custom/";
+		//TEMPLATE_DIR_MYBATIS = "src/main/resources/" + embeddedTemplateDir + "/libraries/spring-boot/mybatis/";
+		
+		String filePath = Objects.requireNonNull(getClass().getClassLoader().getResource(templateDir).getPath());
+		TEMPLATE_DIR_CUSTOM =   filePath + "/custom/";
+		TEMPLATE_DIR_MYBATIS =  filePath + "/mybatis/";
+		
 		apiPackage = "org.openapitools.api";
 		modelPackage = "org.openapitools.model";
 		modelServicePackage = "org.openapitools.model.service";
@@ -228,8 +238,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		updateOption(CodegenConstants.ARTIFACT_ID, this.getArtifactId());
 		updateOption(CodegenConstants.API_PACKAGE, apiPackage);
 		updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
-		updateOption(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
-		updateOption(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
+		//updateOption(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
+		//updateOption(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
 		updateOption(CodegenConstants.SERVICE_PACKAGE, servicePackage);
 		updateOption(CodegenConstants.REPOSITORY_PACKAGE, repositoryPackage);
 		updateOption(CodegenConstants.WEBCLIENTS_PACKAGE, webClientsPackage);
