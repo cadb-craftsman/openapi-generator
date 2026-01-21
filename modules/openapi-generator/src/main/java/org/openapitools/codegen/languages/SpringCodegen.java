@@ -549,7 +549,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 		supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
 
+		// If is different than interface
 		if (!interfaceOnly) {
+			
+			// If is Spring Cloud library
 			if (SPRING_BOOT.equals(library)) {
 				if (useSwaggerUI && selectedDocumentationProviderRequiresSwaggerUiBootstrap()) {
 					supportingFiles.add(
@@ -568,17 +571,18 @@ public class SpringCodegen extends AbstractJavaCodegen
 				supportingFiles.add(new SupportingFile("service.mustache",
 						(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
 						"Service.java"));
-				//supportingFiles.add(new SupportingFile("serviceImpl.mustache",
-				//		(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
-				//		"ServiceImpl.java"));
-				//supportingFiles.add(new SupportingFile("repository.mustache",
-				//		(sourceFolder + File.separator + repositoryPackage).replace(".", java.io.File.separator),
-				//		"Repository.java"));
+				supportingFiles.add(new SupportingFile("serviceImpl.mustache",
+						(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
+						"Impl.java"));
+				supportingFiles.add(new SupportingFile("repository.mustache",
+						(sourceFolder + File.separator + repositoryPackage).replace(".", java.io.File.separator),
+						"Repository.java"));
 				supportingFiles.add(new SupportingFile("webclients.mustache",
 						(sourceFolder + File.separator + webClientsPackage).replace(".", java.io.File.separator),
 						"WebClients.java"));				
-				 
 			}
+			
+			// If is Spring Cloud library 
 			if (SPRING_CLOUD_LIBRARY.equals(library)) {
 
 				supportingFiles.add(new SupportingFile("apiKeyRequestInterceptor.mustache",
@@ -604,10 +608,11 @@ public class SpringCodegen extends AbstractJavaCodegen
 				setRequestMappingMode(RequestMappingMode.none);
 				additionalProperties.put(USE_FEIGN_CLIENT, "true");
 
+			// Else if is Spring Boot library
 			} else if (SPRING_BOOT.equals(library)) {
 
 				apiTemplateFiles.put("apiController.mustache", "Controller.java");
-				serviceTemplateFiles.put("serviceImpl.mustache", "ServiceImpl.java");
+				//serviceTemplateFiles.put("serviceImpl.mustache", "ServiceImpl.java");
 				//repositoryTemplateFiles.put("repository.mustache", "Repository.java");
 				//webClientsTemplateFiles.put("webclients.mustache", "WebClients.java");
 				
@@ -634,8 +639,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 				     * @Craftsman
 				     * Add NativeConfig, WebClientsConfig and WebClientProperties class in Config package.  
 				     */
-
 					if (DocumentationProvider.SPRINGDOC.equals(getDocumentationProvider())) {
+						
 						supportingFiles.add(new SupportingFile("springdocDocumentationConfig.mustache",
 								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
 								"SpringBootDocConfig.java"));
@@ -648,6 +653,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 						supportingFiles.add(new SupportingFile("springbootWebClientsProperties.mustache",
 								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
 								"SpringBootWebClientsProperties.java"));
+						
 					} else if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
 						supportingFiles.add(new SupportingFile("openapiDocumentationConfig.mustache",
 								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
@@ -662,10 +668,15 @@ public class SpringCodegen extends AbstractJavaCodegen
 			}
 		}
 
+		
+	    /***
+	     * @Craftsman
+	     * We dont use this class for the generated project  
 		if (SPRING_BOOT.equals(library)) {
 			supportingFiles.add(new SupportingFile("apiUtil.mustache",
 					(sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "ApiUtil.java"));
 		}
+		*/
 
 		if (delegatePattern && !delegateMethod) {
 			additionalProperties.put("isDelegate", true);

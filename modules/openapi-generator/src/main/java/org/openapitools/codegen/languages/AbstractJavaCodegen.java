@@ -237,6 +237,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         modelTemplateFiles.put("model.mustache", ".java");
         apiTemplateFiles.put("api.mustache", ".java");
         
+	    /***
+	     * @Craftsman
+	     * Adds service, repository and webclients mustache templates  
+	     */
         serviceTemplateFiles.put("service.mustache", ".java");
         repositoryTemplateFiles.put("repository.mustache", ".java");
         webClientsTemplateFiles.put("webclients.mustache", ".java");
