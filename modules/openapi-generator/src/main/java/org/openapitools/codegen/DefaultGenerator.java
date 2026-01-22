@@ -551,8 +551,12 @@ public class DefaultGenerator implements Generator {
             ModelsMap models = allProcessedModels.get(modelName);
             
             models.put("modelPackage", config.modelPackage());
-            //models.put("modelServicePackage", config.modelServicePackage());
-            //models.put("modelPersistencePackage", config.modelPersistencePackage());
+		    /***
+		     * @Craftsman
+		     * Adds modelServicePackage and modelPersistencePackage in models procesos to generate differents package models.  
+		     */
+            models.put("modelServicePackage", config.modelServicePackage());
+            models.put("modelPersistencePackage", config.modelPersistencePackage());
             
             try {
                 //don't generate models that have a schema mapping
@@ -567,6 +571,7 @@ public class DefaultGenerator implements Generator {
                     if (modelTemplate != null && modelTemplate.getModel() != null) {
                         CodegenModel m = modelTemplate.getModel();
                         if (m.isAlias) {
+                        	System.out.println();
                             // alias to number, string, enum, etc, which should not be generated as model
                             // but aliases are still used to dereference models in some languages (such as in html2).
                             aliasModels.add(modelTemplate);  // Store aliases in the separate list.
@@ -731,6 +736,7 @@ public class DefaultGenerator implements Generator {
                 operation.put("importPath", config.toApiImport(tag));
                 operation.put("classFilename", config.toApiFilename(tag));
                 operation.put("strictSpecBehavior", config.isStrictSpecBehavior());
+                
                 Optional.ofNullable(openAPI.getInfo()).map(Info::getLicense).ifPresent(license -> operation.put("license", license));
                 Optional.ofNullable(openAPI.getInfo()).map(Info::getContact).ifPresent(contact -> operation.put("contact", contact));
 
