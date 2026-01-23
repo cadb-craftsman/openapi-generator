@@ -25,6 +25,9 @@ public class CodegenConstants {
     // NOTE: We may want to move these to a separate class to avoid confusion or modification.
     public static final String APIS = "apis";
     public static final String MODELS = "models";
+    public static final String SERVICES = "services";
+    public static final String REPOSITORIES = "repositories";
+    public static final String WEBCLIENTS = "webclients";
     public static final String GENERATE_RECURSIVE_DEPENDENT_MODELS = "generateRecursiveDependentModels";
     public static final String SUPPORTING_FILES = "supportingFiles";
     public static final String MODEL_TESTS = "modelTests";

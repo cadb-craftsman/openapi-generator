@@ -1,15 +1,16 @@
-package {{basePackage}}.repository;
+package {{basePackage}}.domain.mappers;
 
 {{#imports}}import {{import}};
 {{/imports}}
 import java.util.List;
-import java.util.Map;
 
-import org.apache.ibatis.annotations.Mapper;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 @Mapper
 {{#operations}}
-public interface {{classname}}Repository {
+public class {{classname}} {
 {{#operation}}
 
     {{#isDeprecated}}
@@ -17,6 +18,7 @@ public interface {{classname}}Repository {
     {{/isDeprecated}}
     {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
         {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
+
 {{/operation}}
 }
 {{/operations}}

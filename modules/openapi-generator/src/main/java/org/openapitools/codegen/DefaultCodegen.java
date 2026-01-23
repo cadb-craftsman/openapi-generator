@@ -208,7 +208,6 @@ public class DefaultCodegen implements CodegenConfig {
     protected String modelNamePrefix = "", modelNameSuffix = "";
     @Getter @Setter
     protected String apiNamePrefix = "", apiNameSuffix = "Api";
-
     @Getter @Setter
     protected String serviceNamePrefix = "", serviceNameSuffix = "";
     @Getter @Setter
@@ -1691,7 +1690,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toServiceFilename(String name) {
-        return camelize(name);
+        return toServiceName(name);
     }
     
     /**
@@ -1702,7 +1701,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toRepositoryFilename(String name) {
-        return camelize(name);
+        return toRepositoryName(name);
     }
     
     /**
@@ -1713,7 +1712,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toWebClientsFilename(String name) {
-        return camelize(name);
+        return toWebClientsName(name);
     }
     
     /**
@@ -1735,7 +1734,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toServiceTestFilename(String name) {
-        return camelize(name) + "Test";
+        return toServiceName(name) + "Test";
     }
     
     /**
@@ -1746,7 +1745,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toRepositoryTestFilename(String name) {
-        return camelize(name) + "Test";
+        return toRepositoryName(name) + "Test";
     }
     
     /**
@@ -1757,7 +1756,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     @Override
     public String toWebClientsTestFilename(String name) {
-        return camelize(name) + "Test";
+        return toWebClientsName(name) + "Test";
     }
 
     /**
@@ -2838,18 +2837,10 @@ public class DefaultCodegen implements CodegenConfig {
      */	
     @Override
 	public String toServiceName(String name) {
-         // obtain the name from serviceNameMapping directly if provided
-         if (serviceNameMapping.containsKey(name)) {
-             return serviceNameMapping.get(name);
-         }
-
-         if (schemaKeyToServiceNameCache.containsKey(name)) {
-             return schemaKeyToServiceNameCache.get(name);
-         }
-
-         String camelizedName = camelize(serviceNamePrefix + "_" + name + "_" + serviceNameSuffix);
-         schemaKeyToServiceNameCache.put(name, camelizedName);
-         return camelizedName;
+        if (name.length() == 0) {
+            return "DefaultSrv";
+        }
+        return camelize(serviceNamePrefix + "_" + name + "_" + serviceNameSuffix);
 	}
 
     /**
@@ -2862,18 +2853,10 @@ public class DefaultCodegen implements CodegenConfig {
      */	    
 	@Override
 	public String toRepositoryName(String name) {
-        // obtain the name from serviceNameMapping directly if provided
-        if (repositoryNameMapping.containsKey(name)) {
-            return repositoryNameMapping.get(name);
+        if (name.length() == 0) {
+            return "DefaultRepository";
         }
-
-        if (schemaKeyToRepositoryNameCache.containsKey(name)) {
-            return schemaKeyToRepositoryNameCache.get(name);
-        }
-
-        String camelizedName = camelize(repositoryNamePrefix + "_" + name + "_" + repositoryNameSuffix);
-        schemaKeyToRepositoryNameCache.put(name, camelizedName);
-        return camelizedName;
+        return camelize(repositoryNamePrefix + "_" + name + "_" + repositoryNameSuffix);
 	}
 
     /**
@@ -6613,47 +6596,46 @@ public class DefaultCodegen implements CodegenConfig {
     }
     
 	@Override
-	public String serviceFilename(String templateName, String serviceName) {
-        String uniqueServiceName = uniqueCaseInsensitiveString(serviceName, seenModelFilenames);
-        String suffix = modelTemplateFiles().get(templateName);
-        return modelFileFolder() + File.separator + toServiceFilename(uniqueServiceName) + suffix;
+	public String serviceFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = serviceTemplateFiles().get(templateName);
+        return serviceFileFolder() + File.separator + toServiceFilename(uniqueTag) + suffix;
 	}
 
 	@Override
-	public String serviceFilename(String templateName, String serviceName, String outputDir) {
-        String uniqueServiceName = uniqueCaseInsensitiveString(serviceName, seenModelFilenames);
-        String suffix = modelTemplateFiles().get(templateName);
-        return outputDir + File.separator + toServiceFilename(uniqueServiceName) + suffix;
+	public String serviceFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = serviceTemplateFiles().get(templateName);
+        return outputDir + File.separator + toServiceFilename(uniqueTag) + suffix;		
 	}
 
 	@Override
-	public String repositoryFilename(String templateName, String repositoryName) {
-        String uniqueRepositoryName = uniqueCaseInsensitiveString(repositoryName, seenModelFilenames);
-        String suffix = modelTemplateFiles().get(templateName);
-        return modelFileFolder() + File.separator + toRepositoryFilename(uniqueRepositoryName) + suffix;
+	public String repositoryFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryTemplateFiles().get(templateName);
+        return repositoryFileFolder() + File.separator + toRepositoryFilename(uniqueTag) + suffix;
 	}
 
 	@Override
-	public String repositoryFilename(String templateName, String repositoryName, String outputDir) {
-        String uniqueRepositoryName = uniqueCaseInsensitiveString(repositoryName, seenModelFilenames);
-        String suffix = modelTemplateFiles().get(templateName);
-        return outputDir + File.separator + toRepositoryFilename(uniqueRepositoryName) + suffix;
+	public String repositoryFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryTemplateFiles().get(templateName);
+        return outputDir + File.separator + toRepositoryFilename(uniqueTag) + suffix;			
 	}
 
 	@Override
-	public String webClientsFilename(String templateName, String webClientsName) {
-        String uniqueWebClientsName = uniqueCaseInsensitiveString(webClientsName, seenModelFilenames);
-        String suffix = modelTemplateFiles().get(templateName);
-        return modelFileFolder() + File.separator + toWebClientsFilename(uniqueWebClientsName) + suffix;
+	public String webClientsFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = webClientsTemplateFiles().get(templateName);
+        return webClientsFileFolder() + File.separator + toWebClientsFilename(uniqueTag) + suffix;
 	}
 
 	@Override
-	public String webClientsFilename(String templateName, String webClientsName, String outputDir) {
-        String uniqueWebClientsName = uniqueCaseInsensitiveString(webClientsName, seenModelFilenames);
-        String suffix = modelTemplateFiles().get(templateName);
-        return outputDir + File.separator + toWebClientsFilename(uniqueWebClientsName) + suffix;
+	public String webClientsFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = webClientsTemplateFiles().get(templateName);
+        return outputDir + File.separator + toWebClientsFilename(uniqueTag) + suffix;	
 	}    
-    
 
     private final Map<String, String> seenApiDocFilenames = new HashMap<String, String>();
 

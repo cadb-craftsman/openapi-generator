@@ -1,4 +1,4 @@
-package {{package}}.webclients;
+package {{basePackage}}.webclients;
 
 import java.time.Duration;
 
@@ -13,7 +13,7 @@ import reactor.util.retry.Retry;
 
 {{#operations}}
 @AllArgsConstructor
-public class {{classname}}WebClients {
+public class {{classname}}WebClient {
 
 	private WebClient webClient; 
 

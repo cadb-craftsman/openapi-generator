@@ -102,7 +102,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String USE_DEDUCTION_FOR_ONE_OF_INTERFACES = "useDeductionForOneOfInterfaces";
 	public static final String SPRING_API_VERSION = "springApiVersion";
 	
+	public static final String CERTS_PACKAGE = "certs";
 	public static final String REPOSITORY_HANDLERS_PACKAGE = ".handlers";
+	public static final String DOMAIN_MAPPERS_PACKAGE = ".domain.mappers";
+	
 	
 	public static String TEMPLATE_DIR_CUSTOM = "";
 	public static String TEMPLATE_DIR_MYBATIS = "";
@@ -137,9 +140,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 	@Getter
 	@Setter
 	protected String apacheMybatisPackage = "org.apache.ibatis.builder.xml";
-	@Getter	
-	@Setter
-	protected String certsPackage = "certs";
 	@Setter
 	protected boolean isMyBatis = true;
 	
@@ -616,22 +616,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 			// Else if is Spring Boot library
 			} else if (SPRING_BOOT.equals(library)) {
 
-				apiTemplateFiles.put("apiController.mustache", "Controller.java");
-
-				// @Application with yml extension
-				// supportingFiles.add(new SupportingFile("application.mustache",
-				// ("src.main.resources").replace(".", java.io.File.separator),
-				// "application.properties"));
-
 			    /***
 			     * Import application.mustache and generate application.yml  
 			     */
-				supportingFiles.add(new SupportingFile("homeController.mustache",
-						(sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator),
-						"HttpController.java"));
+				apiTemplateFiles.put("apiController.mustache", "Controller.java");
 
+				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
 				supportingFiles.add(new SupportingFile("application.mustache", resourceFolder, "application.yml"));
-
 				supportingFiles.add(new SupportingFile("openapi.mustache", resourceFolder, "openapi.yaml"));
 				
 			    /***
@@ -641,25 +632,11 @@ public class SpringCodegen extends AbstractJavaCodegen
 				if(isMyBatis) {
 					
 					//Generate Service and Repository interfaces with methods definition.
-					apiTemplateFiles.put("service.mustache", "Srv.java");
-					apiTemplateFiles.put("serviceImpl.mustache", "SrvImpl.java");
-					apiTemplateFiles.put("repository.mustache", "Repository.java");
+					serviceTemplateFiles.put("service.mustache", "Srv.java");
+					serviceTemplateFiles.put("serviceImpl.mustache", "SrvImpl.java");
+					repositoryTemplateFiles.put("repository.mustache", "Repository.java");
+					webClientsTemplateFiles.put("webclients.mustache", "WebClient.java");
 
-					//supportingFiles.add(new SupportingFile("service.mustache",
-					//		(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
-					//		"Service.java"));
-					//
-					//supportingFiles.add(new SupportingFile("serviceImpl.mustache",
-					//		(sourceFolder + File.separator + servicePackage).replace(".", java.io.File.separator),
-					//		"Impl.java"));
-
-				    /***
-				     * @Craftsman
-				     * Generate repository, repository handler packages.  
-				     */				
-					//supportingFiles.add(new SupportingFile("repository.mustache",
-					//		(sourceFolder + File.separator + repositoryPackage).replace(".", java.io.File.separator),
-					//		"Repository.java"));
 					supportingFiles.add(new SupportingFile("stringTrimTypeHandler.mustache",
 							(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
 							"StringTrimTypeHandler.java"));
@@ -667,26 +644,17 @@ public class SpringCodegen extends AbstractJavaCodegen
 							(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
 							"YesNoTypeHandler.java"));
 
-				    /***
-				     * Generate webclients packages.  
-				     */
-					supportingFiles.add(new SupportingFile("webclients.mustache",
-							(sourceFolder + File.separator + webClientsPackage).replace(".", java.io.File.separator),
-							"WebClients.java"));				
-
+					supportingFiles.add(new SupportingFile("factoryMapper.mustache",
+							(sourceFolder + File.separator + basePackage + DOMAIN_MAPPERS_PACKAGE).replace(".", java.io.File.separator),
+							"FactoryMapper.java"));
+					
 					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
-					
 					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
-
-					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + certsPackage).replace(".", java.io.File.separator), "type"));
-
-					supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + certsPackage).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
-					
+					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
+					supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
 					supportingFiles.add(new SupportingFile("mybatis-3-config.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-config.dtd"));
-
 					supportingFiles.add(new SupportingFile("mybatis-3-mapper.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-mapper.dtd"));				
-					
-					supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "_MyBatisSampleRepository.xml"));
+					supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
 
 				}
 
@@ -698,22 +666,15 @@ public class SpringCodegen extends AbstractJavaCodegen
 					     * If is mybatis Config and NativeConfig project classes.  
 					     */
 						if(isMyBatis) {
-							supportingFiles.add(new SupportingFile("springdocDocumentationConfig.mustache",
-									(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-									"SpringBootDocConfig.java"));
-							
-							supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache",
-								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-								"SpringBootNativeConfig.java"));
+							supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
+							supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
+						}else {
+							supportingFiles.add(new SupportingFile("springbootDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
+							supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
 						}
 						
-						supportingFiles.add(new SupportingFile("springbootWebClientsConfig.mustache",
-								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-								"SpringBootWebClientsConfig.java"));
-						
-						supportingFiles.add(new SupportingFile("springbootWebClientsProperties.mustache",
-								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-								"SpringBootWebClientsProperties.java"));
+						supportingFiles.add(new SupportingFile("springbootWebClientsConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsConfig.java"));
+						supportingFiles.add(new SupportingFile("springbootWebClientsProperties.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsProperties.java"));
 						
 					} else if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
 						supportingFiles.add(new SupportingFile("openapiDocumentationConfig.mustache",
@@ -1080,6 +1041,33 @@ public class SpringCodegen extends AbstractJavaCodegen
 		name = sanitizeName(name);
 		return camelize(name) + apiNameSuffix;
 	}
+	
+	@Override
+	public String toServiceName(String name) {
+		if (name.length() == 0) {
+			return "DefaultSrv";
+		}
+		name = sanitizeName(name);
+		return camelize(name) + serviceNameSuffix;
+	}
+	
+	@Override
+	public String toRepositoryName(String name) {
+		if (name.length() == 0) {
+			return "DefaultRepository";
+		}
+		name = sanitizeName(name);
+		return camelize(name) + repositoryNameSuffix;
+	}
+	
+	@Override
+	public String toWebClientsName(String name) {
+		if (name.length() == 0) {
+			return "DefaultWebClients";
+		}
+		name = sanitizeName(name);
+		return camelize(name) + webClientsNameSuffix;
+	}	
 
 	@Override
 	public void setParameterExampleValue(CodegenParameter p) {
@@ -1388,21 +1376,4 @@ public class SpringCodegen extends AbstractJavaCodegen
 		return extensions;
 	}
 
-	@Override
-	public String toServiceName(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String toRepositoryName(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String toWebClientsName(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -50,100 +50,29 @@ import java.util.Map;
 import java.util.Optional;
 import {{javaxPackage}}.annotation.Generated;
 
+import lombok.AllArgsConstructor;
+
 {{>generatedAnnotation}}
 
-{{#useResponseEntity}}
-@Controller
-{{/useResponseEntity}}
-{{^useResponseEntity}}
 @RestController
-{{/useResponseEntity}}
-{{#useRequestMappingOnController}}
-{{=<% %>=}}
-@RequestMapping("${openapi.<%title%>.base-path:<%>defaultBasePath%>}")
-<%={{ }}=%>
-{{/useRequestMappingOnController}}
+@AllArgsConstructor
 {{#operations}}
 public class {{classname}}Controller implements {{classname}} {
-{{#isDelegate}}
 
-    private final {{classname}}Delegate delegate;
+	private {{classname}}Srv service;
+	private {{classname}}FactoryMapper mapper;
 
-    public {{classname}}Controller(@Autowired(required = false) {{classname}}Delegate delegate) {
-        this.delegate = Optional.ofNullable(delegate).orElse(new {{classname}}Delegate() {});
-    }
-
-    @Override
-    public {{classname}}Delegate getDelegate() {
-        return delegate;
-    }
-{{/isDelegate}}
-{{^isDelegate}}
-    {{^reactive}}
-
-    private final NativeWebRequest request;
-
-    @Autowired
-    public {{classname}}Controller(NativeWebRequest request) {
-        this.request = request;
-    }
-
-    @Override
-    public Optional<NativeWebRequest> getRequest() {
-        return Optional.ofNullable(request);
-    }
-    {{/reactive}}
-{{/isDelegate}}
-
-{{#_api_controller_impl_}}
 {{#operation}}
-    /**
-     * {{httpMethod}} {{{path}}}{{#summary}} : {{.}}{{/summary}}
-    {{#notes}}
-     * {{.}}
-    {{/notes}}
-     *
-    {{#allParams}}
-     * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{.}}{{/defaultValue}}){{/required}}
-    {{/allParams}}
-     * @return {{#responses}}{{message}} (status code {{code}}){{^-last}}
-     *         or {{/-last}}{{/responses}}
-    {{#isDeprecated}}
-     * @deprecated
-    {{/isDeprecated}}
-    {{#externalDocs}}
-     * {{description}}
-     * @see <a href="{{url}}">{{summary}} Documentation</a>
-    {{/externalDocs}}
-     * @see {{classname}}#{{operationId}}
-     */
+
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
-    public {{#responseWrapper}}{{.}}<{{/responseWrapper}}{{#useResponseEntity}}ResponseEntity<{{/useResponseEntity}}{{>returnTypes}}{{#useResponseEntity}}>{{/useResponseEntity}}{{#responseWrapper}}>{{/responseWrapper}} {{operationId}}(
-        {{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
-        {{/-last}}{{/allParams}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
-        {{/hasParams}}{{^hasParams}}{{#reactive}},{{/reactive}}{{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}
-    ) {
-    {{^isDelegate}}
-        {{^async}}
-        {{>methodBody}}{{! prevent indent}}
-        {{/async}}
-        {{#async}}
-        return new Callable<{{#useResponseEntity}}ResponseEntity<{{/useResponseEntity}}{{>returnTypes}}{{#useResponseEntity}}>{{/useResponseEntity}}>() {
-            @Override
-            public {{#useResponseEntity}}ResponseEntity<{{/useResponseEntity}}{{>returnTypes}}{{#useResponseEntity}}>{{/useResponseEntity}} call() {
-                {{>methodBody}}{{! prevent indent}}
-            }
-        };
-        {{/async}}
-    {{/isDelegate}}
-    {{#isDelegate}}
-        {{^isVoid}}return {{/isVoid}}{{#isVoid}}{{#useResponseEntity}}return {{/useResponseEntity}}{{^useResponseEntity}}{{#reactive}}return {{/reactive}}{{/useResponseEntity}}{{/isVoid}}delegate.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}}, {{/hasParams}}{{^hasParams}}{{#reactive}}, {{/reactive}}{{/hasParams}}pageable{{/vendorExtensions.x-spring-paginated}});
-    {{/isDelegate}}
+    @Override
+    {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
+        {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+        return {{>responseType}};
     }
 
 {{/operation}}
-{{/_api_controller_impl_}}
 }
 {{/operations}}

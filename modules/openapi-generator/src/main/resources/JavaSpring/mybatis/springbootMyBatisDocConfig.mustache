@@ -1,0 +1,110 @@
+package {{configPackage}};
+
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import {{basePackage}}.domain.mappers.{{classname}}FactoryMapperImpl;
+import {{basePackage}}.webclients.{{classname}}WebClient;
+
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+
+@Configuration
+@MapperScan(basePackages = "{{basePackage}}.repository", annotationClass = Mapper.class, sqlSessionTemplateRef = "myBatisSqlSessionTemplate", sqlSessionFactoryRef = "myBatisSqlSessionFactory")
+public class SpringBootDocConfig {
+
+    @Bean(name = "{{configPackage}}.SpringBootDocConfig.apiInfo")
+    OpenAPI apiInfo() {
+        return new OpenAPI()
+                .info(
+                        new Info(){{#appName}}
+                                .title("{{appName}}"){{/appName}}
+                                .description("{{{appDescription}}}"){{#termsOfService}}
+                                .termsOfService("{{termsOfService}}"){{/termsOfService}}{{#openAPI}}{{#info}}{{#contact}}
+                                .contact(
+                                        new Contact(){{#infoName}}
+                                                .name("{{infoName}}"){{/infoName}}{{#infoUrl}}
+                                                .url("{{infoUrl}}"){{/infoUrl}}{{#infoEmail}}
+                                                .email("{{infoEmail}}"){{/infoEmail}}
+                                ){{/contact}}{{#license}}
+                                .license(
+                                        new License()
+                                                {{#licenseInfo}}.name("{{licenseInfo}}")
+                                                {{/licenseInfo}}{{#licenseUrl}}.url("{{licenseUrl}}")
+                                                {{/licenseUrl}}
+                                ){{/license}}{{/info}}{{/openAPI}}
+                                .version("{{appVersion}}")
+                ){{#hasAuthMethods}}
+                .components(
+                        new Components(){{#authMethods}}
+                                .addSecuritySchemes("{{name}}", new SecurityScheme(){{#isBasic}}
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("{{scheme}}"){{#bearerFormat}}
+                                        .bearerFormat("{{bearerFormat}}"){{/bearerFormat}}{{/isBasic}}{{#isApiKey}}
+                                        .type(SecurityScheme.Type.APIKEY){{#isKeyInHeader}}
+                                        .in(SecurityScheme.In.HEADER){{/isKeyInHeader}}{{#isKeyInQuery}}
+                                        .in(SecurityScheme.In.QUERY){{/isKeyInQuery}}{{#isKeyInCookie}}
+                                        .in(SecurityScheme.In.COOKIE){{/isKeyInCookie}}
+                                        .name("{{keyParamName}}"){{/isApiKey}}{{#isOAuth}}
+                                        .type(SecurityScheme.Type.OAUTH2){{/isOAuth}}
+                                ){{/authMethods}}
+                ){{/hasAuthMethods}}
+        ;
+    }
+
+    @Autowired
+    private DataSourceProperties dataSourceProperties;
+
+    @Bean(name = "dataSource")
+    public DataSource dataSource() {
+
+    	DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.driverClassName(dataSourceProperties.getDriverClassName());
+        dataSourceBuilder.url(dataSourceProperties.getUrl());
+        dataSourceBuilder.username(dataSourceProperties.getUsername());
+        dataSourceBuilder.password(dataSourceProperties.getPassword());
+        return dataSourceBuilder.build();
+
+    }
+
+    @Bean(name = "myBatisSqlSessionFactory")
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource());
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean(name = "myBatisSqlSessionTemplate")
+    @Primary
+    public SqlSessionTemplate sqlSessionTemplate() throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory());
+    }    
+    
+    @Bean
+    {{classname}}FactoryMapperImpl getFactoryMapper() {
+	return new {{classname}}FactoryMapperImpl();
+    }
+
+    @Bean
+    {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, SpringBootWebClientProperties clientProperties) {
+        return new {{classname}}WebClient(webClients.get(clientProperties.getClients().get(0).name()), clientProperties.getClients().get(0));
+    }    
+}

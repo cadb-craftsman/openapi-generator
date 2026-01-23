@@ -414,6 +414,7 @@ public class DefaultGenerator implements Generator {
 
             File written = processTemplateToFile(models, templateName, filename, generateModelDocumentation, CodegenConstants.MODEL_DOCS);
             if (written != null) {
+            	System.out.println("generateModelDocumentation: " + templateName + " " + docExtension + " " + suffix + " " + filename);
                 files.add(written);
                 if (config.isEnablePostProcessFile() && !dryRun) {
                     config.postProcessFile(written, "model-doc");
@@ -427,12 +428,26 @@ public class DefaultGenerator implements Generator {
             File written;
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                
+                // TODO Get and change ouputdir
+                String outputDirService = config.getOutputDir() + File.separator + config.modelServicePackage().replace('.', File.separatorChar).replace('/', File.separatorChar);
+                String outputDirPersistence = config.getOutputDir() + config.modelServicePackage().replace('.', File.separatorChar).replace('/', File.separatorChar);
+                
                 String filename = config.modelFilename(templateName, modelName, outputDir);
+                String serviceFilename = config.modelFilename(templateName, modelName, outputDirService);
+                String persistenceFilename = config.modelFilename(templateName, modelName, outputDirPersistence);
+                
+                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                processTemplateToFile(models, templateName, serviceFilename, generateModels, CodegenConstants.MODELS, outputDirService);
+                processTemplateToFile(models, templateName, persistenceFilename, generateModels, CodegenConstants.MODELS, outputDirPersistence);
+                
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelFilename(templateName, modelName);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+                //System.out.println("generateModel: " + templateName + " " + filename);
             }
+
             if (written != null) {
                 files.add(written);
                 if (config.isEnablePostProcessFile() && !dryRun) {
@@ -548,16 +563,17 @@ public class DefaultGenerator implements Generator {
 
         // generate files based on processed models
         for (String modelName : allProcessedModels.keySet()) {
+        	System.out.println("modelName: " + modelName);
+	
             ModelsMap models = allProcessedModels.get(modelName);
             
             models.put("modelPackage", config.modelPackage());
 		    /***
 		     * @Craftsman
 		     * Adds modelServicePackage and modelPersistencePackage in models procesos to generate differents package models.  
-		     */
             models.put("modelServicePackage", config.modelServicePackage());
             models.put("modelPersistencePackage", config.modelPersistencePackage());
-            
+            */
             try {
                 //don't generate models that have a schema mapping
                 if (config.schemaMapping().containsKey(modelName)) {
@@ -779,20 +795,24 @@ public class DefaultGenerator implements Generator {
 
                 addAuthenticationSwitches(operation);
 
+                /***
+                 * @Craftsman generate classes depending in files templates
+                 * 
+                 */
                 for (String templateName : config.apiTemplateFiles().keySet()) {
                     File written = null;
                     if (config.templateOutputDirs().containsKey(templateName)) {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.apiFilename(templateName, tag, outputDir);
                         // do not overwrite apiController file for spring server
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.APIS, outputDir);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
                         }
                     } else {
                         String filename = config.apiFilename(templateName, tag);
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.APIS);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
@@ -805,6 +825,87 @@ public class DefaultGenerator implements Generator {
                         }
                     }
                 }
+                
+                for (String templateName : config.serviceTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.serviceFilename(templateName, tag, outputDir);
+                        // do not overwrite service interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.serviceFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "service");
+                        }
+                    }
+                }
+                
+                for (String templateName : config.repositoryTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.repositoryFilename(templateName, tag, outputDir);
+                        // do not overwrite repository interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.repositoryFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "repository");
+                        }
+                    }
+                }
+                
+                for (String templateName : config.webClientsTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.webClientsFilename(templateName, tag, outputDir);
+                        // do not overwrite webclients interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.WEBCLIENTS, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.webClientsFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.WEBCLIENTS);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "webclients");
+                        }
+                    }
+                }                 
 
                 // to generate api test files
                 for (String templateName : config.apiTestTemplateFiles().keySet()) {
@@ -949,14 +1050,14 @@ public class DefaultGenerator implements Generator {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.apiFilename(templateName, tag, outputDir);
                         // do not overwrite apiController file for spring server
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateWebhooks, CodegenConstants.WEBHOOKS, outputDir);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
                         }
                     } else {
                         String filename = config.apiFilename(templateName, tag);
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateWebhooks, CodegenConstants.WEBHOOKS);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
@@ -1016,6 +1117,12 @@ public class DefaultGenerator implements Generator {
         File apiFile = new File(filename);
         return !(apiFile.exists() && config.getName().equals(generator) && templateName.equals(apiControllerTemplate));
     }
+
+    // checking if repository interface file is already existed for spring generator
+    private boolean filePreCheck(String filename, String generator, String templateName, String template) {
+        File file = new File(filename);
+        return !(file.exists() && config.getName().equals(generator) && templateName.equals(template));
+    }      
 
     /*
      * Generate .openapi-generator-ignore if the option openapiGeneratorIgnoreFile is enabled.
@@ -1449,6 +1556,17 @@ public class DefaultGenerator implements Generator {
                             case SupportingFiles:
                                 // excluded by filter
                                 break;
+							case Service:
+								config.serviceTemplateFiles().put(templateFile, templateExt);
+								break;
+                            case Repository:
+								config.repositoryTemplateFiles().put(templateFile, templateExt);
+								break;
+							case WebClients:
+								config.webClientsTemplateFiles().put(templateFile, templateExt);
+								break;
+							default:
+								break;
                         }
                     });
         }

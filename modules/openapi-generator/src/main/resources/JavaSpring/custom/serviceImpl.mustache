@@ -20,7 +20,11 @@ public class {{classname}}SrvImpl implements {{classname}}Srv {
     @Deprecated
     {{/isDeprecated}}
     @Override
-    {{>responseType}} {{operationId}}({{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},{{/hasParams}}{{^hasParams}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}){{#unhandledException}} throws Exception{{/unhandledException}}; 
+    {{>responseType}} {{operationId}}({{#allParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}}{{#hasParams}},{{/hasParams}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
+        {{/hasParams}}{{^hasParams}},{{/hasParams}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}{{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},
+        {{/hasParams}}{{^hasParams}},{{/hasParams}}{{{.}}}{{^hasParams}}{{^-last}},{{/-last}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+        return {{>responseType}};
+        } 
 
 {{/operation}}
 }

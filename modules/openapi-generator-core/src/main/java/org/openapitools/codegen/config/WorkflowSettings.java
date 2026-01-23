@@ -36,7 +36,7 @@ public class WorkflowSettings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowSettings.class);
     public static final String DEFAULT_OUTPUT_DIR = ".";
-    public static final boolean DEFAULT_VERBOSE = true;
+    public static final boolean DEFAULT_VERBOSE = false;
     public static final boolean DEFAULT_SKIP_OVERWRITE = false;
     public static final boolean DEFAULT_REMOVE_OPERATION_ID_PREFIX = false;
     public static final boolean DEFAULT_SKIP_OPERATION_EXAMPLE = false;

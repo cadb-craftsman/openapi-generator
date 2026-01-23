@@ -20,7 +20,7 @@ public class SpringBootWebClientsConfig {
         if(webClients == null) {
             webClients = new HashMap<>();
 
-            for(KTemplateWebClientProperties.Client client: clientProperties.getClients()) {
+            for(SpringBootWebClientProperties.Client client: clientProperties.getClients()) {
                 if(client.trace()) {
                     log.info(client.name() + " method url: " + client.url());
                 }

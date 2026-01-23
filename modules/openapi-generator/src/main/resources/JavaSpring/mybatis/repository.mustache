@@ -1,4 +1,4 @@
-package {{package}}.repository;
+package {{basePackage}}.repository;
 
 {{#imports}}import {{import}};
 {{/imports}}
@@ -15,8 +15,8 @@ public interface {{classname}}Repository {
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
-    {{>responseType}} {{operationId}}({{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},{{/hasParams}}{{^hasParams}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}){{#unhandledException}} throws Exception{{/unhandledException}}; 
-
+    {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
+        {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
 {{/operation}}
 }
 {{/operations}}

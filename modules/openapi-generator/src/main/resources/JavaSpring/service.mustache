@@ -1,4 +1,4 @@
-package {{package}}.services;
+package {{basePackage}}.services;
 
 {{#imports}}import {{import}};
 {{/imports}}
@@ -12,7 +12,8 @@ public interface {{classname}}Srv {
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
-    {{>responseType}} {{operationId}}({{#vendorExtensions.x-spring-provide-args}}{{{.}}}{{^hasParams}}{{^-last}},{{/-last}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}){{#unhandledException}} throws Exception{{/unhandledException}}; 
+    {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
+        {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
 
 {{/operation}}
 }
