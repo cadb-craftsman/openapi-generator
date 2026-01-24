@@ -105,10 +105,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String CERTS_PACKAGE = "certs";
 	public static final String REPOSITORY_HANDLERS_PACKAGE = ".handlers";
 	public static final String DOMAIN_MAPPERS_PACKAGE = ".domain.mappers";
-	
-	
-	public static String TEMPLATE_DIR_CUSTOM = "";
-	public static String TEMPLATE_DIR_MYBATIS = "";
 
 	@Getter
 	public enum RequestMappingMode {
@@ -224,8 +220,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 		useBeanValidation = true;
 		outputFolder = "generated-code/javaSpring";
 		embeddedTemplateDir = templateDir = "JavaSpring";
-		TEMPLATE_DIR_CUSTOM =  "src/main/resources/" + embeddedTemplateDir + "/libraries/spring-boot/custom/";
-		TEMPLATE_DIR_MYBATIS = "src/main/resources/" + embeddedTemplateDir + "/libraries/spring-boot/mybatis/";
 
 		apiPackage = "org.openapitools.api";
 		modelPackage = "org.openapitools.model";
@@ -242,8 +236,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		updateOption(CodegenConstants.ARTIFACT_ID, this.getArtifactId());
 		updateOption(CodegenConstants.API_PACKAGE, apiPackage);
 		updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
-		//updateOption(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
-		//updateOption(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
+		updateOption(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
+		updateOption(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
 		updateOption(CodegenConstants.SERVICE_PACKAGE, servicePackage);
 		updateOption(CodegenConstants.REPOSITORY_PACKAGE, repositoryPackage);
 		updateOption(CodegenConstants.WEBCLIENTS_PACKAGE, webClientsPackage);

@@ -428,24 +428,14 @@ public class DefaultGenerator implements Generator {
             File written;
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
-                
-                // TODO Get and change ouputdir
-                String outputDirService = config.getOutputDir() + File.separator + config.modelServicePackage().replace('.', File.separatorChar).replace('/', File.separatorChar);
-                String outputDirPersistence = config.getOutputDir() + config.modelServicePackage().replace('.', File.separatorChar).replace('/', File.separatorChar);
-                
                 String filename = config.modelFilename(templateName, modelName, outputDir);
-                String serviceFilename = config.modelFilename(templateName, modelName, outputDirService);
-                String persistenceFilename = config.modelFilename(templateName, modelName, outputDirPersistence);
-                
-                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
-                processTemplateToFile(models, templateName, serviceFilename, generateModels, CodegenConstants.MODELS, outputDirService);
-                processTemplateToFile(models, templateName, persistenceFilename, generateModels, CodegenConstants.MODELS, outputDirPersistence);
-                
+                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelFilename(templateName, modelName);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                //System.out.println("generateModel: " + templateName + " " + filename);
+                System.out.println("generateModel: " + templateName + " " + filename);
+
             }
 
             if (written != null) {
@@ -455,6 +445,48 @@ public class DefaultGenerator implements Generator {
                 }
             }
         }
+        
+        for (String templateName : config.modelServiceTemplateFiles().keySet()) {
+            File written;
+            if (config.templateOutputDirs().containsKey(templateName)) {
+                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                String filename = config.modelServiceFilename(templateName, modelName, outputDir);
+                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+            } else {
+                String filename = config.modelServiceFilename(templateName, modelName);
+                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+                System.out.println("generateModel: " + templateName + " " + filename);
+            }
+
+            if (written != null) {
+                files.add(written);
+                if (config.isEnablePostProcessFile() && !dryRun) {
+                    config.postProcessFile(written, "model");
+                }
+            }
+        } 
+        
+        for (String templateName : config.modelPersistenceTemplateFiles().keySet()) {
+            File written;
+            if (config.templateOutputDirs().containsKey(templateName)) {
+                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
+                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+            } else {
+                String filename = config.modelPersistenceFilename(templateName, modelName);
+                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+                System.out.println("generateModel: " + templateName + " " + filename);
+            }
+
+            if (written != null) {
+                files.add(written);
+                if (config.isEnablePostProcessFile() && !dryRun) {
+                    config.postProcessFile(written, "model");
+                }
+            }
+        }        
     }
 
     void generateModels(List<File> files, List<ModelMap> allModels, List<String> unusedModels, List<ModelMap> aliasModels) {
@@ -568,12 +600,7 @@ public class DefaultGenerator implements Generator {
             ModelsMap models = allProcessedModels.get(modelName);
             
             models.put("modelPackage", config.modelPackage());
-		    /***
-		     * @Craftsman
-		     * Adds modelServicePackage and modelPersistencePackage in models procesos to generate differents package models.  
-            models.put("modelServicePackage", config.modelServicePackage());
-            models.put("modelPersistencePackage", config.modelPersistencePackage());
-            */
+
             try {
                 //don't generate models that have a schema mapping
                 if (config.schemaMapping().containsKey(modelName)) {
@@ -1541,6 +1568,12 @@ public class DefaultGenerator implements Generator {
                             case Model:
                                 config.modelTemplateFiles().put(templateFile, templateExt);
                                 break;
+                            case ModelService:
+                                config.modelServiceTemplateFiles().put(templateFile, templateExt);
+                                break;
+                            case ModelPersistence:
+                                config.modelPersistenceTemplateFiles().put(templateFile, templateExt);
+                                break;                                
                             case APIDocs:
                                 config.apiDocTemplateFiles().put(templateFile, templateExt);
                                 break;
@@ -1559,8 +1592,14 @@ public class DefaultGenerator implements Generator {
 							case Service:
 								config.serviceTemplateFiles().put(templateFile, templateExt);
 								break;
+							case ServiceTests:
+								config.serviceTestTemplateFiles().put(templateFile, templateExt);
+								break;
                             case Repository:
 								config.repositoryTemplateFiles().put(templateFile, templateExt);
+								break;
+                            case RepositoryTests:
+								config.repositoryTestTemplateFiles().put(templateFile, templateExt);
 								break;
 							case WebClients:
 								config.webClientsTemplateFiles().put(templateFile, templateExt);

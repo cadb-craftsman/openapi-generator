@@ -1,4 +1,4 @@
-package {{package}}.services;
+package {{basePackage}}.domain.mappers;
 
 {{#imports}}import {{import}};
 {{/imports}}
@@ -9,16 +9,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 @Mapper
-{{#operations}}
-public class {{classname}} {
-{{#operation}}
+public class {{classVarName}}FactoryMapper {
 
-    {{#isDeprecated}}
-    @Deprecated
-    {{/isDeprecated}}
-    {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
-        {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
-
-{{/operation}}
 }
-{{/operations}}

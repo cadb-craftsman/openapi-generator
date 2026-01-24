@@ -605,7 +605,7 @@ public class CodegenConfigurator {
         if (StringUtils.isNotEmpty(modelServicePackage)) {
             addAdditionalProperty(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
         }
-        generatorSettingsBuilder.withModelPackage(modelServicePackage);
+        generatorSettingsBuilder.withModelServicePackage(modelServicePackage);
         return this;
     }
     
@@ -613,7 +613,7 @@ public class CodegenConfigurator {
         if (StringUtils.isNotEmpty(modelPersistencePackage)) {
             addAdditionalProperty(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
         }
-        generatorSettingsBuilder.withModelPackage(modelPersistencePackage);
+        generatorSettingsBuilder.withModelPersistencePackage(modelPersistencePackage);
         return this;
     }
     

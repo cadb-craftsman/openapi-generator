@@ -77,6 +77,10 @@ public interface CodegenConfig {
     String embeddedTemplateDir();
 
     String modelFileFolder();
+    
+    String modelServiceFileFolder();
+    
+    String modelPersistenceFileFolder();
 
     String modelTestFileFolder();
 
@@ -194,6 +198,10 @@ public interface CodegenConfig {
 
     Map<String, String> modelTemplateFiles();
     
+    Map<String, String> modelServiceTemplateFiles();
+    
+    Map<String, String> modelPersistenceTemplateFiles();
+    
     Map<String, String> serviceTemplateFiles();
     
     Map<String, String> repositoryTemplateFiles();
@@ -207,8 +215,6 @@ public interface CodegenConfig {
     Map<String, String> serviceTestTemplateFiles();
     
     Map<String, String> repositoryTestTemplateFiles();
-    
-    Map<String, String> webClientsTestTemplateFiles();
 
     Map<String, String> apiDocTemplateFiles();
 
@@ -238,6 +244,10 @@ public interface CodegenConfig {
     String toApiFilename(String name);
 
     String toModelFilename(String name);
+    
+    String toModelServiceFilename(String name);
+    
+    String toModelPersistenceFilename(String name);
 
     String toServiceFilename(String name);
 
@@ -295,6 +305,14 @@ public interface CodegenConfig {
     String modelFilename(String templateName, String modelName);
 
     String modelFilename(String templateName, String modelName, String outputDir);
+
+    String modelServiceFilename(String templateName, String modelName);
+
+    String modelServiceFilename(String templateName, String modelName, String outputDir);    
+    
+    String modelPersistenceFilename(String templateName, String modelName);
+
+    String modelPersistenceFilename(String templateName, String modelName, String outputDir);    
 
     String apiFilename(String templateName, String tag);
 

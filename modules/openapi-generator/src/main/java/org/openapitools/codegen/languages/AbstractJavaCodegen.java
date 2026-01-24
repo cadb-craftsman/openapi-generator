@@ -235,6 +235,8 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
         supportsInheritance = true;
         modelTemplateFiles.put("model.mustache", ".java");
+        modelServiceTemplateFiles.put("modelService.mustache", ".java");
+        modelPersistenceTemplateFiles.put("modelPersistence.mustache", ".java");
         apiTemplateFiles.put("api.mustache", ".java");
         
 	    /***
@@ -481,6 +483,14 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
             additionalProperties.put(CodegenConstants.MODEL_PACKAGE, modelPackage);
         }
 
+        if (!additionalProperties.containsKey(CodegenConstants.MODEL_SERVICE_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
+        }
+        
+        if (!additionalProperties.containsKey(CodegenConstants.MODEL_PERSISTENCE_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
+        }
+        
         if (!additionalProperties.containsKey(CodegenConstants.API_PACKAGE)) {
             additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
         }
@@ -566,6 +576,8 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         }
 
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_SERVICE_PACKAGE, this::setModelServicePackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, this::setModelPersistencePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
@@ -846,6 +858,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         additionalProperties.remove(CodegenConstants.API_PACKAGE);
         this.setModelPackage(sanitizePackageName(modelPackage));
         additionalProperties.remove(CodegenConstants.MODEL_PACKAGE);
+        this.setModelServicePackage(sanitizePackageName(modelServicePackage));
+        additionalProperties.remove(CodegenConstants.MODEL_SERVICE_PACKAGE);
+        this.setModelPersistencePackage(sanitizePackageName(modelPersistencePackage));
+        additionalProperties.remove(CodegenConstants.MODEL_PERSISTENCE_PACKAGE);
         this.setServicePackage(sanitizePackageName(servicePackage));
         additionalProperties.remove(CodegenConstants.SERVICE_PACKAGE);
         this.setRepositoryPackage(sanitizePackageName(repositoryPackage));
@@ -894,6 +910,16 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     @Override
     public String modelFileFolder() {
         return (outputFolder + File.separator + sourceFolder + File.separator + modelPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+
+    @Override
+    public String modelServiceFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + modelServicePackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+    
+    @Override
+    public String modelPersistenceFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + modelPersistencePackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
     
     @Override

@@ -225,6 +225,8 @@ public class DefaultCodegen implements CodegenConfig {
     */
     protected Map<String, String> apiTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTemplateFiles = new HashMap<>();
+    protected Map<String, String> modelServiceTemplateFiles = new HashMap<>();
+    protected Map<String, String> modelPersistenceTemplateFiles = new HashMap<>();
     protected Map<String, String> serviceTemplateFiles = new HashMap<>();
     protected Map<String, String> repositoryTemplateFiles = new HashMap<>();
     protected Map<String, String> webClientsTemplateFiles = new HashMap<>();
@@ -233,7 +235,6 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> modelTestTemplateFiles = new HashMap<>();
     protected Map<String, String> serviceTestTemplateFiles = new HashMap<>();
     protected Map<String, String> repositoryTestTemplateFiles = new HashMap<>();
-    protected Map<String, String> webClientsTestTemplateFiles = new HashMap<>();
     
     protected Map<String, String> apiDocTemplateFiles = new HashMap<>();
     protected Map<String, String> modelDocTemplateFiles = new HashMap<>();
@@ -1448,6 +1449,16 @@ public class DefaultCodegen implements CodegenConfig {
     }
     
 	@Override
+	public Map<String, String> modelServiceTemplateFiles() {
+		return modelServiceTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> modelPersistenceTemplateFiles() {
+		return modelPersistenceTemplateFiles;
+	}       
+    
+	@Override
 	public Map<String, String> serviceTemplateFiles() {
 		return serviceTemplateFiles;
 	}
@@ -1472,11 +1483,6 @@ public class DefaultCodegen implements CodegenConfig {
         return repositoryTestTemplateFiles;
 	}
 
-	@Override
-	public Map<String, String> webClientsTestTemplateFiles() {
-        return webClientsTestTemplateFiles;
-	}
-
     @Override
     public String apiFileFolder() {
         return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
@@ -1486,6 +1492,16 @@ public class DefaultCodegen implements CodegenConfig {
     public String modelFileFolder() {
         return outputFolder + File.separator + modelPackage().replace('.', File.separatorChar);
     }
+
+	@Override
+	public String modelServiceFileFolder() {
+        return outputFolder + File.separator + modelServicePackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String modelPersistenceFileFolder() {
+        return outputFolder + File.separator + modelPersistencePackage().replace('.', File.separatorChar);
+	}    
     
 	@Override
 	public String serviceFileFolder() {
@@ -1681,6 +1697,28 @@ public class DefaultCodegen implements CodegenConfig {
     public String toModelFilename(String name) {
         return camelize(name);
     }
+    
+    /**
+     * Return the capitalized file name of the model service
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */    
+	@Override
+	public String toModelServiceFilename(String name) {
+		return camelize(name);
+	}
+
+    /**
+     * Return the capitalized file name of the model persistence
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+	@Override
+	public String toModelPersistenceFilename(String name) {
+		return camelize(name);	
+	}    
 
     /**
      * Return the capitalized file name of the model
@@ -6594,6 +6632,33 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = modelTemplateFiles().get(templateName);
         return outputDir + File.separator + toModelFilename(uniqueModelName) + suffix;
     }
+    
+	@Override
+	public String modelServiceFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelServiceTemplateFiles().get(templateName);
+        return modelServiceFileFolder() + File.separator + toModelServiceFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String modelServiceFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelServiceTemplateFiles().get(templateName);
+        return outputDir + File.separator + toModelServiceFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String modelPersistenceFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelPersistenceTemplateFiles().get(templateName);
+        return modelPersistenceFileFolder() + File.separator + toModelPersistenceFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String modelPersistenceFilename(String templateName, String modelName, String outputDir) {
+		// TODO Auto-generated method stub
+		return null;
+	}    
     
 	@Override
 	public String serviceFilename(String templateName, String tag) {
