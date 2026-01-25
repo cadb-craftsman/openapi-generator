@@ -1,19 +1,37 @@
 package {{configPackage}};
 
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
+import {{basePackage}}.domain.mappers.{{classname}}FactoryMapperImpl;
+import {{basePackage}}.webclients.{{classname}}WebClient;
+
 import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
-public class SpringBootDocConfig {
+@MapperScan(basePackages = "{{basePackage}}.repository", annotationClass = Mapper.class, sqlSessionTemplateRef = "myBatisSqlSessionTemplate", sqlSessionFactoryRef = "myBatisSqlSessionFactory")
+public class {{classname}}DocConfig {
 
-    @Bean(name = "{{configPackage}}.SpringDocConfiguration.apiInfo")
+    @Bean(name = "{{configPackage}}.{{classname}}DocConfig.apiInfo")
     OpenAPI apiInfo() {
         return new OpenAPI()
                 .info(
@@ -51,6 +69,34 @@ public class SpringBootDocConfig {
                 ){{/hasAuthMethods}}
         ;
     }
+
+    @Autowired
+    private DataSourceProperties dataSourceProperties;
+
+    @Bean(name = "dataSource")
+    public DataSource dataSource() {
+
+    	DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.driverClassName(dataSourceProperties.getDriverClassName());
+        dataSourceBuilder.url(dataSourceProperties.getUrl());
+        dataSourceBuilder.username(dataSourceProperties.getUsername());
+        dataSourceBuilder.password(dataSourceProperties.getPassword());
+        return dataSourceBuilder.build();
+
+    }
+
+    @Bean(name = "myBatisSqlSessionFactory")
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource());
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean(name = "myBatisSqlSessionTemplate")
+    @Primary
+    public SqlSessionTemplate sqlSessionTemplate() throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory());
+    }    
     
     @Bean
     {{classname}}FactoryMapperImpl getFactoryMapper() {
@@ -58,7 +104,7 @@ public class SpringBootDocConfig {
     }
 
     @Bean
-    {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, SpringBootWebClientProperties clientProperties) {
+    {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, {{classname}}WebClientProperties clientProperties) {
         return new {{classname}}WebClient(webClients.get(clientProperties.getClients().get(0).name()), clientProperties.getClients().get(0));
     }    
 }

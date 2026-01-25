@@ -8,9 +8,12 @@ import java.util.StringJoiner;
  */
 public enum TemplateFileType {
     API(Constants.APIS),
+    Config(Constants.CONFIG),
     Model(Constants.MODELS),
     ModelService(Constants.MODELS_SERVICE),
     ModelPersistence(Constants.MODELS_PERSISTENCE),
+    Exceptions(Constants.EXCEPTIONS),
+    Mappers(Constants.MAPPERS),
     Service(Constants.SERVICES),
     Repository(Constants.REPOSITORIES),
     WebClients(Constants.WEBCLIENTS),
@@ -64,9 +67,12 @@ public enum TemplateFileType {
 
     public static class Constants {
         public static final String APIS = "apis";
+        public static final String CONFIG = "config";
         public static final String MODELS = "models";
         public static final String MODELS_SERVICE = "modelsService";
         public static final String MODELS_PERSISTENCE = "modelsPersistence";
+        public static final String EXCEPTIONS = "exceptions";
+        public static final String MAPPERS = "mappers";
         public static final String SERVICES = "services";
         public static final String REPOSITORIES = "repositories";
         public static final String WEBCLIENTS = "webclients";

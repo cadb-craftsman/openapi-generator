@@ -61,8 +61,12 @@ public interface CodegenConfig {
     String testPackage();
 
     String apiPackage();
+    
+    String configPackage();
 
     String apiFileFolder();
+    
+    String configFileFolder();
 
     String apiTestFileFolder();
 
@@ -77,10 +81,6 @@ public interface CodegenConfig {
     String embeddedTemplateDir();
 
     String modelFileFolder();
-    
-    String modelServiceFileFolder();
-    
-    String modelPersistenceFileFolder();
 
     String modelTestFileFolder();
 
@@ -90,7 +90,19 @@ public interface CodegenConfig {
     
     String modelServicePackage();
     
+    String modelServiceFileFolder();
+
     String modelPersistencePackage();
+
+    String modelPersistenceFileFolder();
+
+    String exceptionsPackage();
+    
+    String exceptionsFileFolder();
+    
+    String mappersPackage();
+    
+    String mappersFileFolder();
     
     String servicePackage();
     
@@ -111,10 +123,16 @@ public interface CodegenConfig {
     String webClientsTestFileFolder();
 
     String toApiName(String name);
+    
+    String toConfigName(String name);
 
     String toApiVarName(String name);
 
     String toModelName(String name);
+    
+    String toExceprionsName(String name);
+    
+    String toMappersName(String name);
     
     String toServiceName(String name);
     
@@ -195,12 +213,18 @@ public interface CodegenConfig {
     Map<String, String> openapiNormalizer();
 
     Map<String, String> apiTemplateFiles();
+    
+    Map<String, String> configTemplateFiles();
 
     Map<String, String> modelTemplateFiles();
     
     Map<String, String> modelServiceTemplateFiles();
     
     Map<String, String> modelPersistenceTemplateFiles();
+    
+    Map<String, String> exceptionsTemplateFiles();
+    
+    Map<String, String> mappersTemplateFiles();
     
     Map<String, String> serviceTemplateFiles();
     
@@ -242,12 +266,18 @@ public interface CodegenConfig {
      */
 
     String toApiFilename(String name);
+    
+    String toConfigFilename(String name);
 
     String toModelFilename(String name);
     
     String toModelServiceFilename(String name);
     
     String toModelPersistenceFilename(String name);
+    
+    String toExceptionsFilename(String name);
+    
+    String toMappersFilename(String name);
 
     String toServiceFilename(String name);
 
@@ -312,11 +342,23 @@ public interface CodegenConfig {
     
     String modelPersistenceFilename(String templateName, String modelName);
 
-    String modelPersistenceFilename(String templateName, String modelName, String outputDir);    
+    String modelPersistenceFilename(String templateName, String modelName, String outputDir);   
+    
+    String exceptionsFilename(String templateName, String modelName);
 
+    String exceptionsFilename(String templateName, String modelName, String outputDir);
+    
+    String mappersFilename(String templateName, String modelName);
+
+    String mappersFilename(String templateName, String modelName, String outputDir); 
+    
     String apiFilename(String templateName, String tag);
 
     String apiFilename(String templateName, String tag, String outputDir);
+    
+    String configFilename(String templateName, String tag);
+
+    String configFilename(String templateName, String tag, String outputDir);    
 
     String apiTestFilename(String templateName, String tag);
 

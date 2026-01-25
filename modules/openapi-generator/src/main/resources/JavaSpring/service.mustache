@@ -1,4 +1,4 @@
-package {{basePackage}}.services;
+ package {{basePackage}}.services;
 
 {{#imports}}import {{import}};
 {{/imports}}
@@ -12,8 +12,7 @@ public interface {{classname}}Srv {
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
-    {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
-        {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
+    {{>responseType}} {{operationId}}({{#allParams}}{{^-last}},{{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
 
 {{/operation}}
 }

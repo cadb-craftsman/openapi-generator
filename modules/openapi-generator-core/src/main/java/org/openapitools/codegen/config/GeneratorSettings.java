@@ -27,7 +27,8 @@ import java.util.*;
  */
 public final class GeneratorSettings implements Serializable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratorSettings.class);
+    private static final long serialVersionUID = 4268971702225602337L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(GeneratorSettings.class);
     private static final String DEFAULT_GIT_HOST = "github.com";
     private static final String DEFAULT_GIT_USER_ID = "GIT_USER_ID";
     private static final String DEFAULT_GIT_REPO_ID = "GIT_REPO_ID";
@@ -35,11 +36,13 @@ public final class GeneratorSettings implements Serializable {
 
     private String generatorName;
     private String apiPackage;
+    private String configPackage;
     private String modelPackage;
     
     private String modelServicePackage;
     private String modelPersistencePackage;
-    
+    private String exceptionsPackage;
+    private String mappersPackage;
     private String servicePackage;
     private String repositoryPackage;
     private String webClientsPackage;
@@ -64,9 +67,12 @@ public final class GeneratorSettings implements Serializable {
     private final Map<String, String> nameMappings;
     private final Map<String, String> parameterNameMappings;
     private final Map<String, String> modelNameMappings;
+    private final Map<String, String> configNameMappings;
     
     private final Map<String, String> modelServiceNameMappings;
     private final Map<String, String> modelPersistenceNameMappings;
+    private final Map<String, String> exceptionsNameMappings;
+    private final Map<String, String> mappersNameMappings;
     private final Map<String, String> serviceNameMappings;
     private final Map<String, String> repositoryNameMappings;
     private final Map<String, String> webClientsNameMappings;
@@ -102,6 +108,15 @@ public final class GeneratorSettings implements Serializable {
     public String getApiPackage() {
         return apiPackage;
     }
+    
+    /**
+     * Gets the api package name for generated sources.
+     *
+     * @return the api package
+     */
+    public String getConfigPackage() {
+        return configPackage;
+    }
 
     /**
      * Gets the model package name for generated sources
@@ -129,6 +144,24 @@ public final class GeneratorSettings implements Serializable {
     public String getModelPersistencePackage() {
         return modelPersistencePackage;
     }
+    
+    /**
+     * Gets the exceptions package name for generated sources
+     *
+     * @return the exceptions package
+     */
+    public String getExceptionsPackage() {
+        return exceptionsPackage;
+    }
+    
+    /**
+     * Gets the mappers package name for generated sources
+     *
+     * @return the mappers package
+     */
+    public String getMappersPackage() {
+        return mappersPackage;
+    }        
 
     /**
      * Gets the service package name for generated sources
@@ -348,6 +381,15 @@ public final class GeneratorSettings implements Serializable {
     public Map<String, String> getParameterNameMappings() {
         return parameterNameMappings;
     }
+    
+    /**
+     * Gets model name mappings between a model name and the new name.
+     *
+     * @return the model name mappings
+     */
+    public Map<String, String> getConfigNameMappings() {
+        return configNameMappings;
+    }
 
     /**
      * Gets model name mappings between a model name and the new name.
@@ -374,7 +416,25 @@ public final class GeneratorSettings implements Serializable {
      */
     public Map<String, String> getModelPersistenceNameMappings() {
         return modelPersistenceNameMappings;
-    }      
+    } 
+    
+    /**
+     * Gets model name mappings between a exceptions name and the new name.
+     *
+     * @return the exceptions name mappings
+     */
+    public Map<String, String> getExceptionsNameMappings() {
+        return exceptionsNameMappings;
+    }
+    
+    /**
+     * Gets model name mappings between a mappers name and the new name.
+     *
+     * @return the mappers name mappings
+     */
+    public Map<String, String> getMappersNameMappings() {
+        return mappersNameMappings;
+    }     
     
     /**
      * Gets service name mappings between a service name and the new name.
@@ -541,11 +601,13 @@ public final class GeneratorSettings implements Serializable {
 
         generatorName = builder.generatorName;
         apiPackage = builder.apiPackage;
+        configPackage = builder.configPackage;
         modelPackage = builder.modelPackage;
         
         modelServicePackage = builder.modelServicePackage;
         modelPersistencePackage = builder.modelPersistencePackage;
-        
+        exceptionsPackage = builder.exceptionsPackage;
+        mappersPackage = builder.mappersPackage;
         servicePackage = builder.servicePackage;
         repositoryPackage = builder.repositoryPackage;
         webClientsPackage = builder.webClientsPackage;
@@ -570,8 +632,11 @@ public final class GeneratorSettings implements Serializable {
         parameterNameMappings = Collections.unmodifiableMap(builder.parameterNameMappings);
         modelNameMappings = Collections.unmodifiableMap(builder.modelNameMappings);
 
+        configNameMappings = Collections.unmodifiableMap(builder.configNameMappings);
         modelServiceNameMappings = Collections.unmodifiableMap(builder.modelServiceNameMappings);
         modelPersistenceNameMappings = Collections.unmodifiableMap(builder.modelPersistenceNameMappings);
+        exceptionsNameMappings = Collections.unmodifiableMap(builder.exceptionsNameMappings);
+        mappersNameMappings = Collections.unmodifiableMap(builder.mappersNameMappings);
         serviceNameMappings = Collections.unmodifiableMap(builder.serviceNameMappings);
         repositoryNameMappings = Collections.unmodifiableMap(builder.repositoryNameMappings);
         webClientsNameMappings = Collections.unmodifiableMap(builder.webClientsNameMappings);
@@ -594,6 +659,9 @@ public final class GeneratorSettings implements Serializable {
         if (isNotEmpty(apiPackage)) {
             additional.put("apiPackage", apiPackage);
         }
+        if (isNotEmpty(configPackage)) {
+            additional.put("configPackage", configPackage);
+        }
 		if (isNotEmpty(modelPackage)) {
 			additional.put("modelPackage", modelPackage);
 		}
@@ -603,6 +671,12 @@ public final class GeneratorSettings implements Serializable {
 		if (isNotEmpty(modelPersistencePackage)) {
 			additional.put("modelPersistencePackage", modelPersistencePackage);
 		}
+		if (isNotEmpty(exceptionsPackage)) {
+			additional.put("exceptionsPackage", exceptionsPackage);
+		}
+		if (isNotEmpty(mappersPackage)) {
+			additional.put("mappersPackage", mappersPackage);
+		}		
 		if (isNotEmpty(servicePackage)) {
 			additional.put("servicePackage", servicePackage);
 		}
@@ -672,8 +746,11 @@ public final class GeneratorSettings implements Serializable {
         parameterNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         modelNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         
+        configNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         modelServiceNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         modelPersistenceNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
+        exceptionsNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
+        mappersNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         serviceNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         repositoryNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
         webClientsNameMappings = Collections.unmodifiableMap(new HashMap<>(0));
@@ -711,10 +788,13 @@ public final class GeneratorSettings implements Serializable {
         Builder builder = new Builder();
         builder.generatorName = copy.getGeneratorName();
         builder.apiPackage = copy.getApiPackage();
+        builder.configPackage = copy.getConfigPackage();
         builder.modelPackage = copy.getModelPackage();
         
         builder.modelServicePackage = copy.getModelServicePackage();
         builder.modelPersistencePackage = copy.getModelPersistencePackage();
+        builder.exceptionsPackage = copy.getExceptionsPackage();
+        builder.mappersPackage = copy.getMappersPackage();
         builder.servicePackage = copy.getServicePackage();
         builder.repositoryPackage = copy.getRepositoryPackage();
         builder.webClientsPackage = copy.getWebClientsPackage();
@@ -764,6 +844,12 @@ public final class GeneratorSettings implements Serializable {
         }
         if (copy.getModelPersistenceNameMappings() != null) {
             builder.modelPersistenceNameMappings.putAll(copy.getModelPersistenceNameMappings());
+        }
+        if (copy.getExceptionsNameMappings() != null) {
+            builder.exceptionsNameMappings.putAll(copy.getExceptionsNameMappings());
+        }         
+        if (copy.getMappersNameMappings() != null) {
+            builder.mappersNameMappings.putAll(copy.getMappersNameMappings());
         }         
         if (copy.getEnumNameMappings() != null) {
             builder.enumNameMappings.putAll(copy.getEnumNameMappings());
@@ -803,10 +889,13 @@ public final class GeneratorSettings implements Serializable {
     public static final class Builder {
         private String generatorName;
         private String apiPackage;
+        private String configPackage;
         private String modelPackage;
         
         private String modelServicePackage;
         private String modelPersistencePackage;
+        private String exceptionsPackage;
+        private String mappersPackage;
         private String servicePackage;
         private String repositoryPackage;
         private String webClientsPackage;
@@ -832,8 +921,11 @@ public final class GeneratorSettings implements Serializable {
         private Map<String, String> parameterNameMappings;
         private Map<String, String> modelNameMappings;
         
+        private Map<String, String> configNameMappings;
         private Map<String, String> modelServiceNameMappings;
         private Map<String, String> modelPersistenceNameMappings;
+        private Map<String, String> exceptionsNameMappings;
+        private Map<String, String> mappersNameMappings;
         private Map<String, String> serviceNameMappings;
         private Map<String, String> repositoryNameMappings;
         private Map<String, String> webClientsNameMappings;
@@ -866,8 +958,11 @@ public final class GeneratorSettings implements Serializable {
             parameterNameMappings = new HashMap<>();
             modelNameMappings = new HashMap<>();
             
+            configNameMappings = new HashMap<>();
             modelServiceNameMappings = new HashMap<>();
             modelPersistenceNameMappings = new HashMap<>();
+            exceptionsNameMappings = new HashMap<>();
+            mappersNameMappings = new HashMap<>();
             serviceNameMappings = new HashMap<>();
             repositoryNameMappings = new HashMap<>();
             webClientsNameMappings = new HashMap<>();
@@ -907,6 +1002,17 @@ public final class GeneratorSettings implements Serializable {
             this.apiPackage = apiPackage;
             return this;
         }
+        
+        /**
+         * Sets the {@code configPackage} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param configPackage the {@code configPackage} to set
+         * @return a reference to this Builder
+         */
+        public Builder withConfigPackage(String configPackage) {
+            this.configPackage = configPackage;
+            return this;
+        }        
 
         /**
          * Sets the {@code modelPackage} and returns a reference to this Builder so that the methods can be chained together.
@@ -941,6 +1047,28 @@ public final class GeneratorSettings implements Serializable {
             return this;
         }
 
+        /**
+         * Sets the {@code exceptionsPackage} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param exceptionsPackage the {@code exceptionsPackage} to set
+         * @return a reference to this Builder
+         */
+        public Builder withExceptionsPackage(String exceptionsPackage) {
+            this.exceptionsPackage = exceptionsPackage;
+            return this;
+        }
+        
+        /**
+         * Sets the {@code mappersPackage} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param mappersPackage the {@code mappersPackage} to set
+         * @return a reference to this Builder
+         */
+        public Builder withMappersPackage(String mappersPackage) {
+            this.mappersPackage = mappersPackage;
+            return this;
+        }         
+        
         /**
          * Sets the {@code servicePackage} and returns a reference to this Builder so that the methods can be chained together.
          *
@@ -1328,6 +1456,58 @@ public final class GeneratorSettings implements Serializable {
             this.modelNameMappings.put(key, value);
             return this;
         }
+        
+        /**
+         * Sets the {@code exceptionsNameMappings} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param exceptionsNameMappings the {@code exceptionsNameMappings} to set
+         * @return a reference to this Builder
+         */
+        public Builder withExceptionsNameMappings(Map<String, String> exceptionsNameMappings) {
+            this.exceptionsNameMappings = exceptionsNameMappings;
+            return this;
+        }
+        
+        /**
+         * Sets a single {@code modelNameMappings} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param key   A key for the name mapping
+         * @param value The value of name mapping
+         * @return a reference to this Builder
+         */
+        public Builder withExceptionsNameMapping(String key, String value) {
+            if (this.exceptionsNameMappings == null) {
+                this.exceptionsNameMappings = new HashMap<>();
+            }
+            this.exceptionsNameMappings.put(key, value);
+            return this;
+        }         
+        
+        /**
+         * Sets the {@code mappersNameMappings} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param mappersNameMappings the {@code mappersNameMappings} to set
+         * @return a reference to this Builder
+         */
+        public Builder withMappersNameMappings(Map<String, String> mappersNameMappings) {
+            this.mappersNameMappings = mappersNameMappings;
+            return this;
+        }
+        
+        /**
+         * Sets a single {@code modelNameMappings} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param key   A key for the name mapping
+         * @param value The value of name mapping
+         * @return a reference to this Builder
+         */
+        public Builder withMappersNameMapping(String key, String value) {
+            if (this.mappersNameMappings == null) {
+                this.mappersNameMappings = new HashMap<>();
+            }
+            this.mappersNameMappings.put(key, value);
+            return this;
+        }          
         
         /**
          * Sets the {@code serviceNameMappings} and returns a reference to this Builder so that the methods can be chained together.

@@ -202,12 +202,15 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> operationIdNameMapping = new HashMap<>();
     // a map to store the rules in OpenAPI Normalizer
     protected Map<String, String> openapiNormalizer = new HashMap<>();
-    @Setter protected String modelPackage = "", modelServicePackage = "", modelPersistencePackage = "", apiPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
+    @Setter protected String modelPackage = "", modelServicePackage = "", modelPersistencePackage = "",  apiPackage = "", configPackage = "", exceptionsPackage = "", mappersPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
     protected String fileSuffix;
     @Getter @Setter
     protected String modelNamePrefix = "", modelNameSuffix = "";
     @Getter @Setter
-    protected String apiNamePrefix = "", apiNameSuffix = "Api";
+    protected String apiNamePrefix = "", apiNameSuffix = "";
+    //protected String apiNamePrefix = "", apiNameSuffix = "Api";
+    @Getter @Setter
+    protected String configNamePrefix = "", configNameSuffix = "";    
     @Getter @Setter
     protected String serviceNamePrefix = "", serviceNameSuffix = "";
     @Getter @Setter
@@ -224,9 +227,12 @@ public class DefaultCodegen implements CodegenConfig {
     API templates may be written multiple times; APIs are grouped by tag and the file is written once per tag group.
     */
     protected Map<String, String> apiTemplateFiles = new HashMap<>();
+    protected Map<String, String> configTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTemplateFiles = new HashMap<>();
     protected Map<String, String> modelServiceTemplateFiles = new HashMap<>();
     protected Map<String, String> modelPersistenceTemplateFiles = new HashMap<>();
+    protected Map<String, String> exceptionsTemplateFiles = new HashMap<>();
+    protected Map<String, String> mappersTemplateFiles = new HashMap<>();
     protected Map<String, String> serviceTemplateFiles = new HashMap<>();
     protected Map<String, String> repositoryTemplateFiles = new HashMap<>();
     protected Map<String, String> webClientsTemplateFiles = new HashMap<>();
@@ -417,6 +423,7 @@ public class DefaultCodegen implements CodegenConfig {
         convertPropertyToStringAndWriteBack(CodegenConstants.TEMPLATE_DIR, this::setTemplateDir);
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.CONFIG_PACKAGE, this::setConfigPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.WEBCLIENTS_PACKAGE, this::setWebClientsPackage);
@@ -1379,6 +1386,21 @@ public class DefaultCodegen implements CodegenConfig {
         return apiPackage;
     }
     
+    @Override
+    public String configPackage() {
+        return configPackage;
+    }
+    
+	@Override
+	public String exceptionsPackage() {
+		return exceptionsPackage;
+	}
+
+	@Override
+	public String mappersPackage() {
+		return mappersPackage;
+	}    
+    
 	@Override
 	public String servicePackage() {		
 		return servicePackage;
@@ -1442,6 +1464,11 @@ public class DefaultCodegen implements CodegenConfig {
     public Map<String, String> apiTemplateFiles() {
         return apiTemplateFiles;
     }
+    
+    @Override
+    public Map<String, String> configTemplateFiles() {
+        return configTemplateFiles;
+    }
 
     @Override
     public Map<String, String> modelTemplateFiles() {
@@ -1456,8 +1483,18 @@ public class DefaultCodegen implements CodegenConfig {
 	@Override
 	public Map<String, String> modelPersistenceTemplateFiles() {
 		return modelPersistenceTemplateFiles;
-	}       
-    
+	}
+	
+	@Override
+	public Map<String, String> exceptionsTemplateFiles() {
+		return exceptionsTemplateFiles;
+	}  	
+
+	@Override
+	public Map<String, String> mappersTemplateFiles() {
+		return mappersTemplateFiles;
+	}  	
+
 	@Override
 	public Map<String, String> serviceTemplateFiles() {
 		return serviceTemplateFiles;
@@ -1487,6 +1524,11 @@ public class DefaultCodegen implements CodegenConfig {
     public String apiFileFolder() {
         return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
     }
+    
+	@Override
+	public String configFileFolder() {
+        return outputFolder + File.separator + configPackage().replace('.', File.separatorChar);
+	}    
 
     @Override
     public String modelFileFolder() {
@@ -1502,7 +1544,17 @@ public class DefaultCodegen implements CodegenConfig {
 	public String modelPersistenceFileFolder() {
         return outputFolder + File.separator + modelPersistencePackage().replace('.', File.separatorChar);
 	}    
-    
+
+	@Override
+	public String exceptionsFileFolder() {
+        return outputFolder + File.separator + exceptionsPackage().replace('.', File.separatorChar);
+	}
+	
+	@Override
+	public String mappersFileFolder() {
+        return outputFolder + File.separator + mappersPackage().replace('.', File.separatorChar);
+	} 	
+	
 	@Override
 	public String serviceFileFolder() {
         return outputFolder + File.separator + servicePackage().replace('.', File.separatorChar);
@@ -1653,6 +1705,17 @@ public class DefaultCodegen implements CodegenConfig {
     public String toApiFilename(String name) {
         return toApiName(name);
     }
+    
+    /**
+     * Return the file name of the Config
+     *
+     * @param name the file name of the Config
+     * @return the file name of the Config
+     */
+	@Override
+	public String toConfigFilename(String name) {
+		return toConfigName(name);
+	}
 
     /**
      * Return the file name of the Api Documentation
@@ -1718,7 +1781,27 @@ public class DefaultCodegen implements CodegenConfig {
 	@Override
 	public String toModelPersistenceFilename(String name) {
 		return camelize(name);	
-	}    
+	}
+	
+	@Override
+	public String toExceprionsName(String name) {
+		return camelize(name);	
+	}
+
+	@Override
+	public String toMappersName(String name) {
+		return camelize(name);	
+	}
+
+	@Override
+	public String toExceptionsFilename(String name) {
+		return camelize(name);	
+	}
+
+	@Override
+	public String toMappersFilename(String name) {
+		return camelize(name);	
+	}	
 
     /**
      * Return the capitalized file name of the model
@@ -2840,6 +2923,14 @@ public class DefaultCodegen implements CodegenConfig {
         }
         return camelize(apiNamePrefix + "_" + name + "_" + apiNameSuffix);
     }
+    
+	@Override
+	public String toConfigName(String name) {
+        if (name.length() == 0) {
+            return "DefaultConfig";
+        }
+        return camelize(configNamePrefix + "_" + name + "_" + configNameSuffix);
+	}    
 
     /**
      * Converts the OpenAPI schema name to a model name suitable for the current code generator.
@@ -6616,6 +6707,20 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = apiTemplateFiles().get(templateName);
         return outputDir + File.separator + toApiFilename(uniqueTag) + suffix;
     }
+    
+    @Override
+    public String configFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = configTemplateFiles().get(templateName);
+        return configFileFolder() + File.separator + toConfigFilename(uniqueTag) + suffix;
+    }
+
+    @Override
+    public String configFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = configTemplateFiles().get(templateName);
+        return outputDir + File.separator + toConfigFilename(uniqueTag) + suffix;
+    }    
 
     private final Map<String, String> seenModelFilenames = new HashMap<String, String>();
 
@@ -6656,9 +6761,38 @@ public class DefaultCodegen implements CodegenConfig {
 
 	@Override
 	public String modelPersistenceFilename(String templateName, String modelName, String outputDir) {
-		// TODO Auto-generated method stub
-		return null;
-	}    
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelPersistenceTemplateFiles().get(templateName);
+        return outputDir + File.separator + toModelPersistenceFilename(uniqueModelName) + suffix;
+	} 
+	
+	@Override
+	public String exceptionsFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = exceptionsTemplateFiles().get(templateName);
+        return exceptionsFileFolder() + File.separator + toExceptionsFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String exceptionsFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = exceptionsTemplateFiles().get(templateName);
+        return outputDir + File.separator + toExceptionsFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String mappersFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = mappersTemplateFiles().get(templateName);
+        return mappersFileFolder() + File.separator + toMappersFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String mappersFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = mappersTemplateFiles().get(templateName);
+        return outputDir + File.separator + toMappersFilename(uniqueModelName) + suffix;
+	}	
     
 	@Override
 	public String serviceFilename(String templateName, String tag) {

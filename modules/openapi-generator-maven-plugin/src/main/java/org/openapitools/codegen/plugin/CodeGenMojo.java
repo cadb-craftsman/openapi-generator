@@ -208,6 +208,12 @@ public class CodeGenMojo extends AbstractMojo {
     private String apiPackage;
 
     /**
+     * The package to use for generated config objects/classes
+     */
+    @Parameter(name = "configPackage", property = "openapi.generator.maven.plugin.configPackage")
+    private String configPackage;
+    
+    /**
      * The package to use for generated model objects/classes
      */
     @Parameter(name = "modelPackage", property = "openapi.generator.maven.plugin.modelPackage")
@@ -225,6 +231,18 @@ public class CodeGenMojo extends AbstractMojo {
     @Parameter(name = "modelPersistencePackage", property = "openapi.generator.maven.plugin.modelPersistencePackage")
     private String modelPersistencePackage;
     
+    /**
+     * The package to use for generated exceptions objects/classes
+     */
+    @Parameter(name = "exceptionsPackage", property = "openapi.generator.maven.plugin.exceptionsPackage")
+    private String exceptionsPackage;
+        
+    /**
+     * The package to use for generated exceptions objects/classes
+     */
+    @Parameter(name = "mappersPackage", property = "openapi.generator.maven.plugin.mappersPackage")
+    private String mappersPackage;    
+         
     /**
      * The package to use for generated service objects/classes
      */
@@ -749,6 +767,10 @@ public class CodeGenMojo extends AbstractMojo {
                 configurator.setApiPackage(apiPackage);
             }
 
+            if (isNotEmpty(configPackage)) {
+                configurator.setConfigPackage(configPackage);
+            }            
+            
             if (isNotEmpty(modelPackage)) {
                 configurator.setModelPackage(modelPackage);
             }

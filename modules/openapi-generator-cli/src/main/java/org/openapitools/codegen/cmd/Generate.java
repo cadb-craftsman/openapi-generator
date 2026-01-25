@@ -113,12 +113,16 @@ public class Generate extends OpenApiGeneratorCommand {
             description = CodegenConstants.API_PACKAGE_DESC)
     private String apiPackage;
 
+    private String configPackage;
+    
     @Option(name = {"--model-package"}, title = "model package",
             description = CodegenConstants.MODEL_PACKAGE_DESC)
     private String modelPackage;
     
     private String modelServicePackage;
     private String modelPersistencePackage;
+    private String exceptionsPackage;
+    private String mappersPackage;
     private String servicePackage;
     private String repositoryPackage;
     private String webClientsPackage;
@@ -423,6 +427,10 @@ public class Generate extends OpenApiGeneratorCommand {
         if (isNotEmpty(apiPackage)) {
             configurator.setApiPackage(apiPackage);
         }
+        
+        if (isNotEmpty(configPackage)) {
+            configurator.setConfigPackage(configPackage);
+        }
 
         if (isNotEmpty(modelPackage)) {
             configurator.setModelPackage(modelPackage);
@@ -435,6 +443,14 @@ public class Generate extends OpenApiGeneratorCommand {
         if (isNotEmpty(modelPersistencePackage)) {
             configurator.setModelPersistencePackage(modelPersistencePackage);
         }
+
+        if (isNotEmpty(exceptionsPackage)) {
+            configurator.setExceptionsPackage(exceptionsPackage);
+        }
+        
+        if (isNotEmpty(mappersPackage)) {
+            configurator.setMappersPackage(mappersPackage);
+        }        
         
         if (isNotEmpty(servicePackage)) {
             configurator.setServicePackage(servicePackage);

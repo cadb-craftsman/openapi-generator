@@ -11,16 +11,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-public class SpringBootWebClientsConfig {
+public class {{classname}}WebClientsConfig {
 
     Map<String, WebClient> webClients = null;
 
     @Bean("webClients")
-    Map<String, WebClient> getWebClients(SpringBootWebClientsProperties clientProperties, WebClient.Builder webClientBuilder){
+    Map<String, WebClient> getWebClients({{classname}}WebClientsProperties clientProperties, WebClient.Builder webClientBuilder){
         if(webClients == null) {
             webClients = new HashMap<>();
 
-            for(SpringBootWebClientsProperties.Client client: clientProperties.getClients()) {
+            for({{classname}}WebClientsProperties.Client client: clientProperties.getClients()) {
                 if(client.trace()) {
                     log.info(client.name() + " method url: " + client.url());
                 }

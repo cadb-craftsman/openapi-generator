@@ -124,9 +124,9 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 	@Setter
 	protected String title = "OpenAPI Spring";
-	@Getter
-	@Setter
-	protected String configPackage = "org.openapitools.configuration";
+	//@Getter
+	//@Setter
+	//protected String configPackage = "org.openapitools.config";
 	@Getter
 	@Setter
 	protected String basePackage = "org.openapitools";
@@ -222,9 +222,12 @@ public class SpringCodegen extends AbstractJavaCodegen
 		embeddedTemplateDir = templateDir = "JavaSpring";
 
 		apiPackage = "org.openapitools.api";
+		configPackage = "org.openapitools.config";
 		modelPackage = "org.openapitools.model";
 		modelServicePackage = "org.openapitools.model.service";
 		modelPersistencePackage = "org.openapitools.model.persistence";
+		exceptionsPackage = "org.openapitools.model.exceptions";
+		mappersPackage = "org.openapitools.model.mappers";
 		servicePackage = "org.openapitools.service";
 		repositoryPackage = "org.openapitools.repository";
 		webClientsPackage = "org.openapitools.webclients";
@@ -235,9 +238,12 @@ public class SpringCodegen extends AbstractJavaCodegen
 		updateOption(CodegenConstants.INVOKER_PACKAGE, this.getInvokerPackage());
 		updateOption(CodegenConstants.ARTIFACT_ID, this.getArtifactId());
 		updateOption(CodegenConstants.API_PACKAGE, apiPackage);
+		updateOption(CodegenConstants.CONFIG_PACKAGE, configPackage);
 		updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
 		updateOption(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
 		updateOption(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
+		updateOption(CodegenConstants.EXCEPTIONS_PACKAGE, exceptionsPackage);
+		updateOption(CodegenConstants.MAPPERS_PACKAGE, mappersPackage);
 		updateOption(CodegenConstants.SERVICE_PACKAGE, servicePackage);
 		updateOption(CodegenConstants.REPOSITORY_PACKAGE, repositoryPackage);
 		updateOption(CodegenConstants.WEBCLIENTS_PACKAGE, webClientsPackage);
@@ -256,8 +262,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		additionalProperties.put("closebrace", CLOSE_BRACE);
 
 		cliOptions.add(new CliOption(TITLE, "server title name or client service name").defaultValue(title));
-		cliOptions.add(new CliOption(CONFIG_PACKAGE, "configuration package for generated code")
-				.defaultValue(this.getConfigPackage()));
+		//cliOptions.add(new CliOption(CodegenConstants.CONFIG_PACKAGE, "configuration package for generated code")
+		//		.defaultValue(this.getConfigPackage()));
 		cliOptions.add(new CliOption(BASE_PACKAGE, "base package (invokerPackage) for generated code")
 				.defaultValue(this.getBasePackage()));
 		cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY,
@@ -614,6 +620,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			     * Import application.mustache and generate application.yml  
 			     */
 				apiTemplateFiles.put("apiController.mustache", "Controller.java");
+				apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
 
 				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
 				supportingFiles.add(new SupportingFile("application.mustache", resourceFolder, "application.yml"));
@@ -626,6 +633,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 				if(isMyBatis) {
 					
 					//Generate Service and Repository interfaces with methods definition.
+					mappersTemplateFiles.put("factoryMapper.mustache", "FactoryMapper.java");
+					exceptionsTemplateFiles.put("serviceException.mustache", "Exception.java");
+					exceptionsTemplateFiles.put("serviceNoContentException.mustache", "NoContentException.java");
+					exceptionsTemplateFiles.put("serviceNotFoundException.mustache", "NotFoundException.java");
 					serviceTemplateFiles.put("service.mustache", "Srv.java");
 					serviceTemplateFiles.put("serviceImpl.mustache", "SrvImpl.java");
 					repositoryTemplateFiles.put("repository.mustache", "Repository.java");
@@ -638,14 +649,14 @@ public class SpringCodegen extends AbstractJavaCodegen
 							(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
 							"YesNoTypeHandler.java"));
 
-					supportingFiles.add(new SupportingFile("factoryMapper.mustache",
-							(sourceFolder + File.separator + basePackage + DOMAIN_MAPPERS_PACKAGE).replace(".", java.io.File.separator),
-							"FactoryMapper.java"));
+					//supportingFiles.add(new SupportingFile("factoryMapper.mustache",
+					//		(sourceFolder + File.separator + basePackage + DOMAIN_MAPPERS_PACKAGE).replace(".", java.io.File.separator),
+					//		"FactoryMapper.java"));
 					
 					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
 					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
-					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
-					supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
+					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
+					supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
 					supportingFiles.add(new SupportingFile("mybatis-3-config.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-config.dtd"));
 					supportingFiles.add(new SupportingFile("mybatis-3-mapper.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-mapper.dtd"));				
 					supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
@@ -660,15 +671,22 @@ public class SpringCodegen extends AbstractJavaCodegen
 					     * If is mybatis Config and NativeConfig project classes.  
 					     */
 						if(isMyBatis) {
-							supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
-							supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
+							configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
+							configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
+							
+							//supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
+							//supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
 						}else {
-							supportingFiles.add(new SupportingFile("springbootDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
-							supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
+							configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
+							configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
+							//supportingFiles.add(new SupportingFile("springbootDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
+							//supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
 						}
 						
-						supportingFiles.add(new SupportingFile("springbootWebClientsConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsConfig.java"));
-						supportingFiles.add(new SupportingFile("springbootWebClientsProperties.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsProperties.java"));
+						configTemplateFiles.put("springbootWebClientsConfig.mustache", "WebClientsConfig.java");
+						configTemplateFiles.put("springbootWebClientsProperties.mustache", "WebClientsProperties.java");
+						//supportingFiles.add(new SupportingFile("springbootWebClientsConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsConfig.java"));
+						//supportingFiles.add(new SupportingFile("springbootWebClientsProperties.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsProperties.java"));
 						
 					} else if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
 						supportingFiles.add(new SupportingFile("openapiDocumentationConfig.mustache",
@@ -776,6 +794,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		// HEADS-UP: Do not add more template file after this block
 		if (apiFirst) {
 			apiTemplateFiles.clear();
+			configTemplateFiles.clear();
 			modelTemplateFiles.clear();
 			serviceTemplateFiles.clear();
 			repositoryTemplateFiles.clear();
@@ -1369,5 +1388,4 @@ public class SpringCodegen extends AbstractJavaCodegen
 		extensions.add(VendorExtension.X_SPRING_API_VERSION);
 		return extensions;
 	}
-
 }

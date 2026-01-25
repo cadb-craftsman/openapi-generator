@@ -1,17 +1,19 @@
 package {{configPackage}};
 
-import org.springframework.context.annotation.Bean;
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.security.SecurityScheme;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
+@Data
 @Configuration
-public class SpringBootWebClientProperties {
+@ConfigurationProperties(prefix = "config")
+public class {{classname}}WebClientsProperties {
 
 	private List<Client> clients;
 

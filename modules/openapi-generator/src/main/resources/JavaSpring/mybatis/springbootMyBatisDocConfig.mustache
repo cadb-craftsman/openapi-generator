@@ -29,9 +29,9 @@ import io.swagger.v3.oas.models.info.License;
 
 @Configuration
 @MapperScan(basePackages = "{{basePackage}}.repository", annotationClass = Mapper.class, sqlSessionTemplateRef = "myBatisSqlSessionTemplate", sqlSessionFactoryRef = "myBatisSqlSessionFactory")
-public class SpringBootDocConfig {
+public class {{classname}}DocConfig {
 
-    @Bean(name = "{{configPackage}}.SpringBootDocConfig.apiInfo")
+    @Bean(name = "{{configPackage}}.{{classname}}DocConfig.apiInfo")
     OpenAPI apiInfo() {
         return new OpenAPI()
                 .info(
@@ -104,7 +104,7 @@ public class SpringBootDocConfig {
     }
 
     @Bean
-    {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, SpringBootWebClientProperties clientProperties) {
+    {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, {{classname}}WebClientProperties clientProperties) {
         return new {{classname}}WebClient(webClients.get(clientProperties.getClients().get(0).name()), clientProperties.getClients().get(0));
     }    
 }

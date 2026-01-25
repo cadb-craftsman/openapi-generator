@@ -19,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
  * This configuration to use spring-native.
  */
 @Configuration(proxyBeanMethods = false)
-@ImportRuntimeHints(SpringBootNativeConfig.SpringBootRuntimeHintsRegistrar.class)
-public class SpringBootNativeConfig {
+@ImportRuntimeHints({{classname}}NativeConfig.SpringBootRuntimeHintsRegistrar.class)
+public class {{classname}}NativeConfig {
 
   static class SpringBootRuntimeHintsRegistrar implements RuntimeHintsRegistrar {
 	  

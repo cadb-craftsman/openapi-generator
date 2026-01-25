@@ -765,11 +765,12 @@ public class DefaultGenerator implements Generator {
                         .ifPresent(description -> operation.put("operationTagDescription", config.escapeText(description)));
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
+                operation.put("configPackage", config.configPackage());
                 operation.put("modelPackage", config.modelPackage());
-                
                 operation.put("modelServicePackage", config.modelServicePackage());
                 operation.put("modelPersistencePackage", config.modelPersistencePackage());
-                
+                operation.put("exceptionsPackage", config.exceptionsPackage());
+                operation.put("mappersPackage", config.mappersPackage());
                 operation.put("servicePackage", config.servicePackage());
                 operation.put("repositoryPackage", config.repositoryPackage());
                 operation.put("webClientsPackage", config.webClientsPackage());
@@ -826,6 +827,7 @@ public class DefaultGenerator implements Generator {
                  * @Craftsman generate classes depending in files templates
                  * 
                  */
+                // to generate api files
                 for (String templateName : config.apiTemplateFiles().keySet()) {
                     File written = null;
                     if (config.templateOutputDirs().containsKey(templateName)) {
@@ -853,6 +855,91 @@ public class DefaultGenerator implements Generator {
                     }
                 }
                 
+                // to generate config files
+                for (String templateName : config.configTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.configFilename(templateName, tag, outputDir);
+                        // do not overwrite apiController file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.CONFIG, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.configFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.CONFIG);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "config");
+                        }
+                    }
+                }                
+                
+                // to generate mappers files
+                for (String templateName : config.mappersTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.mappersFilename(templateName, tag, outputDir);
+                        // do not overwrite service interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.mappersFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "exceptions");
+                        }
+                    }
+                }                 
+                
+                // to generate exceptions files
+                for (String templateName : config.exceptionsTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.exceptionsFilename(templateName, tag, outputDir);
+                        // do not overwrite service interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.exceptionsFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "mappers");
+                        }
+                    }
+                }                
+                
+                // to generate service files
                 for (String templateName : config.serviceTemplateFiles().keySet()) {
                     File written = null;
                     if (config.templateOutputDirs().containsKey(templateName)) {
@@ -880,6 +967,7 @@ public class DefaultGenerator implements Generator {
                     }
                 }
                 
+                // to generate repository files
                 for (String templateName : config.repositoryTemplateFiles().keySet()) {
                     File written = null;
                     if (config.templateOutputDirs().containsKey(templateName)) {
@@ -907,6 +995,7 @@ public class DefaultGenerator implements Generator {
                     }
                 }
                 
+                // to generate webclients files
                 for (String templateName : config.webClientsTemplateFiles().keySet()) {
                     File written = null;
                     if (config.templateOutputDirs().containsKey(templateName)) {
@@ -932,7 +1021,7 @@ public class DefaultGenerator implements Generator {
                             config.postProcessFile(written, "webclients");
                         }
                     }
-                }                 
+                } 
 
                 // to generate api test files
                 for (String templateName : config.apiTestTemplateFiles().keySet()) {
@@ -1017,12 +1106,15 @@ public class DefaultGenerator implements Generator {
                         .ifPresent(description -> operation.put("operationTagDescription", config.escapeText(description)));
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
+                operation.put("configPackage", config.configPackage());
                 operation.put("modelPackage", config.modelPackage());
-                
                 operation.put("modelServicePackage", config.modelServicePackage());
                 operation.put("modelPersistencePackage", config.modelPersistencePackage());
-                
-                
+                operation.put("exceptionsPackage", config.exceptionsPackage());
+                operation.put("mappersPackage", config.mappersPackage());
+                operation.put("servicePackage", config.servicePackage());
+                operation.put("repositoryPackage", config.repositoryPackage());
+                operation.put("webClientsPackage", config.webClientsPackage());
                 operation.putAll(config.additionalProperties());
                 operation.put("classname", config.toApiName(tag));
                 operation.put("classVarName", config.toApiVarName(tag));
@@ -1322,11 +1414,15 @@ public class DefaultGenerator implements Generator {
         bundle.put("models", allModels);
         bundle.put("aliasModels", aliasModels);
         bundle.put("apiFolder", config.apiPackage().replace('.', File.separatorChar));
+        bundle.put("configPackage", config.configPackage());
         bundle.put("modelPackage", config.modelPackage());
-        
         bundle.put("modelServicePackage", config.modelServicePackage());
         bundle.put("modelPersistencePackage", config.modelPersistencePackage());
-
+        bundle.put("exceptionsPackage", config.exceptionsPackage());
+        bundle.put("mappersPackage", config.mappersPackage());
+        bundle.put("servicePackage", config.servicePackage());
+        bundle.put("repositoryPackage", config.repositoryPackage());
+        bundle.put("webClientsPackage", config.webClientsPackage());
         bundle.put("library", config.getLibrary());
         bundle.put("generatorLanguageVersion", config.generatorLanguageVersion());
         // todo verify support and operation bundles have access to the common variables
@@ -1565,6 +1661,9 @@ public class DefaultGenerator implements Generator {
                             case API:
                                 config.apiTemplateFiles().put(templateFile, templateExt);
                                 break;
+                            case Config:
+                                config.configTemplateFiles().put(templateFile, templateExt);
+                                break;                                
                             case Model:
                                 config.modelTemplateFiles().put(templateFile, templateExt);
                                 break;

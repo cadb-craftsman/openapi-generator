@@ -80,8 +80,8 @@ import com.github.pagehelper.dialect.helper.PostgreSqlDialect;
  * This configuration to use mybatis-spring-native.
  */
 @Configuration(proxyBeanMethods = false)
-@ImportRuntimeHints(SpringBootNativeConfig.MyBatisRuntimeHintsRegistrar.class)
-public class SpringBootNativeConfig {
+@ImportRuntimeHints({{classname}}NativeConfig.MyBatisRuntimeHintsRegistrar.class)
+public class {{classname}}NativeConfig {
 
   @Bean
   MyBatisBeanFactoryInitializationAotProcessor myBatisBeanFactoryInitializationAotProcessor() {
@@ -95,7 +95,7 @@ public class SpringBootNativeConfig {
 
   static class MyBatisRuntimeHintsRegistrar implements RuntimeHintsRegistrar {
 	  
-	private String pkg = "{{package}}.repository";
+	private String pkg = "{{basePackage}}.repository";
 
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {

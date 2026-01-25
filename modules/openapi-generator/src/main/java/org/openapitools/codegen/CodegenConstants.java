@@ -24,6 +24,7 @@ public class CodegenConstants {
     /* System Properties */
     // NOTE: We may want to move these to a separate class to avoid confusion or modification.
     public static final String APIS = "apis";
+    public static final String CONFIG = "config";
     public static final String MODELS = "models";
     public static final String SERVICES = "services";
     public static final String REPOSITORIES = "repositories";
@@ -46,6 +47,9 @@ public class CodegenConstants {
 
     public static final String API_SUFFIX = "apiSuffix";
     public static final String API_SUFFIX_DESC = "suffix for api classes";
+    
+    public static final String CONFIG_PACKAGE = "configPackage";
+    public static final String CONFIG_PACKAGE_DESC = "package for generated config classes";
 
     public static final String AUTOSET_CONSTANTS = "autosetConstants";
 
@@ -57,6 +61,12 @@ public class CodegenConstants {
 
     public static final String MODEL_PERSISTENCE_PACKAGE = "modelPersistencePackage";
     public static final String MODEL_PERSISTENCE_PACKAGE_DESC = "package for generated models";
+
+    public static final String EXCEPTIONS_PACKAGE = "exceptionsPackage";
+    public static final String EXCEPTIONS_PACKAGE_DESC = "package for generated exceptions";
+
+    public static final String MAPPERS_PACKAGE = "mappersPackage";
+    public static final String MAPPERS_PACKAGE_DESC = "package for generated mappers";
 
     public static final String SERVICE_PACKAGE = "servicePackage";
     public static final String SERVICE_PACKAGE_DESC = "package for generated services";

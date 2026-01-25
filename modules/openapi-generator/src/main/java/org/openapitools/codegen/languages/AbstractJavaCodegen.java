@@ -238,15 +238,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         modelServiceTemplateFiles.put("modelService.mustache", ".java");
         modelPersistenceTemplateFiles.put("modelPersistence.mustache", ".java");
         apiTemplateFiles.put("api.mustache", ".java");
-        
-	    /***
-	     * @Craftsman
-	     * Adds service, repository and webclients mustache templates  
-	     */
-        serviceTemplateFiles.put("service.mustache", ".java");
-        repositoryTemplateFiles.put("repository.mustache", ".java");
-        webClientsTemplateFiles.put("webclients.mustache", ".java");
-        
+
         apiTestTemplateFiles.put("api_test.mustache", ".java");
         modelDocTemplateFiles.put("model_doc.mustache", ".md");
         apiDocTemplateFiles.put("api_doc.mustache", ".md");
@@ -311,6 +303,9 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
         cliOptions.add(new CliOption(CodegenConstants.MODEL_PACKAGE, CodegenConstants.MODEL_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.API_PACKAGE, CodegenConstants.API_PACKAGE_DESC));
+        cliOptions.add(new CliOption(CodegenConstants.CONFIG_PACKAGE, CodegenConstants.CONFIG_PACKAGE_DESC));
+        cliOptions.add(new CliOption(CodegenConstants.EXCEPTIONS_PACKAGE, CodegenConstants.EXCEPTIONS_PACKAGE_DESC));
+        cliOptions.add(new CliOption(CodegenConstants.MAPPERS_PACKAGE, CodegenConstants.MAPPERS_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.SERVICE_PACKAGE, CodegenConstants.SERVICE_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.REPOSITORY_PACKAGE, CodegenConstants.REPOSITORY_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.WEBCLIENTS_PACKAGE, CodegenConstants.WEBCLIENTS_PACKAGE_DESC));
@@ -495,6 +490,18 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
             additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
         }
         
+        if (!additionalProperties.containsKey(CodegenConstants.CONFIG_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.CONFIG_PACKAGE, configPackage);
+        }
+
+        if (!additionalProperties.containsKey(CodegenConstants.EXCEPTIONS_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.EXCEPTIONS_PACKAGE, exceptionsPackage);
+        }
+
+        if (!additionalProperties.containsKey(CodegenConstants.MAPPERS_PACKAGE)) {
+            additionalProperties.put(CodegenConstants.MAPPERS_PACKAGE, mappersPackage);
+        }
+        
         if (!additionalProperties.containsKey(CodegenConstants.SERVICE_PACKAGE)) {
             additionalProperties.put(CodegenConstants.SERVICE_PACKAGE, servicePackage);
         }
@@ -578,7 +585,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_SERVICE_PACKAGE, this::setModelServicePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, this::setModelPersistencePackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.EXCEPTIONS_PACKAGE, this::setExceptionsPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.MAPPERS_PACKAGE, this::setMappersPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.CONFIG_PACKAGE, this::setConfigPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.WEBCLIENTS_PACKAGE, this::setWebClientsPackage);
@@ -856,12 +866,18 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 	     */
         this.setApiPackage(sanitizePackageName(apiPackage));
         additionalProperties.remove(CodegenConstants.API_PACKAGE);
+        this.setConfigPackage(sanitizePackageName(configPackage));
+        additionalProperties.remove(CodegenConstants.CONFIG_PACKAGE);
         this.setModelPackage(sanitizePackageName(modelPackage));
         additionalProperties.remove(CodegenConstants.MODEL_PACKAGE);
         this.setModelServicePackage(sanitizePackageName(modelServicePackage));
         additionalProperties.remove(CodegenConstants.MODEL_SERVICE_PACKAGE);
         this.setModelPersistencePackage(sanitizePackageName(modelPersistencePackage));
         additionalProperties.remove(CodegenConstants.MODEL_PERSISTENCE_PACKAGE);
+        this.setExceptionsPackage(sanitizePackageName(exceptionsPackage));
+        additionalProperties.remove(CodegenConstants.EXCEPTIONS_PACKAGE);
+        this.setMappersPackage(sanitizePackageName(mappersPackage));
+        additionalProperties.remove(CodegenConstants.MAPPERS_PACKAGE);
         this.setServicePackage(sanitizePackageName(servicePackage));
         additionalProperties.remove(CodegenConstants.SERVICE_PACKAGE);
         this.setRepositoryPackage(sanitizePackageName(repositoryPackage));
@@ -903,6 +919,11 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     }
 
     @Override
+    public String configFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + configPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+
+    @Override
     public String modelTestFileFolder() {
         return (outputTestFolder + File.separator + testFolder + File.separator + modelPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
@@ -921,6 +942,16 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     public String modelPersistenceFileFolder() {
         return (outputFolder + File.separator + sourceFolder + File.separator + modelPersistencePackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
+    
+    @Override
+    public String exceptionsFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + exceptionsPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    } 
+    
+    @Override
+    public String mappersFileFolder() {
+        return (outputFolder + File.separator + sourceFolder + File.separator + mappersPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }     
     
     @Override
     public String serviceTestFileFolder() {
