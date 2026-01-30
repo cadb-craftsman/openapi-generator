@@ -649,10 +649,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 							(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
 							"YesNoTypeHandler.java"));
 
-					//supportingFiles.add(new SupportingFile("factoryMapper.mustache",
-					//		(sourceFolder + File.separator + basePackage + DOMAIN_MAPPERS_PACKAGE).replace(".", java.io.File.separator),
-					//		"FactoryMapper.java"));
-					
 					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
 					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
 					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
@@ -673,20 +669,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 						if(isMyBatis) {
 							configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
 							configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
-							
-							//supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
-							//supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
 						}else {
 							configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
 							configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
-							//supportingFiles.add(new SupportingFile("springbootDocConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootDocConfig.java"));
-							//supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootNativeConfig.java"));
 						}
 						
-						configTemplateFiles.put("springbootWebClientsConfig.mustache", "WebClientsConfig.java");
-						configTemplateFiles.put("springbootWebClientsProperties.mustache", "WebClientsProperties.java");
-						//supportingFiles.add(new SupportingFile("springbootWebClientsConfig.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsConfig.java"));
-						//supportingFiles.add(new SupportingFile("springbootWebClientsProperties.mustache",(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringBootWebClientsProperties.java"));
+						configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
+						configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");
 						
 					} else if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
 						supportingFiles.add(new SupportingFile("openapiDocumentationConfig.mustache",

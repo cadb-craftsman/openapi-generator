@@ -1,46 +1,26 @@
 package {{basePackage}}.webclients;
 
-import java.time.Duration;
-
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import com.amaseguros.api.RestServiceApiV1Api;
+import com.amaseguros.client.ApiClient;
+import {{basePackage}}.config.{{classname}}WebClientProperties;
 
 import lombok.AllArgsConstructor;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-{{#operations}}
 @AllArgsConstructor
-public class {{classname}}WebClient {
+public class {{classname}}WebClient extends RestServiceApiV1Api{
 
-	private WebClient webClient; 
+    private {{classname}}WebClientProperties.Client client;
 
-{{#operation}}
-    {{#jdk8-default-interface}}default {{/jdk8-default-interface}}{{>responseType}} {{#delegate-method}}_{{/delegate-method}}{{operationId}}(
-        {{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
-        {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}},
-        {{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
-        {{/hasParams}}{{^hasParams}}{{#reactive}},{{/reactive}}{{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore {{/springFoxDocumentationProvider}}{{#springDocDocumentationProvider}}@ParameterObject {{/springDocDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}{{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},
-        {{/hasParams}}{{^hasParams}}{{#reactive}},{{/reactive}}{{/hasParams}}{{#swagger2AnnotationLibrary}}@Parameter(hidden = true){{/swagger2AnnotationLibrary}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} {{{.}}}{{^hasParams}}{{^-last}}{{^reactive}},{{/reactive}}
-        {{/-last}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}
-    ){{#unhandledException}} throws Exception{{/unhandledException}}{{^jdk8-default-interface}};{{/jdk8-default-interface}}{{#jdk8-default-interface}} {
-        {{#delegate-method}}
-        {{^isVoid}}return {{/isVoid}}{{#isVoid}}{{#useResponseEntity}}return {{/useResponseEntity}}{{^useResponseEntity}}{{#reactive}}return {{/reactive}}{{/useResponseEntity}}{{/isVoid}}{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}}, {{/hasParams}}{{^hasParams}}{{#reactive}}, {{/reactive}}{{/hasParams}}pageable{{/vendorExtensions.x-spring-paginated}});
+    public {{classname}}WebClient(WebClient webClient, {{classname}}WebClientProperties.Client client) {
+        super(new ApiClient(webClient));
+        this.client = client;
+        getApiClient().setBasePath(client.url().toString() + client.api());
     }
 
-    // Override this method
-    {{#jdk8-default-interface}}default {{/jdk8-default-interface}} {{>responseType}} {{operationId}}({{#allParams}}{{^isFile}}{{^isBodyParam}}{{>optionalDataType}}{{/isBodyParam}}{{#isBodyParam}}{{^reactive}}{{>optionalDataType}}{{/reactive}}{{#reactive}}{{^isArray}}Mono<{{{dataType}}}>{{/isArray}}{{#isArray}}Flux<{{{baseType}}}>{{/isArray}}{{/reactive}}{{/isBodyParam}}{{/isFile}}{{#isFile}}{{#reactive}}{{#isArray}}Flux<{{/isArray}}Part{{#isArray}}>{{/isArray}}{{/reactive}}{{^reactive}}{{#isArray}}List<{{/isArray}}MultipartFile{{#isArray}}>{{/isArray}}{{/reactive}}{{/isFile}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}} final ServerWebExchange exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}}, {{/hasParams}}{{^hasParams}}{{#reactive}}, {{/reactive}}{{/hasParams}}{{#springFoxDocumentationProvider}}@ApiIgnore{{/springFoxDocumentationProvider}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}){{#unhandledException}} throws Exception{{/unhandledException}} {
-        {{/delegate-method}}
-        {{^isDelegate}}
-        {{>methodBody}}{{! prevent indent}}
-        {{/isDelegate}}
-        {{#isDelegate}}
-        {{^isVoid}}return {{/isVoid}}{{#isVoid}}{{#useResponseEntity}}return {{/useResponseEntity}}{{^useResponseEntity}}{{#reactive}}return {{/reactive}}{{/useResponseEntity}}{{/isVoid}}getDelegate().{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}{{#reactive}}{{#hasParams}}, {{/hasParams}}exchange{{/reactive}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}}, {{/hasParams}}{{^hasParams}}{{#reactive}}, {{/reactive}}{{/hasParams}}pageable{{/vendorExtensions.x-spring-paginated}});
-        {{/isDelegate}}
-    }{{/jdk8-default-interface}}
+    public {{classname}}WebClientProperties.Client getWebClient() {
+        return this.client;
+    }
 
-{{/operation}}
 }
-{{/operations}}
