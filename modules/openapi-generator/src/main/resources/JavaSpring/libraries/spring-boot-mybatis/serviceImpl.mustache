@@ -1,0 +1,31 @@
+package {{package}}.services;
+
+{{#imports}}import {{import}};
+{{/imports}}
+import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@AllArgsConstructor
+{{#operations}}
+public class {{classname}}SrvImpl implements {{classname}}Srv {
+{{#operation}}
+
+    {{#isDeprecated}}
+    @Deprecated
+    {{/isDeprecated}}
+    @Override
+    {{>responseType}} {{operationId}}({{#allParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}}{{#hasParams}},{{/hasParams}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
+        {{/hasParams}}{{^hasParams}},{{/hasParams}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}{{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},
+        {{/hasParams}}{{^hasParams}},{{/hasParams}}{{{.}}}{{^hasParams}}{{^-last}},{{/-last}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+        return {{>responseType}};
+        } 
+
+{{/operation}}
+}
+{{/operations}}

@@ -82,6 +82,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String RESPONSE_WRAPPER = "responseWrapper";
 	public static final String USE_TAGS = "useTags";
 	public static final String SPRING_BOOT = "spring-boot";
+	public static final String SPRING_BOOT_MYBATIS = "spring-boot-mybatis";
+	public static final String SPRING_BOOT_CUSTOM = "spring-boot-custom";
 	public static final String SPRING_CLOUD_LIBRARY = "spring-cloud";
 	public static final String SPRING_HTTP_INTERFACE = "spring-http-interface";
 	public static final String API_FIRST = "apiFirst";
@@ -124,9 +126,9 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 	@Setter
 	protected String title = "OpenAPI Spring";
-	//@Getter
+	@Getter
 	//@Setter
-	//protected String configPackage = "org.openapitools.config";
+	protected String configPackage = "org.openapitools.config";
 	@Getter
 	@Setter
 	protected String basePackage = "org.openapitools";
@@ -136,8 +138,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 	@Getter
 	@Setter
 	protected String apacheMybatisPackage = "org.apache.ibatis.builder.xml";
-	@Setter
-	protected boolean isMyBatis = true;
+	//@Setter
+	//protected boolean isMyBatis = true;
 	
 	@Setter
 	protected boolean interfaceOnly = false;
@@ -264,46 +266,27 @@ public class SpringCodegen extends AbstractJavaCodegen
 		cliOptions.add(new CliOption(TITLE, "server title name or client service name").defaultValue(title));
 		//cliOptions.add(new CliOption(CodegenConstants.CONFIG_PACKAGE, "configuration package for generated code")
 		//		.defaultValue(this.getConfigPackage()));
-		cliOptions.add(new CliOption(BASE_PACKAGE, "base package (invokerPackage) for generated code")
-				.defaultValue(this.getBasePackage()));
-		cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY,
-				"Whether to generate only API interface stubs without the server files.", interfaceOnly));
-		cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_URL,
-				"Whether to generate Feign client with url parameter.", useFeignClientUrl));
-		cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_CONTEXT_ID,
-				"Whether to generate Feign client with contextId parameter.", useFeignClientContextId));
-		cliOptions.add(CliOption.newBoolean(DELEGATE_PATTERN,
-				"Whether to generate the server files using the delegate pattern", delegatePattern));
-		cliOptions.add(CliOption.newBoolean(SINGLE_CONTENT_TYPES,
-				"Whether to select only one produces/consumes content-type by operation.", singleContentTypes));
-		cliOptions.add(CliOption.newBoolean(SKIP_DEFAULT_INTERFACE,
-				"Whether to skip generation of default implementations for java8 interfaces", skipDefaultInterface));
+		cliOptions.add(new CliOption(BASE_PACKAGE, "base package (invokerPackage) for generated code").defaultValue(this.getBasePackage()));
+		cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY, "Whether to generate only API interface stubs without the server files.", interfaceOnly));
+		cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_URL, "Whether to generate Feign client with url parameter.", useFeignClientUrl));
+		cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_CONTEXT_ID, "Whether to generate Feign client with contextId parameter.", useFeignClientContextId));
+		cliOptions.add(CliOption.newBoolean(DELEGATE_PATTERN, "Whether to generate the server files using the delegate pattern", delegatePattern));
+		cliOptions.add(CliOption.newBoolean(SINGLE_CONTENT_TYPES, "Whether to select only one produces/consumes content-type by operation.", singleContentTypes));
+		cliOptions.add(CliOption.newBoolean(SKIP_DEFAULT_INTERFACE, "Whether to skip generation of default implementations for java8 interfaces", skipDefaultInterface));
 		cliOptions.add(CliOption.newBoolean(ASYNC, "use async Callable controllers", async));
-		cliOptions.add(CliOption.newBoolean(REACTIVE, "wrap responses in Mono/Flux Reactor types (spring-boot only)",
-				reactive));
-		cliOptions.add(new CliOption(RESPONSE_WRAPPER,
-				"wrap the responses in given type (Future, Callable, CompletableFuture,ListenableFuture, DeferredResult, RxObservable, RxSingle or fully qualified type)"));
-		cliOptions.add(CliOption.newBoolean(VIRTUAL_SERVICE,
-				"Generates the virtual service. For more details refer - https://github.com/virtualansoftware/virtualan/wiki"));
-		cliOptions.add(
-				CliOption.newBoolean(USE_TAGS, "use tags for creating interface and controller classnames", useTags));
-		cliOptions
-				.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
-		cliOptions.add(CliOption.newBoolean(USE_SPRING_BUILT_IN_VALIDATION,
-				"Disable `@Validated` at the class level when using built-in validation.", useSpringBuiltInValidation));
-		cliOptions.add(CliOption.newBoolean(PERFORM_BEANVALIDATION,
-				"Use Bean Validation Impl. to perform BeanValidation", performBeanValidation));
+		cliOptions.add(CliOption.newBoolean(REACTIVE, "wrap responses in Mono/Flux Reactor types (spring-boot only)", reactive));
+		cliOptions.add(new CliOption(RESPONSE_WRAPPER, "wrap the responses in given type (Future, Callable, CompletableFuture,ListenableFuture, DeferredResult, RxObservable, RxSingle or fully qualified type)"));
+		cliOptions.add(CliOption.newBoolean(VIRTUAL_SERVICE, "Generates the virtual service. For more details refer - https://github.com/virtualansoftware/virtualan/wiki"));
+		cliOptions.add(CliOption.newBoolean(USE_TAGS, "use tags for creating interface and controller classnames", useTags));
+		cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
+		cliOptions.add(CliOption.newBoolean(USE_SPRING_BUILT_IN_VALIDATION, "Disable `@Validated` at the class level when using built-in validation.", useSpringBuiltInValidation));
+		cliOptions.add(CliOption.newBoolean(PERFORM_BEANVALIDATION, "Use Bean Validation Impl. to perform BeanValidation", performBeanValidation));
 		cliOptions.add(CliOption.newBoolean(USE_SEALED, "Whether to generate sealed model interfaces and classes"));
-		cliOptions.add(CliOption.newBoolean(API_FIRST,
-				"Generate the API from the OAI spec at server compile time (API first approach)", apiFirst));
-		cliOptions
-				.add(CliOption.newBoolean(USE_OPTIONAL, "Use Optional container for optional parameters", useOptional));
-		cliOptions.add(
-				CliOption.newBoolean(HATEOAS, "Use Spring HATEOAS library to allow adding HATEOAS links", hateoas));
-		cliOptions
-				.add(CliOption.newBoolean(RETURN_SUCCESS_CODE, "Generated server returns 2xx code", returnSuccessCode));
-		cliOptions.add(CliOption.newBoolean(SPRING_CONTROLLER, "Annotate the generated API as a Spring Controller",
-				useSpringController));
+		cliOptions.add(CliOption.newBoolean(API_FIRST, "Generate the API from the OAI spec at server compile time (API first approach)", apiFirst));
+		cliOptions.add(CliOption.newBoolean(USE_OPTIONAL, "Use Optional container for optional parameters", useOptional));
+		cliOptions.add(CliOption.newBoolean(HATEOAS, "Use Spring HATEOAS library to allow adding HATEOAS links", hateoas));
+		cliOptions.add(CliOption.newBoolean(RETURN_SUCCESS_CODE, "Generated server returns 2xx code", returnSuccessCode));
+		cliOptions.add(CliOption.newBoolean(SPRING_CONTROLLER, "Annotate the generated API as a Spring Controller", useSpringController));
 
 		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION,
 				"Where to generate the class level @RequestMapping annotation.")
@@ -313,42 +296,25 @@ public class SpringCodegen extends AbstractJavaCodegen
 		}
 		cliOptions.add(requestMappingOpt);
 
-		cliOptions.add(CliOption.newBoolean(UNHANDLED_EXCEPTION_HANDLING,
-				"Declare operation methods to throw a generic exception and allow unhandled exceptions (useful for Spring `@ControllerAdvice` directives).",
-				unhandledException));
-		cliOptions.add(CliOption.newBoolean(USE_SWAGGER_UI,
-				"Open the OpenApi specification in swagger-ui. Will also import and configure needed dependencies",
-				useSwaggerUI));
-		cliOptions.add(CliOption.newBoolean(USE_RESPONSE_ENTITY,
-				"Use the `ResponseEntity` type to wrap return values of generated API methods. "
-						+ "If disabled, method are annotated using a `@ResponseStatus` annotation, which has the status of the first response declared in the Api definition",
-				useResponseEntity));
-		cliOptions.add(CliOption.newBoolean(GENERATE_GENERIC_RESPONSE_ENTITY,
-				"Use a generic type for the `ResponseEntity` wrapping return values of generated API methods. "
-						+ "If enabled, method are generated with return type ResponseEntity<?>",
-				generateGenericResponseEntity));
-		cliOptions.add(CliOption.newBoolean(USE_ENUM_CASE_INSENSITIVE,
-				"Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
-		cliOptions.add(CliOption.newBoolean(USE_SPRING_BOOT3,
-				"Generate code and provide dependencies for use with Spring Boot 3.x. (Use jakarta instead of javax in imports). Enabling this option will also enable `useJakartaEe`.",
-				useSpringBoot3));
-		cliOptions.add(CliOption.newBoolean(GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS,
-				"Whether to generate constructors with required args for models",
-				generatedConstructorWithRequiredArgs));
+		cliOptions.add(CliOption.newBoolean(UNHANDLED_EXCEPTION_HANDLING, "Declare operation methods to throw a generic exception and allow unhandled exceptions (useful for Spring `@ControllerAdvice` directives).", unhandledException));
+		cliOptions.add(CliOption.newBoolean(USE_SWAGGER_UI, "Open the OpenApi specification in swagger-ui. Will also import and configure needed dependencies", useSwaggerUI));
+		cliOptions.add(CliOption.newBoolean(USE_RESPONSE_ENTITY, "Use the `ResponseEntity` type to wrap return values of generated API methods. " + "If disabled, method are annotated using a `@ResponseStatus` annotation, which has the status of the first response declared in the Api definition", useResponseEntity));
+		cliOptions.add(CliOption.newBoolean(GENERATE_GENERIC_RESPONSE_ENTITY, "Use a generic type for the `ResponseEntity` wrapping return values of generated API methods. " + "If enabled, method are generated with return type ResponseEntity<?>", generateGenericResponseEntity));
+		cliOptions.add(CliOption.newBoolean(USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
+		cliOptions.add(CliOption.newBoolean(USE_SPRING_BOOT3, "Generate code and provide dependencies for use with Spring Boot 3.x. (Use jakarta instead of javax in imports). Enabling this option will also enable `useJakartaEe`.", useSpringBoot3));
+		cliOptions.add(CliOption.newBoolean(GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS, "Whether to generate constructors with required args for models", generatedConstructorWithRequiredArgs));
 		cliOptions.add(new CliOption(RESOURCE_FOLDER, RESOURCE_FOLDER_DESC).defaultValue(this.getResourceFolder()));
-		cliOptions.add(CliOption.newBoolean(OPTIONAL_ACCEPT_NULLABLE,
-				"Use `ofNullable` instead of just `of` to accept null values when using Optional.",
-				optionalAcceptNullable));
-
-		cliOptions.add(CliOption.newBoolean(USE_DEDUCTION_FOR_ONE_OF_INTERFACES,
-				"whether to use deduction for generated oneOf interfaces", useDeductionForOneOfInterfaces));
-		cliOptions.add(CliOption.newString(SPRING_API_VERSION,
-				"Value for 'version' attribute in @RequestMapping (for Spring 7 and above)."));
+		cliOptions.add(CliOption.newBoolean(OPTIONAL_ACCEPT_NULLABLE, "Use `ofNullable` instead of just `of` to accept null values when using Optional.", optionalAcceptNullable));
+		cliOptions.add(CliOption.newBoolean(USE_DEDUCTION_FOR_ONE_OF_INTERFACES, "whether to use deduction for generated oneOf interfaces", useDeductionForOneOfInterfaces));
+		cliOptions.add(CliOption.newString(SPRING_API_VERSION, "Value for 'version' attribute in @RequestMapping (for Spring 7 and above)."));
+		
 		supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
-		supportedLibraries.put(SPRING_CLOUD_LIBRARY,
-				"Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
+		supportedLibraries.put(SPRING_BOOT_MYBATIS, "Spring-boot-mybatis Server application.");
+		supportedLibraries.put(SPRING_BOOT_CUSTOM, "Spring-boot-custom Server application.");
+		supportedLibraries.put(SPRING_CLOUD_LIBRARY, "Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
 		supportedLibraries.put(SPRING_HTTP_INTERFACE, "Spring 6 HTTP interfaces (testing)");
 		setLibrary(SPRING_BOOT);
+		
 		final CliOption library = new CliOption(CodegenConstants.LIBRARY, CodegenConstants.LIBRARY_DESC)
 				.defaultValue(SPRING_BOOT);
 		library.setEnum(supportedLibraries);
@@ -549,6 +515,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		importMapping.put("DateTimeFormat", "org.springframework.format.annotation.DateTimeFormat");
 		importMapping.put("ApiIgnore", "springfox.documentation.annotations.ApiIgnore");
 		importMapping.put("ParameterObject", "org.springdoc.api.annotations.ParameterObject");
+		
 		if (isUseSpringBoot3()) {
 			importMapping.put("ParameterObject", "org.springdoc.core.annotations.ParameterObject");
 		}
@@ -570,39 +537,27 @@ public class SpringCodegen extends AbstractJavaCodegen
 		if (!interfaceOnly) {
 			
 			// If is Spring Boot library
-			if (SPRING_BOOT.equals(library)) {
+			if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 				if (useSwaggerUI && selectedDocumentationProviderRequiresSwaggerUiBootstrap()) {
 					supportingFiles.add(
 							new SupportingFile("swagger-ui.mustache", "src/main/resources/static", "swagger-ui.html"));
 				}
 				// rename template to SpringBootApplication.mustache
-				supportingFiles.add(new SupportingFile("openapi2SpringBoot.mustache",
-						(sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator),
-						"OpenApiGeneratorApplication.java"));
-				supportingFiles.add(new SupportingFile("SpringBootTest.mustache",
-						(testFolder + File.separator + basePackage).replace(".", java.io.File.separator),
-						"OpenApiGeneratorApplicationTests.java"));
-				supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache",
-						(sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator),
-						"RFC3339DateFormat.java"));
+				supportingFiles.add(new SupportingFile("openapi2SpringBoot.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplication.java"));
+				supportingFiles.add(new SupportingFile("SpringBootTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplicationTests.java"));
+				supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "RFC3339DateFormat.java"));
 			}
 			
 			// If is Spring Cloud library 
 			if (SPRING_CLOUD_LIBRARY.equals(library)) {
 
-				supportingFiles.add(new SupportingFile("apiKeyRequestInterceptor.mustache",
-						(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-						"ApiKeyRequestInterceptor.java"));
+				supportingFiles.add(new SupportingFile("apiKeyRequestInterceptor.mustache", (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "ApiKeyRequestInterceptor.java"));
 
 				if (ProcessUtils.hasOAuthMethods(openAPI)) {
-					supportingFiles.add(new SupportingFile("clientPropertiesConfiguration.mustache",
-							(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-							"ClientPropertiesConfiguration.java"));
+					supportingFiles.add(new SupportingFile("clientPropertiesConfiguration.mustache", (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "ClientPropertiesConfiguration.java"));
 				}
 
-				supportingFiles.add(new SupportingFile("clientConfiguration.mustache",
-						(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-						"ClientConfiguration.java"));
+				supportingFiles.add(new SupportingFile("clientConfiguration.mustache", (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "ClientConfiguration.java"));
 
 				apiTemplateFiles.put("apiClient.mustache", "Client.java");
 				if (!additionalProperties.containsKey(SINGLE_CONTENT_TYPES)) {
@@ -614,13 +569,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 				additionalProperties.put(USE_FEIGN_CLIENT, "true");
 
 			// Else if is Spring Boot library
-			} else if (SPRING_BOOT.equals(library)) {
-
-			    /***
-			     * Import application.mustache and generate application.yml  
-			     */
-				apiTemplateFiles.put("apiController.mustache", "Controller.java");
-				apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
+			} else if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 
 				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
 				supportingFiles.add(new SupportingFile("application.mustache", resourceFolder, "application.yml"));
@@ -630,63 +579,72 @@ public class SpringCodegen extends AbstractJavaCodegen
 			     * @Craftsman
 			     * Generate code for Mybatis archetype package of services, repository, repository handler, webclients packages and all config files.  
 			     */
-				if(isMyBatis) {
+				if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 					
-					//Generate Service and Repository interfaces with methods definition.
+					//Generate Classes for api controller package of the project.
+					apiTemplateFiles.put("apiController.mustache", "Controller.java");
+					apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
+					
+					//Generate Packages for Mappers beans.
 					mappersTemplateFiles.put("factoryMapper.mustache", "FactoryMapper.java");
+					
+					//Generate Packages to handle exceptions in project.
 					exceptionsTemplateFiles.put("serviceException.mustache", "Exception.java");
 					exceptionsTemplateFiles.put("serviceNoContentException.mustache", "NoContentException.java");
 					exceptionsTemplateFiles.put("serviceNotFoundException.mustache", "NotFoundException.java");
+					
+					//Generate Packages for Service interface of the project.
 					serviceTemplateFiles.put("service.mustache", "Srv.java");
 					serviceTemplateFiles.put("serviceImpl.mustache", "SrvImpl.java");
+					
+					//Generate Packages for Repository interface of the project.
 					repositoryTemplateFiles.put("repository.mustache", "Repository.java");
+					
+					//Generate Packages for WebClients of the project.
 					webClientsTemplateFiles.put("webclients.mustache", "WebClient.java");
 
-					supportingFiles.add(new SupportingFile("stringTrimTypeHandler.mustache",
-							(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
-							"StringTrimTypeHandler.java"));
-					supportingFiles.add(new SupportingFile("yesNoTypeHandler.mustache",
-							(sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator),
-							"YesNoTypeHandler.java"));
+					if(SPRING_BOOT_MYBATIS.equals(library)) {
+						supportingFiles.add(new SupportingFile("stringTrimTypeHandler.mustache", (sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator), "StringTrimTypeHandler.java")); 
+						supportingFiles.add(new SupportingFile("yesNoTypeHandler.mustache", (sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator), "YesNoTypeHandler.java"));
 
+						//Generate Static resources for mybatis project.
+						supportingFiles.add(new SupportingFile("mybatis-3-config.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-config.dtd"));
+						supportingFiles.add(new SupportingFile("mybatis-3-mapper.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-mapper.dtd"));				
+						supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
+						
+					}
+
+					//Generate Static resources of the project.
 					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
 					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
 					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
 					supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
-					supportingFiles.add(new SupportingFile("mybatis-3-config.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-config.dtd"));
-					supportingFiles.add(new SupportingFile("mybatis-3-mapper.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-mapper.dtd"));				
-					supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
-
 				}
 
 				if (!reactive && !apiFirst) {
 					if (DocumentationProvider.SPRINGDOC.equals(getDocumentationProvider())) {
 
-					    /***
-					     * @Craftsman
-					     * If is mybatis Config and NativeConfig project classes.  
-					     */
-						if(isMyBatis) {
+						if(SPRING_BOOT_MYBATIS.equals(library)) {
 							configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
 							configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
-						}else {
+						}else if(SPRING_BOOT_CUSTOM.equals(library)){
 							configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
 							configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
 						}
 						
-						configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
-						configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");
+						if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+							//Generate classes of config package for all WebClients of the project.
+							configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
+							configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");							
+						}
+
 						
 					} else if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
-						supportingFiles.add(new SupportingFile("openapiDocumentationConfig.mustache",
-								(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-								"SpringFoxConfiguration.java"));
+						supportingFiles.add(new SupportingFile("openapiDocumentationConfig.mustache", (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "SpringFoxConfiguration.java"));
 					}
 				}
 			} else if (SPRING_HTTP_INTERFACE.equals(library)) {
-				supportingFiles.add(new SupportingFile("httpInterfacesConfiguration.mustache",
-						(sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
-						"HttpInterfacesAbstractConfigurator.java"));
+				supportingFiles.add(new SupportingFile("httpInterfacesConfiguration.mustache", (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "HttpInterfacesAbstractConfigurator.java"));
 				writePropertyBack(USE_BEANVALIDATION, false);
 			}
 		}
@@ -784,7 +742,11 @@ public class SpringCodegen extends AbstractJavaCodegen
 		if (apiFirst) {
 			apiTemplateFiles.clear();
 			configTemplateFiles.clear();
+			mappersTemplateFiles.clear();
+			exceptionsTemplateFiles.clear();
 			modelTemplateFiles.clear();
+			modelServiceTemplateFiles.clear();
+			modelPersistenceTemplateFiles.clear();
 			serviceTemplateFiles.clear();
 			repositoryTemplateFiles.clear();
 			webClientsTemplateFiles.clear();
