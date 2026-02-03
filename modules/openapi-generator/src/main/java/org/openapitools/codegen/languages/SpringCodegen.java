@@ -285,7 +285,9 @@ public class SpringCodegen extends AbstractJavaCodegen
 		cliOptions.add(CliOption.newBoolean(RETURN_SUCCESS_CODE, "Generated server returns 2xx code", returnSuccessCode));
 		cliOptions.add(CliOption.newBoolean(SPRING_CONTROLLER, "Annotate the generated API as a Spring Controller", useSpringController));
 
-		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION, "Where to generate the class level @RequestMapping annotation.").defaultValue(requestMappingMode.name());
+		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION,
+				"Where to generate the class level @RequestMapping annotation.")
+				.defaultValue(requestMappingMode.name());
 		for (RequestMappingMode mode : RequestMappingMode.values()) {
 			requestMappingOpt.addEnum(mode.name(), mode.getDescription());
 		}
@@ -310,7 +312,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		supportedLibraries.put(SPRING_HTTP_INTERFACE, "Spring 6 HTTP interfaces (testing)");
 		setLibrary(SPRING_BOOT);
 		
-		final CliOption library = new CliOption(CodegenConstants.LIBRARY, CodegenConstants.LIBRARY_DESC).defaultValue(SPRING_BOOT);
+		final CliOption library = new CliOption(CodegenConstants.LIBRARY, CodegenConstants.LIBRARY_DESC)
+				.defaultValue(SPRING_BOOT);
 		library.setEnum(supportedLibraries);
 		cliOptions.add(library);
 
@@ -373,7 +376,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public void processOpts() {
 		final List<Pair<String, String>> configOptions = additionalProperties.entrySet().stream()
 				.filter(e -> !Arrays.asList(API_FIRST, "hideGenerationTimestamp").contains(e.getKey()))
-				.filter(e -> cliOptions.stream().map(CliOption::getOpt).anyMatch(opt -> opt.equals(e.getKey()))))
+				.filter(e -> cliOptions.stream().map(CliOption::getOpt).anyMatch(opt -> opt.equals(e.getKey())))
 				.map(e -> Pair.of(e.getKey(), e.getValue().toString())).collect(Collectors.toList());
 		additionalProperties.put("configOptions", configOptions);
 
@@ -589,12 +592,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 					
 					//Generate Packages for Mappers beans.
 					mappersTemplateFiles.put("factoryMapper.mustache", "FactoryMapper.java");
-				
-					exceptionsPackage
-					
+
 					//Generate Packages to handle exceptions in project.
 					//exceptionsTemplateFiles.put("messageException.mustache", ".java");
-					supportingFiles.add(new SupportingFile("messageException.mustache", (sourceFolder + File.separator + exceptionPackage).replace(".", java.io.File.separator), "MessageException.java"));
+					supportingFiles.add(new SupportingFile("messageException.mustache", (sourceFolder + File.separator + exceptionsPackage).replace(".", java.io.File.separator), "MessageException.java"));
 					exceptionsTemplateFiles.put("serviceException.mustache", "Exception.java");
 					exceptionsTemplateFiles.put("serviceNoContentException.mustache", "NoContentException.java");
 					exceptionsTemplateFiles.put("serviceNotFoundException.mustache", "NotFoundException.java");
