@@ -1,0 +1,1 @@
+{{#isQueryParam}}{{#vendorExtensions.x-field-extra-annotation}}{{{.}}} {{/vendorExtensions.x-field-extra-annotation}}{{^isModel}}{{/isModel}}{{>dateTimeParam}}{{#isDeprecated}} @Deprecated{{/isDeprecated}} {{>nullableAnnotation}}{{>optionalDataType}} {{paramName}}{{/isQueryParam}}

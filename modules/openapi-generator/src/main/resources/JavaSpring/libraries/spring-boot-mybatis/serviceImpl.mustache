@@ -1,7 +1,10 @@
-package {{package}}.services;
+package {{basePackage}}.services;
 
 {{#imports}}import {{import}};
 {{/imports}}
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
@@ -14,17 +17,20 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 {{#operations}}
 public class {{classname}}SrvImpl implements {{classname}}Srv {
+
+	private {{classname}}Repository repository;
+
+	private {{classname}}FactoryMapper mapper;
+
 {{#operation}}
 
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
     @Override
-    {{>responseType}} {{operationId}}({{#allParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}}{{#hasParams}},{{/hasParams}}{{#vendorExtensions.x-spring-paginated}}{{#hasParams}},
-        {{/hasParams}}{{^hasParams}},{{/hasParams}}final Pageable pageable{{/vendorExtensions.x-spring-paginated}}{{#vendorExtensions.x-spring-provide-args}}{{#hasParams}},
-        {{/hasParams}}{{^hasParams}},{{/hasParams}}{{{.}}}{{^hasParams}}{{^-last}},{{/-last}}{{/hasParams}}{{/vendorExtensions.x-spring-provide-args}}){{#unhandledException}} throws Exception{{/unhandledException}}{
-        return {{>responseType}};
-        } 
+    public {{>responseCustomType}} {{operationId}}({{#allParams}}{{>queryCustomParams}}{{>pathCustomParams}}{{>bodyCustomParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+        return new {{>responseCustomType}}();
+    }
 
 {{/operation}}
 }

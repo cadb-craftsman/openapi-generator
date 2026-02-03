@@ -1,0 +1,63 @@
+options:
+  max-time: 120
+  docker: false
+clone:
+  enabled: true
+definitions:
+   services:
+      docker:
+         image: docker:dind
+pipelines:
+  branches:
+    main:
+      - step:
+          name: test
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'
+          script:
+            - echo ------------------------------------stest------------------------------------------;          
+            #- mvn -X clean test;
+            #- mvn clean test;
+      - step:
+          name: build
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell' 
+          script:
+            - echo ------------------------------------sbuild------------------------------------------;
+            # Command to generate OCI from paketo buildpacks and graalvm native image
+            - mvn clean -DskipTests -Pnative spring-boot:build-image;
+            #- mvn -X clean -DskipTests -Pnative spring-boot:build-image;
+            # Command to generate OCI from Dockerfile multi build
+            #- mvn -X clean -DskipTests -Pcontainer package k8s:build;
+      - step:
+          name: release
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'  
+          script:
+            - echo ------------------------------------srelease------------------------------------------;
+            - mvn -X -Prelease k8s:push;
+      - step:
+          name: deploy
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'          
+          script:
+            - echo ------------------------------------sdeploy------------------------------------------;
+            - echo deploy to cluster; 
+            - PVERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout);
+            - PARTIFACT=$(mvn --non-recursive help:evaluate -Dexpression=project.artifactId -q -DforceStdout);
+            - PRELEASE=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{sub(/-.*/,x)}1');
+            - docker tag $IMAGE_PREFIX/$PARTIFACT:$PVERSION $IMAGE_PREFIX/$PARTIFACT:$PRELEASE;
+            - docker push $IMAGE_PREFIX/$PARTIFACT:$PRELEASE;
+      - step:
+          name: clean
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'  
+          script:
+            - echo ------------------------------------sclean------------------------------------------;
+            - echo clean images from runner;
+            - docker image prune -f;                                    

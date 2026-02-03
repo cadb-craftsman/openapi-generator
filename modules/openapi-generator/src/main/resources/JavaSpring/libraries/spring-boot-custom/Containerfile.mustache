@@ -1,0 +1,25 @@
+# Builder image
+FROM bellsoft/liberica-runtime-container:jre-17.0.10-musl as builder
+WORKDIR /workspace
+LABEL version="1.0.0"
+LABEL email="cadb.craftsman@gmail.com"
+COPY maven/target/*.jar /opt/lib/app.jar
+RUN java -Djarmode=layertools -jar /opt/lib/app.jar extract
+
+FROM bellsoft/liberica-runtime-container:jre-17.0.10-musl
+WORKDIR /workspace
+# Extract dependencies
+COPY --from=builder workspace/dependencies/ ./
+RUN true
+COPY --from=builder workspace/spring-boot-loader/ ./
+RUN mkdir -p /workspace/target/data
+COPY --from=builder workspace/snapshot-dependencies/ ./
+RUN mkdir -p /workspace/target/logs
+COPY --from=builder workspace/application/ ./
+#RUN mkdir /workspace/target && mkdir /workspace/target/data && chown spring -R /workspace  && chgrp spring -R /workspace
+#RUN addgroup -S spring && adduser -S -D -H spring -G spring
+RUN addgroup -g 1000 -S spring && adduser -u 1000 -S -D -H spring -G spring
+RUN chown spring -R /workspace && chgrp spring -R /workspace
+USER spring
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+EXPOSE 8080

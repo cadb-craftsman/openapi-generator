@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 {{#useResponseEntity}}
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 {{/useResponseEntity}}
 {{^useResponseEntity}}
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +51,9 @@ import java.util.Map;
 import java.util.Optional;
 import {{javaxPackage}}.annotation.Generated;
 
+import {{basePackage}}.services.{{classname}}Srv;
+import {{basePackage}}.domain.mappers.{{classname}}FactoryMapper;
+
 import lombok.AllArgsConstructor;
 
 {{>generatedAnnotation}}
@@ -68,9 +72,8 @@ public class {{classname}}Controller implements {{classname}} {
     @Deprecated
     {{/isDeprecated}}
     @Override
-    {{>responseType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}}{{^-last}},
-        {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
-        return {{>responseType}};
+    public {{>responseType}} {{operationId}}({{#allParams}}{{>queryCustomParams}}{{>pathCustomParams}}{{>bodyCustomParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+        return ResponseEntity.ok(null);
     }
 
 {{/operation}}

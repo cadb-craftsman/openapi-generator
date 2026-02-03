@@ -1,12 +1,7 @@
 package {{basePackage}}.domain.model.service;
 
-import java.net.URI;
-import java.util.Objects;
 {{#imports}}import {{import}};
 {{/imports}}
-{{#openApiNullable}}
-import org.openapitools.jackson.nullable.JsonNullable;
-{{/openApiNullable}}
 {{#serializableModel}}
 import java.io.Serializable;
 {{/serializableModel}}
@@ -28,18 +23,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 {{/withXml}}
 {{/jackson}}
-{{#swagger2AnnotationLibrary}}
-import io.swagger.v3.oas.annotations.media.Schema;
-{{/swagger2AnnotationLibrary}}
-
-{{#withXml}}
-import {{javaxPackage}}.xml.bind.annotation.*;
-{{/withXml}}
-{{^parent}}
-{{#hateoas}}
-import org.springframework.hateoas.RepresentationModel;
-{{/hateoas}}
-{{/parent}}
 
 import java.util.*;
 import {{javaxPackage}}.annotation.Generated;

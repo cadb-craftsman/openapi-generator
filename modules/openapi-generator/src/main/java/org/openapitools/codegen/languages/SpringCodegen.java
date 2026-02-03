@@ -138,9 +138,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 	@Getter
 	@Setter
 	protected String apacheMybatisPackage = "org.apache.ibatis.builder.xml";
-	//@Setter
-	//protected boolean isMyBatis = true;
-	
 	@Setter
 	protected boolean interfaceOnly = false;
 	@Setter
@@ -288,9 +285,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		cliOptions.add(CliOption.newBoolean(RETURN_SUCCESS_CODE, "Generated server returns 2xx code", returnSuccessCode));
 		cliOptions.add(CliOption.newBoolean(SPRING_CONTROLLER, "Annotate the generated API as a Spring Controller", useSpringController));
 
-		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION,
-				"Where to generate the class level @RequestMapping annotation.")
-				.defaultValue(requestMappingMode.name());
+		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION, "Where to generate the class level @RequestMapping annotation.").defaultValue(requestMappingMode.name());
 		for (RequestMappingMode mode : RequestMappingMode.values()) {
 			requestMappingOpt.addEnum(mode.name(), mode.getDescription());
 		}
@@ -315,8 +310,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		supportedLibraries.put(SPRING_HTTP_INTERFACE, "Spring 6 HTTP interfaces (testing)");
 		setLibrary(SPRING_BOOT);
 		
-		final CliOption library = new CliOption(CodegenConstants.LIBRARY, CodegenConstants.LIBRARY_DESC)
-				.defaultValue(SPRING_BOOT);
+		final CliOption library = new CliOption(CodegenConstants.LIBRARY, CodegenConstants.LIBRARY_DESC).defaultValue(SPRING_BOOT);
 		library.setEnum(supportedLibraries);
 		cliOptions.add(library);
 
@@ -379,7 +373,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public void processOpts() {
 		final List<Pair<String, String>> configOptions = additionalProperties.entrySet().stream()
 				.filter(e -> !Arrays.asList(API_FIRST, "hideGenerationTimestamp").contains(e.getKey()))
-				.filter(e -> cliOptions.stream().map(CliOption::getOpt).anyMatch(opt -> opt.equals(e.getKey())))
+				.filter(e -> cliOptions.stream().map(CliOption::getOpt).anyMatch(opt -> opt.equals(e.getKey()))))
 				.map(e -> Pair.of(e.getKey(), e.getValue().toString())).collect(Collectors.toList());
 		additionalProperties.put("configOptions", configOptions);
 
@@ -488,13 +482,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 		}
 		convertPropertyToBooleanAndWriteBack(OPTIONAL_ACCEPT_NULLABLE, this::setOptionalAcceptNullable);
 		convertPropertyToBooleanAndWriteBack(USE_SPRING_BUILT_IN_VALIDATION, this::setUseSpringBuiltInValidation);
-		convertPropertyToBooleanAndWriteBack(USE_DEDUCTION_FOR_ONE_OF_INTERFACES,
-				this::setUseDeductionForOneOfInterfaces);
+		convertPropertyToBooleanAndWriteBack(USE_DEDUCTION_FOR_ONE_OF_INTERFACES, this::setUseDeductionForOneOfInterfaces);
 
 		additionalProperties.put("springHttpStatus", new SpringHttpStatusLambda());
 
 		convertPropertyToBooleanAndWriteBack(USE_ENUM_CASE_INSENSITIVE, this::setUseEnumCaseInsensitive);
 		convertPropertyToBooleanAndWriteBack(USE_SPRING_BOOT3, this::setUseSpringBoot3);
+		
 		if (isUseSpringBoot3()) {
 			if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
 				throw new IllegalArgumentException(
@@ -532,6 +526,16 @@ public class SpringCodegen extends AbstractJavaCodegen
 		}
 
 		supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
+		
+		if (SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+			//supportingFiles.add(new SupportingFile("LICENSE.mustache", "", "LICENSE"));
+			supportingFiles.add(new SupportingFile("mvnw.mustache", "", "mvnw"));
+			supportingFiles.add(new SupportingFile("mvnw.cmd.mustache", "", "mvnw.cmd"));
+			supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
+			supportingFiles.add(new SupportingFile("dockerignore.mustache", "", ".dockerignore"));
+			supportingFiles.add(new SupportingFile("Containerfile.mustache", "", "Containerfile"));
+			supportingFiles.add(new SupportingFile("bitbucket-pipelines.mustache", "", "bitbucket-pipelines.yml"));
+		}
 
 		// If is different than interface
 		if (!interfaceOnly) {
@@ -539,8 +543,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			// If is Spring Boot library
 			if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 				if (useSwaggerUI && selectedDocumentationProviderRequiresSwaggerUiBootstrap()) {
-					supportingFiles.add(
-							new SupportingFile("swagger-ui.mustache", "src/main/resources/static", "swagger-ui.html"));
+					supportingFiles.add(new SupportingFile("swagger-ui.mustache", "src/main/resources/static", "swagger-ui.html"));
 				}
 				// rename template to SpringBootApplication.mustache
 				supportingFiles.add(new SupportingFile("openapi2SpringBoot.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplication.java"));
@@ -571,24 +574,27 @@ public class SpringCodegen extends AbstractJavaCodegen
 			// Else if is Spring Boot library
 			} else if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 
-				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
-				supportingFiles.add(new SupportingFile("application.mustache", resourceFolder, "application.yml"));
-				supportingFiles.add(new SupportingFile("openapi.mustache", resourceFolder, "openapi.yaml"));
-				
 			    /***
 			     * @Craftsman
 			     * Generate code for Mybatis archetype package of services, repository, repository handler, webclients packages and all config files.  
 			     */
+				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
+
 				if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 					
 					//Generate Classes for api controller package of the project.
+					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
 					apiTemplateFiles.put("apiController.mustache", "Controller.java");
 					apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
 					
 					//Generate Packages for Mappers beans.
 					mappersTemplateFiles.put("factoryMapper.mustache", "FactoryMapper.java");
+				
+					exceptionsPackage
 					
 					//Generate Packages to handle exceptions in project.
+					//exceptionsTemplateFiles.put("messageException.mustache", ".java");
+					supportingFiles.add(new SupportingFile("messageException.mustache", (sourceFolder + File.separator + exceptionPackage).replace(".", java.io.File.separator), "MessageException.java"));
 					exceptionsTemplateFiles.put("serviceException.mustache", "Exception.java");
 					exceptionsTemplateFiles.put("serviceNoContentException.mustache", "NoContentException.java");
 					exceptionsTemplateFiles.put("serviceNotFoundException.mustache", "NotFoundException.java");
@@ -615,6 +621,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 					}
 
 					//Generate Static resources of the project.
+					supportingFiles.add(new SupportingFile("application.mustache", resourceFolder, "application.yml"));
+					supportingFiles.add(new SupportingFile("openapi.mustache", resourceFolder, "openapi.yaml"));
 					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
 					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
 					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
