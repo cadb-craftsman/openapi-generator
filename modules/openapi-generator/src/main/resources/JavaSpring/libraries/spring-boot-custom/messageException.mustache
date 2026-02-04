@@ -1,18 +1,15 @@
 package {{basePackage}}.domain.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class MessageException extends RuntimeException {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MessageException {
 
-	private static final long serialVersionUID = -1932808270673621129L;
-
-	public MessageException() {
-		super();
-	}
-
-	public MessageException(String message, Throwable e) {
-		super(message, e);
-	}
-
+    private String message;
+    private String cause;
+	
 }

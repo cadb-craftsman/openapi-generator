@@ -590,6 +590,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 					apiTemplateFiles.put("apiController.mustache", "Controller.java");
 					apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
 					
+					//Generate Classes for models service and persistence packages of the project.
+					modelServiceTemplateFiles.put("modelService.mustache", ".java");
+			        modelPersistenceTemplateFiles.put("modelPersistence.mustache", ".java");
+
 					//Generate Packages for Mappers beans.
 					mappersTemplateFiles.put("factoryMapper.mustache", "FactoryMapper.java");
 

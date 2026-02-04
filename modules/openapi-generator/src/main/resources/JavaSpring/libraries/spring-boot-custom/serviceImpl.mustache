@@ -2,12 +2,19 @@ package {{basePackage}}.services;
 
 {{#imports}}import {{import}};
 {{/imports}}
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import {{basePackage}}.repository.{{classname}}Repository;
+import {{basePackage}}.domain.mappers.{{classname}}FactoryMapper;
 
 @Slf4j
 @Service
@@ -25,8 +32,8 @@ public class {{classname}}SrvImpl implements {{classname}}Srv {
     @Deprecated
     {{/isDeprecated}}
     @Override
-    {{>responseCustomType}} {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>bodyParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
-        return new {{>responseCustomType}};
+    public {{>responseCustomType}} {{operationId}}({{#allParams}}{{>queryCustomParams}}{{>pathCustomParams}}{{>bodyCustomParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+        return null;
     }
 
 {{/operation}}
