@@ -236,8 +236,6 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
         supportsInheritance = true;
         modelTemplateFiles.put("model.mustache", ".java");
-        //modelServiceTemplateFiles.put("modelService.mustache", ".java");
-        //modelPersistenceTemplateFiles.put("modelPersistence.mustache", ".java");
         apiTemplateFiles.put("api.mustache", ".java");
 
         apiTestTemplateFiles.put("api_test.mustache", ".java");

@@ -414,7 +414,7 @@ public class DefaultGenerator implements Generator {
 
             File written = processTemplateToFile(models, templateName, filename, generateModelDocumentation, CodegenConstants.MODEL_DOCS);
             if (written != null) {
-            	System.out.println("generateModelDocumentation: " + templateName + " " + docExtension + " " + suffix + " " + filename);
+            	//System.out.println("generateModelDocumentation: " + templateName + " " + docExtension + " " + suffix + " " + filename);
                 files.add(written);
                 if (config.isEnablePostProcessFile() && !dryRun) {
                     config.postProcessFile(written, "model-doc");
@@ -429,12 +429,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelFilename(templateName, modelName, outputDir);
-                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelFilename(templateName, modelName);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModel: " + templateName + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + filename);
 
             }
 
@@ -451,12 +451,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelServiceFilename(templateName, modelName, outputDir);
-                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelServiceFilename(templateName, modelName);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModel: " + templateName + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -595,7 +595,7 @@ public class DefaultGenerator implements Generator {
 
         // generate files based on processed models
         for (String modelName : allProcessedModels.keySet()) {
-        	System.out.println("modelName: " + modelName);
+        	//System.out.println("modelName: " + modelName);
 	
             ModelsMap models = allProcessedModels.get(modelName);
             
@@ -942,6 +942,27 @@ public class DefaultGenerator implements Generator {
                 // to generate service files
                 for (String templateName : config.serviceTemplateFiles().keySet()) {
                     File written = null;
+                    
+                    for(int i = 0; i < operation.getImports().size(); i++) {
+                    	for(Map.Entry entry : operation.getImports().get(i).entrySet()) {
+                    		if(entry.getKey().equals("import")) {
+                    			System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
+                    			String oldTag = entry.getValue().toString();
+                    			String newTag = null;
+                    			System.out.println("oldTag: " + oldTag);
+                    			if(oldTag.contains(".dto.")) {
+                        			newTag = entry.getValue().toString().replace(".dto.", ".service.");
+                        			System.out.println("newTag: " + newTag);
+                        			entry.setValue(newTag);
+                    			}else if(oldTag.contains(".persistence.")){
+                        			newTag = entry.getValue().toString().replace(".persistence.", ".service.");
+                        			System.out.println("newTag: " + newTag);
+                        			entry.setValue(newTag);
+                    			}
+                    		}
+                    	}
+                    }
+                    
                     if (config.templateOutputDirs().containsKey(templateName)) {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.serviceFilename(templateName, tag, outputDir);
@@ -970,6 +991,27 @@ public class DefaultGenerator implements Generator {
                 // to generate repository files
                 for (String templateName : config.repositoryTemplateFiles().keySet()) {
                     File written = null;
+                    
+                    for(int i = 0; i < operation.getImports().size(); i++) {
+                    	for(Map.Entry entry : operation.getImports().get(i).entrySet()) {
+                    		if(entry.getKey().equals("import")) {
+                    			System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
+                    			String oldTag = entry.getValue().toString();
+                    			String newTag = null;
+                    			System.out.println("oldTag: " + oldTag);
+                    			if(oldTag.contains(".dto.")) {
+                        			newTag = entry.getValue().toString().replace(".dto.", ".persistence.");
+                        			System.out.println("newTag: " + newTag);
+                        			entry.setValue(newTag);
+                    			}else if(oldTag.contains(".service.")){
+                        			newTag = entry.getValue().toString().replace(".service.", ".persistence.");
+                        			System.out.println("newTag: " + newTag);
+                        			entry.setValue(newTag);
+                    			}
+                    		}
+                    	}
+                    }
+
                     if (config.templateOutputDirs().containsKey(templateName)) {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.repositoryFilename(templateName, tag, outputDir);
