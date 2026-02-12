@@ -124,8 +124,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String OPEN_BRACE = "{";
 	public static final String CLOSE_BRACE = "}";
 
-	@Setter
-	protected String title = "OpenAPI Spring";
+	@Setter protected String title = "OpenAPI Spring";
 	@Getter
 	//@Setter
 	protected String configPackage = "org.openapitools.config";
@@ -260,30 +259,52 @@ public class SpringCodegen extends AbstractJavaCodegen
 		additionalProperties.put("openbrace", OPEN_BRACE);
 		additionalProperties.put("closebrace", CLOSE_BRACE);
 
-		cliOptions.add(new CliOption(TITLE, "server title name or client service name").defaultValue(title));
-		//cliOptions.add(new CliOption(CodegenConstants.CONFIG_PACKAGE, "configuration package for generated code")
-		//		.defaultValue(this.getConfigPackage()));
-		cliOptions.add(new CliOption(BASE_PACKAGE, "base package (invokerPackage) for generated code").defaultValue(this.getBasePackage()));
-		cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY, "Whether to generate only API interface stubs without the server files.", interfaceOnly));
-		cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_URL, "Whether to generate Feign client with url parameter.", useFeignClientUrl));
-		cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_CONTEXT_ID, "Whether to generate Feign client with contextId parameter.", useFeignClientContextId));
-		cliOptions.add(CliOption.newBoolean(DELEGATE_PATTERN, "Whether to generate the server files using the delegate pattern", delegatePattern));
-		cliOptions.add(CliOption.newBoolean(SINGLE_CONTENT_TYPES, "Whether to select only one produces/consumes content-type by operation.", singleContentTypes));
-		cliOptions.add(CliOption.newBoolean(SKIP_DEFAULT_INTERFACE, "Whether to skip generation of default implementations for java8 interfaces", skipDefaultInterface));
-		cliOptions.add(CliOption.newBoolean(ASYNC, "use async Callable controllers", async));
-		cliOptions.add(CliOption.newBoolean(REACTIVE, "wrap responses in Mono/Flux Reactor types (spring-boot only)", reactive));
-		cliOptions.add(new CliOption(RESPONSE_WRAPPER, "wrap the responses in given type (Future, Callable, CompletableFuture,ListenableFuture, DeferredResult, RxObservable, RxSingle or fully qualified type)"));
-		cliOptions.add(CliOption.newBoolean(VIRTUAL_SERVICE, "Generates the virtual service. For more details refer - https://github.com/virtualansoftware/virtualan/wiki"));
-		cliOptions.add(CliOption.newBoolean(USE_TAGS, "use tags for creating interface and controller classnames", useTags));
-		cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
-		cliOptions.add(CliOption.newBoolean(USE_SPRING_BUILT_IN_VALIDATION, "Disable `@Validated` at the class level when using built-in validation.", useSpringBuiltInValidation));
-		cliOptions.add(CliOption.newBoolean(PERFORM_BEANVALIDATION, "Use Bean Validation Impl. to perform BeanValidation", performBeanValidation));
-		cliOptions.add(CliOption.newBoolean(USE_SEALED, "Whether to generate sealed model interfaces and classes"));
-		cliOptions.add(CliOption.newBoolean(API_FIRST, "Generate the API from the OAI spec at server compile time (API first approach)", apiFirst));
-		cliOptions.add(CliOption.newBoolean(USE_OPTIONAL, "Use Optional container for optional parameters", useOptional));
-		cliOptions.add(CliOption.newBoolean(HATEOAS, "Use Spring HATEOAS library to allow adding HATEOAS links", hateoas));
-		cliOptions.add(CliOption.newBoolean(RETURN_SUCCESS_CODE, "Generated server returns 2xx code", returnSuccessCode));
-		cliOptions.add(CliOption.newBoolean(SPRING_CONTROLLER, "Annotate the generated API as a Spring Controller", useSpringController));
+        cliOptions.add(new CliOption(TITLE, "server title name or client service name").defaultValue(title));
+       // cliOptions.add(new CliOption(CONFIG_PACKAGE, "configuration package for generated code")
+       //         .defaultValue(this.getConfigPackage()));
+        cliOptions.add(new CliOption(BASE_PACKAGE, "base package (invokerPackage) for generated code")
+                .defaultValue(this.getBasePackage()));
+        cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY,
+                "Whether to generate only API interface stubs without the server files.", interfaceOnly));
+        cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_URL,
+                "Whether to generate Feign client with url parameter.", useFeignClientUrl));
+        cliOptions.add(CliOption.newBoolean(USE_FEIGN_CLIENT_CONTEXT_ID,
+                "Whether to generate Feign client with contextId parameter.", useFeignClientContextId));
+        cliOptions.add(CliOption.newBoolean(DELEGATE_PATTERN,
+                "Whether to generate the server files using the delegate pattern", delegatePattern));
+        cliOptions.add(CliOption.newBoolean(SINGLE_CONTENT_TYPES,
+                "Whether to select only one produces/consumes content-type by operation.", singleContentTypes));
+        cliOptions.add(CliOption.newBoolean(SKIP_DEFAULT_INTERFACE,
+                "Whether to skip generation of default implementations for java8 interfaces", skipDefaultInterface));
+        cliOptions.add(CliOption.newBoolean(ASYNC, "use async Callable controllers", async));
+        cliOptions.add(CliOption.newBoolean(REACTIVE, "wrap responses in Mono/Flux Reactor types (spring-boot only)",
+                reactive));
+        cliOptions.add(new CliOption(RESPONSE_WRAPPER,
+                "wrap the responses in given type (Future, Callable, CompletableFuture,ListenableFuture, DeferredResult, RxObservable, RxSingle or fully qualified type)"));
+        cliOptions.add(CliOption.newBoolean(VIRTUAL_SERVICE,
+                "Generates the virtual service. For more details refer - https://github.com/virtualansoftware/virtualan/wiki"));
+        cliOptions.add(
+                CliOption.newBoolean(USE_TAGS, "use tags for creating interface and controller classnames", useTags));
+        cliOptions
+                .add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
+        cliOptions.add(CliOption.newBoolean(USE_SPRING_BUILT_IN_VALIDATION,
+                "Disable `@Validated` at the class level when using built-in validation.",
+                useSpringBuiltInValidation));
+        cliOptions.add(CliOption.newBoolean(PERFORM_BEANVALIDATION,
+                "Use Bean Validation Impl. to perform BeanValidation", performBeanValidation));
+        cliOptions.add(CliOption.newBoolean(USE_SEALED,
+                "Whether to generate sealed model interfaces and classes"));
+        cliOptions.add(CliOption.newBoolean(API_FIRST,
+                "Generate the API from the OAI spec at server compile time (API first approach)", apiFirst));
+        cliOptions
+                .add(CliOption.newBoolean(USE_OPTIONAL, "Use Optional container for optional parameters", useOptional));
+        cliOptions.add(
+                CliOption.newBoolean(HATEOAS, "Use Spring HATEOAS library to allow adding HATEOAS links", hateoas));
+        cliOptions
+                .add(CliOption.newBoolean(RETURN_SUCCESS_CODE, "Generated server returns 2xx code", returnSuccessCode));
+        cliOptions.add(CliOption.newBoolean(SPRING_CONTROLLER, "Annotate the generated API as a Spring Controller", useSpringController));
+        cliOptions.add(CliOption.newString(X_IMPLEMENTS_SKIP, "Ability to choose interfaces that should NOT be implemented in the models despite their presence in vendor extension `x-implements`. Takes a list of fully qualified interface names. Example: yaml `xImplementsSkip: [com.some.pack.WithPhotoUrls]` skips implementing the interface `com.some.pack.WithPhotoUrls` in any schema", "empty list"));
+        cliOptions.add(CliOption.newString(SCHEMA_IMPLEMENTS, "Ability to supply interfaces per schema that should be implemented (serves similar purpose as vendor extension `x-implements`, but is fully decoupled from the api spec). Example: yaml `schemaImplements: {Pet: com.some.pack.WithId, Category: [com.some.pack.CategoryInterface], Dog: [com.some.pack.Canine, com.some.pack.OtherInterface]}` implements interfaces in schemas `Pet` (interface `com.some.pack.WithId`), `Category` (interface `com.some.pack.CategoryInterface`), `Dog`(interfaces `com.some.pack.Canine`, `com.some.pack.OtherInterface`)", "empty map"));
 
 		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION,
 				"Where to generate the class level @RequestMapping annotation.")
@@ -293,18 +314,37 @@ public class SpringCodegen extends AbstractJavaCodegen
 		}
 		cliOptions.add(requestMappingOpt);
 
-		cliOptions.add(CliOption.newBoolean(UNHANDLED_EXCEPTION_HANDLING, "Declare operation methods to throw a generic exception and allow unhandled exceptions (useful for Spring `@ControllerAdvice` directives).", unhandledException));
-		cliOptions.add(CliOption.newBoolean(USE_SWAGGER_UI, "Open the OpenApi specification in swagger-ui. Will also import and configure needed dependencies", useSwaggerUI));
-		cliOptions.add(CliOption.newBoolean(USE_RESPONSE_ENTITY, "Use the `ResponseEntity` type to wrap return values of generated API methods. " + "If disabled, method are annotated using a `@ResponseStatus` annotation, which has the status of the first response declared in the Api definition", useResponseEntity));
-		cliOptions.add(CliOption.newBoolean(GENERATE_GENERIC_RESPONSE_ENTITY, "Use a generic type for the `ResponseEntity` wrapping return values of generated API methods. " + "If enabled, method are generated with return type ResponseEntity<?>", generateGenericResponseEntity));
-		cliOptions.add(CliOption.newBoolean(USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
-		cliOptions.add(CliOption.newBoolean(USE_SPRING_BOOT3, "Generate code and provide dependencies for use with Spring Boot 3.x. (Use jakarta instead of javax in imports). Enabling this option will also enable `useJakartaEe`.", useSpringBoot3));
-		cliOptions.add(CliOption.newBoolean(GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS, "Whether to generate constructors with required args for models", generatedConstructorWithRequiredArgs));
-		cliOptions.add(new CliOption(RESOURCE_FOLDER, RESOURCE_FOLDER_DESC).defaultValue(this.getResourceFolder()));
-		cliOptions.add(CliOption.newBoolean(OPTIONAL_ACCEPT_NULLABLE, "Use `ofNullable` instead of just `of` to accept null values when using Optional.", optionalAcceptNullable));
+        cliOptions.add(CliOption.newBoolean(UNHANDLED_EXCEPTION_HANDLING,
+                "Declare operation methods to throw a generic exception and allow unhandled exceptions (useful for Spring `@ControllerAdvice` directives).",
+                unhandledException));
+        cliOptions.add(CliOption.newBoolean(USE_SWAGGER_UI,
+                "Open the OpenApi specification in swagger-ui. Will also import and configure needed dependencies",
+                useSwaggerUI));
+        cliOptions.add(CliOption.newBoolean(USE_RESPONSE_ENTITY,
+                "Use the `ResponseEntity` type to wrap return values of generated API methods. "
+                        + "If disabled, method are annotated using a `@ResponseStatus` annotation, which has the status of the first response declared in the Api definition",
+                useResponseEntity));
+        cliOptions.add(CliOption.newBoolean(GENERATE_GENERIC_RESPONSE_ENTITY,
+                "Use a generic type for the `ResponseEntity` wrapping return values of generated API methods. "
+                        + "If enabled, method are generated with return type ResponseEntity<?>",
+                generateGenericResponseEntity));
+        cliOptions.add(CliOption.newBoolean(USE_ENUM_CASE_INSENSITIVE,
+                "Use `equalsIgnoreCase` when String for enum comparison",
+                useEnumCaseInsensitive));
+        cliOptions.add(CliOption.newBoolean(USE_SPRING_BOOT3,
+                "Generate code and provide dependencies for use with Spring Boot ≥ 3 (use jakarta instead of javax in imports). Enabling this option will also enable `useJakartaEe`.",
+                useSpringBoot3));
+        cliOptions.add(CliOption.newBoolean(GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS,
+                "Whether to generate constructors with required args for models",
+                generatedConstructorWithRequiredArgs));
+        cliOptions.add(new CliOption(RESOURCE_FOLDER, RESOURCE_FOLDER_DESC).defaultValue(this.getResourceFolder()));
+        cliOptions.add(CliOption.newBoolean(OPTIONAL_ACCEPT_NULLABLE,
+                "Use `ofNullable` instead of just `of` to accept null values when using Optional.",
+                optionalAcceptNullable));		
 		cliOptions.add(CliOption.newBoolean(USE_DEDUCTION_FOR_ONE_OF_INTERFACES, "whether to use deduction for generated oneOf interfaces", useDeductionForOneOfInterfaces));
 		cliOptions.add(CliOption.newString(SPRING_API_VERSION, "Value for 'version' attribute in @RequestMapping (for Spring 7 and above)."));
-		
+
+        
 		supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
 		supportedLibraries.put(SPRING_BOOT_MYBATIS, "Spring-boot-mybatis Server application.");
 		supportedLibraries.put(SPRING_BOOT_CUSTOM, "Spring-boot-custom Server application.");
@@ -316,6 +356,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 				.defaultValue(SPRING_BOOT);
 		library.setEnum(supportedLibraries);
 		cliOptions.add(library);
+
 
 	}
 
@@ -859,72 +900,72 @@ public class SpringCodegen extends AbstractJavaCodegen
 		}
 	}
 
-	@Override
-	public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
-		final OperationMap operations = objs.getOperations();
-		if (operations != null) {
-			final List<CodegenOperation> ops = operations.getOperation();
-			for (final CodegenOperation operation : ops) {
-				final List<CodegenResponse> responses = operation.responses;
-				if (responses != null) {
-					for (final CodegenResponse resp : responses) {
-						if ("0".equals(resp.code)) {
-							resp.code = "200";
-						}
-						doDataTypeAssignment(resp.dataType, new DataTypeAssigner() {
-							@Override
-							public void setReturnType(final String returnType) {
-								resp.dataType = returnType;
-							}
+    @Override
+    public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
+        final OperationMap operations = objs.getOperations();
+        if (operations != null) {
+            final List<CodegenOperation> ops = operations.getOperation();
+            for (final CodegenOperation operation : ops) {
+                final List<CodegenResponse> responses = operation.responses;
+                if (responses != null) {
+                    for (final CodegenResponse resp : responses) {
+                        if ("0".equals(resp.code)) {
+                            resp.code = "200";
+                        }
+                        doDataTypeAssignment(resp.dataType, new DataTypeAssigner() {
+                            @Override
+                            public void setReturnType(final String returnType) {
+                                resp.dataType = returnType;
+                            }
 
-							@Override
-							public void setReturnContainer(final String returnContainer) {
-								resp.containerType = returnContainer;
-							}
+                            @Override
+                            public void setReturnContainer(final String returnContainer) {
+                                resp.containerType = returnContainer;
+                            }
 
-							@Override
-							public void setIsVoid(boolean isVoid) {
-								resp.isVoid = isVoid;
-							}
-						});
-					}
-				}
+                            @Override
+                            public void setIsVoid(boolean isVoid) {
+                                resp.isVoid = isVoid;
+                            }
+                        });
+                    }
+                }
 
-				doDataTypeAssignment(operation.returnType, new DataTypeAssigner() {
+                doDataTypeAssignment(operation.returnType, new DataTypeAssigner() {
 
-					@Override
-					public void setReturnType(final String returnType) {
-						operation.returnType = returnType;
-					}
+                    @Override
+                    public void setReturnType(final String returnType) {
+                        operation.returnType = returnType;
+                    }
 
-					@Override
-					public void setReturnContainer(final String returnContainer) {
-						operation.returnContainer = returnContainer;
-					}
+                    @Override
+                    public void setReturnContainer(final String returnContainer) {
+                        operation.returnContainer = returnContainer;
+                    }
 
-					@Override
-					public void setIsVoid(boolean isVoid) {
-						operation.isVoid = isVoid;
-					}
-				});
+                    @Override
+                    public void setIsVoid(boolean isVoid) {
+                        operation.isVoid = isVoid;
+                    }
+                });
 
-				prepareVersioningParameters(ops);
-				handleImplicitHeaders(operation);
-			}
-			// The tag for the controller is the first tag of the first operation
-			final CodegenOperation firstOperation = ops.get(0);
-			final Tag firstTag = firstOperation.tags.get(0);
-			final String firstTagName = firstTag.getName();
-			// But use a sensible tag name if there is none
-			objs.put("tagName", "default".equals(firstTagName) ? firstOperation.baseName : firstTagName);
-			objs.put("tagDescription", escapeText(firstTag.getDescription()));
-		}
+                prepareVersioningParameters(ops);
+                handleImplicitHeaders(operation);
+            }
+            // The tag for the controller is the first tag of the first operation
+            final CodegenOperation firstOperation = ops.get(0);
+            final Tag firstTag = firstOperation.tags.get(0);
+            final String firstTagName = firstTag.getName();
+            // But use a sensible tag name if there is none
+            objs.put("tagName", "default".equals(firstTagName) ? firstOperation.baseName : firstTagName);
+            objs.put("tagDescription", escapeText(firstTag.getDescription()));
+        }
 
-		removeImport(objs, "java.util.List");
+        removeImport(objs, "java.util.List");
 
-		return objs;
-	}
-
+        return objs;
+    }
+	
 	private interface DataTypeAssigner {
 		void setReturnType(String returnType);
 
@@ -1129,8 +1170,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 			codegenModel.imports.remove("Schema");
 		}
 
-		return codegenModel;
-	}
+		// Only add Nullable import for non-enum models that may have nullable fields
+        if (!Boolean.TRUE.equals(codegenModel.isEnum)) {
+            addSpringNullableImport(codegenModel.imports);
+        }
+
+        return codegenModel;
+    }
 
 	@Override
 	protected boolean isConstructorWithAllArgsAllowed(CodegenModel codegenModel) {
@@ -1194,11 +1240,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			codegenOperation.imports.addAll(provideArgsClassSet);
 		}
 
-		// to prevent inheritors (JavaCamelServerCodegen etc.) mistakenly use it
-		if (getName().contains("spring")) {
-			codegenOperation.allParams.stream().filter(CodegenParameter::notRequiredOrIsNullable).findAny()
-					.ifPresent(p -> codegenOperation.imports.add("Nullable"));
-		}
+        addSpringNullableImportForOperation(codegenOperation);
 
 		if (reactive) {
 			if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
@@ -1339,17 +1381,39 @@ public class SpringCodegen extends AbstractJavaCodegen
 		this.useSwaggerUI = useSwaggerUI;
 	}
 
-	@Override
-	public List<VendorExtension> getSupportedVendorExtensions() {
-		List<VendorExtension> extensions = super.getSupportedVendorExtensions();
-		extensions.add(VendorExtension.X_OPERATION_EXTRA_ANNOTATION);
-		extensions.add(VendorExtension.X_SPRING_PAGINATED);
-		extensions.add(VendorExtension.X_VERSION_PARAM);
-		extensions.add(VendorExtension.X_PATTERN_MESSAGE);
-		extensions.add(VendorExtension.X_SIZE_MESSAGE);
-		extensions.add(VendorExtension.X_MINIMUM_MESSAGE);
-		extensions.add(VendorExtension.X_MAXIMUM_MESSAGE);
-		extensions.add(VendorExtension.X_SPRING_API_VERSION);
-		return extensions;
-	}
+    @Override
+    public List<VendorExtension> getSupportedVendorExtensions() {
+        List<VendorExtension> extensions = super.getSupportedVendorExtensions();
+        extensions.add(VendorExtension.X_OPERATION_EXTRA_ANNOTATION);
+        extensions.add(VendorExtension.X_SPRING_PAGINATED);
+        extensions.add(VendorExtension.X_VERSION_PARAM);
+        extensions.add(VendorExtension.X_PATTERN_MESSAGE);
+        extensions.add(VendorExtension.X_SIZE_MESSAGE);
+        extensions.add(VendorExtension.X_MINIMUM_MESSAGE);
+        extensions.add(VendorExtension.X_MAXIMUM_MESSAGE);
+        extensions.add(VendorExtension.X_SPRING_API_VERSION);
+        return extensions;
+    }
+
+    private boolean isSpringCodegen() {
+        return getName().contains("spring");
+    }
+
+    private void addSpringNullableImport(Set<String> imports) {
+        if (isSpringCodegen()) {
+            imports.add("Nullable");
+        }
+    }
+
+    /**
+     * Adds Spring Nullable import if any parameter is nullable or optional.
+     */
+    private void addSpringNullableImportForOperation(CodegenOperation codegenOperation) {
+        if (isSpringCodegen()) {
+            codegenOperation.allParams.stream()
+                .filter(CodegenParameter::notRequiredOrIsNullable)
+                .findAny()
+                .ifPresent(param -> codegenOperation.imports.add("Nullable"));
+        }
+    }
 }
