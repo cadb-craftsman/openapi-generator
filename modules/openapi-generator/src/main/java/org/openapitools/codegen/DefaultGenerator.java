@@ -946,17 +946,17 @@ public class DefaultGenerator implements Generator {
                     for(int i = 0; i < operation.getImports().size(); i++) {
                     	for(Map.Entry entry : operation.getImports().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
+                    			//System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
-                    			System.out.println("oldTag: " + oldTag);
+                    			//System.out.println("oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
                         			newTag = entry.getValue().toString().replace(".dto.", ".service.");
-                        			System.out.println("newTag: " + newTag);
+                        			//System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}else if(oldTag.contains(".persistence.")){
                         			newTag = entry.getValue().toString().replace(".persistence.", ".service.");
-                        			System.out.println("newTag: " + newTag);
+                        			//System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}
                     		}
@@ -995,17 +995,17 @@ public class DefaultGenerator implements Generator {
                     for(int i = 0; i < operation.getImports().size(); i++) {
                     	for(Map.Entry entry : operation.getImports().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
+                    			//System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
-                    			System.out.println("oldTag: " + oldTag);
+                    			//System.out.println("oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
                         			newTag = entry.getValue().toString().replace(".dto.", ".persistence.");
-                        			System.out.println("newTag: " + newTag);
+                        			//System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}else if(oldTag.contains(".service.")){
                         			newTag = entry.getValue().toString().replace(".service.", ".persistence.");
-                        			System.out.println("newTag: " + newTag);
+                        			//System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}
                     		}
