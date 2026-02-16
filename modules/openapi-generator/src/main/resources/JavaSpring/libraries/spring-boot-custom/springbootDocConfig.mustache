@@ -5,19 +5,13 @@ import org.springframework.context.annotation.Configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-{{#swagger2AnnotationLibrary}}
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-{{/swagger2AnnotationLibrary}}
+
+import {{basePackage}}.domain.mappers.{{classname}}FactoryMapperImpl;
+import {{basePackage}}.webclients.{{classname}}WebClient;
 
 @Configuration
 public class {{classname}}DocConfig {
@@ -61,12 +55,12 @@ public class {{classname}}DocConfig {
         ;
     }
     
-    @Bean
+    @Bean("{{classname}}FactoryMapper")
     {{classname}}FactoryMapperImpl getFactoryMapper() {
 	return new {{classname}}FactoryMapperImpl();
     }
 
-    @Bean
+    @Bean("{{classname}}WebClient")
     {{classname}}WebClient get{{classname}}WebClient(@Qualifier("webClients") Map<String, WebClient> webClients, {{classname}}WebClientProperties clientProperties) {
         return new {{classname}}WebClient(webClients.get(clientProperties.getClients().get(0).name()), clientProperties.getClients().get(0));
     }    
