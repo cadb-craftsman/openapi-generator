@@ -588,7 +588,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
 				if (useSwaggerUI && selectedDocumentationProviderRequiresSwaggerUiBootstrap()) {
 					supportingFiles.add(new SupportingFile("swagger-ui.mustache", "src/main/resources/static", "swagger-ui.html"));
-					supportingFiles.add(new SupportingFile("springbootApiTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "ApiTest.java"));
+					//supportingFiles.add(new SupportingFile("springbootApiTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "ApiTest.java"));
 				}
 				// rename template to SpringBootApplication.mustache
 				supportingFiles.add(new SupportingFile("openapi2SpringBoot.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplication.java"));
