@@ -87,6 +87,8 @@ public class SpringCodegen extends AbstractJavaCodegen
     public static final String RESPONSE_WRAPPER = "responseWrapper";
     public static final String USE_TAGS = "useTags";
     public static final String SPRING_BOOT = "spring-boot";
+	public static final String SPRING_BOOT_MYBATIS = "spring-boot-mybatis";
+	public static final String SPRING_BOOT_CUSTOM = "spring-boot-custom";
     public static final String SPRING_CLOUD_LIBRARY = "spring-cloud";
     public static final String SPRING_HTTP_INTERFACE = "spring-http-interface";
     public static final String API_FIRST = "apiFirst";
@@ -131,7 +133,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String CLOSE_BRACE = "}";
 
     @Setter protected String title = "OpenAPI Spring";
-    @Getter @Setter
+    @Getter //@Setter
     protected String configPackage = "org.openapitools.configuration";
     @Getter @Setter
     protected String basePackage = "org.openapitools";
