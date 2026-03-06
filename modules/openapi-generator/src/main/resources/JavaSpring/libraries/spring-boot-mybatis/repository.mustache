@@ -15,7 +15,7 @@ public interface {{classname}}Repository {
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
-    public {{>responseCustomType}} {{operationId}}({{#allParams}}{{>queryCustomParams}}{{>pathCustomParams}}{{>bodyCustomParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
+    public {{>responseCustomTypeEntity}} {{operationId}}({{#allParams}}{{>queryCustomParamsEntity}}{{>pathCustomParamsEntity}}{{>bodyCustomParamsEntity}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
 {{/operation}}
 }
 {{/operations}}

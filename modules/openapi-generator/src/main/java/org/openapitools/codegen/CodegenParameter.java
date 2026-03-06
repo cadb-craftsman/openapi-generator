@@ -33,7 +33,7 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
             isCookieParam, isBodyParam, isContainer,
             isCollectionFormatMulti, isPrimitiveType, isModel, isExplode, isDeepObject, isMatrix, isAllowEmptyValue,
             isFormStyle, isSpaceDelimited, isPipeDelimited;
-    public String baseName, paramName, dataType, datatypeWithEnum, dataFormat, contentType,
+    public String baseName, paramName, dataType, dataTypeBean, dataTypeEntity, datatypeWithEnum, dataFormat, contentType,
             collectionFormat, description, unescapedDescription, baseType, defaultValue, enumDefaultValue, enumName, style;
 
     public String nameInLowerCase; // property name in lower case
@@ -149,6 +149,8 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
         output.baseName = this.baseName;
         output.paramName = this.paramName;
         output.dataType = this.dataType;
+        output.dataTypeBean = this.dataTypeBean;
+        output.dataTypeEntity = this.dataTypeEntity;
         output.datatypeWithEnum = this.datatypeWithEnum;
         output.enumName = this.enumName;
         output.dataFormat = this.dataFormat;
@@ -288,7 +290,7 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
     public int hashCode() {
         return Objects.hash(isFormParam, isQueryParam, isPathParam, isHeaderParam, isCookieParam,
                 isBodyParam, isContainer, isCollectionFormatMulti, isPrimitiveType, isModel, isExplode, baseName,
-                paramName, dataType, datatypeWithEnum, dataFormat, collectionFormat, description,
+                paramName, dataType, dataTypeBean, dataTypeEntity, datatypeWithEnum, dataFormat, collectionFormat, description,
                 unescapedDescription, baseType, containerType, containerTypeMapped, defaultValue,
                 enumDefaultValue, enumName, style, isDeepObject, isMatrix, isAllowEmptyValue, example, examples,
                 isFormStyle, isSpaceDelimited, isPipeDelimited,
@@ -373,6 +375,8 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
                 Objects.equals(baseName, that.baseName) &&
                 Objects.equals(paramName, that.paramName) &&
                 Objects.equals(dataType, that.dataType) &&
+                Objects.equals(dataTypeBean, that.dataTypeBean) &&
+                Objects.equals(dataTypeEntity, that.dataTypeEntity) &&
                 Objects.equals(datatypeWithEnum, that.datatypeWithEnum) &&
                 Objects.equals(dataFormat, that.dataFormat) &&
                 Objects.equals(collectionFormat, that.collectionFormat) &&
@@ -441,6 +445,8 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
         sb.append(", baseName='").append(baseName).append('\'');
         sb.append(", paramName='").append(paramName).append('\'');
         sb.append(", dataType='").append(dataType).append('\'');
+        sb.append(", dataTypeBean='").append(dataTypeBean).append('\'');
+        sb.append(", dataTypeEntity='").append(dataTypeEntity).append('\'');
         sb.append(", datatypeWithEnum='").append(datatypeWithEnum).append('\'');
         sb.append(", dataFormat='").append(dataFormat).append('\'');
         sb.append(", collectionFormat='").append(collectionFormat).append('\'');

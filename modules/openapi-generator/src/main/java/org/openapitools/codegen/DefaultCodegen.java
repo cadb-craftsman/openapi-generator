@@ -588,6 +588,8 @@ public class DefaultCodegen implements CodegenConfig {
                 objsValue.put("package", modelPackage());
                 objsValue.setImports(importsValue);
                 objsValue.put("classname", cm.classname);
+                objsValue.put("classnameBean", cm.classnameBean);
+                objsValue.put("classnameEntity", cm.classnameEntity);
                 objsValue.putAll(additionalProperties);
                 objs.put(cm.name, objsValue);
             }
@@ -2975,6 +2977,49 @@ public class DefaultCodegen implements CodegenConfig {
     }
     
     /**
+     * Converts the OpenAPI schema name to a model name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */
+    public String toModelNameBean(final String name) {
+    	String className = name;
+
+        if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Bean");
+        }
+        
+        return className;
+
+    }    
+
+    /**
+     * Converts the OpenAPI schema name to a model name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */
+    public String toModelNameEntity(final String name) {
+    	String className = name;
+
+    	if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Entity");
+        }
+        
+        return className;
+
+    }    
+    
+    
+    /**
      * Converts the OpenAPI schema name to a service name suitable for the current code generator.
      * May be overridden for each programming language.
      * In case the name belongs to the TypeSystem it won't be renamed.
@@ -3463,6 +3508,8 @@ public class DefaultCodegen implements CodegenConfig {
         m.description = escapeText(schema.getDescription());
         m.unescapedDescription = schema.getDescription();
         m.classname = toModelName(name);
+        m.classnameBean = toModelNameBean(m.classname);
+        m.classnameEntity = toModelNameEntity(m.classname);
         m.classVarName = toVarName(name);
         m.classFilename = toModelFilename(name);
         m.modelJson = Json.pretty(schema);
@@ -5019,6 +5066,8 @@ public class DefaultCodegen implements CodegenConfig {
 
             op.defaultResponse = toDefaultValue(responseSchema);
             op.returnType = cm.dataType;
+            op.returnTypeBean = toModelNameBean(op.returnType);
+            op.returnTypeEntity = toModelNameEntity(op.returnType);		
             op.returnFormat = cm.dataFormat;
             op.hasReference = schemas != null && schemas.containsKey(op.returnBaseType);
 
@@ -5915,11 +5964,15 @@ public class DefaultCodegen implements CodegenConfig {
 
         if (parameterModelName != null) {
             codegenParameter.dataType = parameterModelName;
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
             if (ModelUtils.isObjectSchema(parameterSchema) || ModelUtils.isComposedSchema(parameterSchema)) {
                 codegenProperty.complexType = codegenParameter.dataType;
             }
         } else {
             codegenParameter.dataType = codegenProperty.dataType;
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
         }
 
         if (ModelUtils.isArraySchema(parameterSchema)) {
@@ -7987,6 +8040,8 @@ public class DefaultCodegen implements CodegenConfig {
 
         codegenParameter.baseType = codegenProperty.baseType;
         codegenParameter.dataType = codegenProperty.dataType;
+        codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+        codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
         codegenParameter.baseName = codegenProperty.baseName;
         codegenParameter.paramName = toParamName(codegenParameter.baseName);
         codegenParameter.nameInCamelCase = camelize(codegenParameter.paramName, LOWERCASE_FIRST_LETTER);
@@ -8180,6 +8235,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.paramName = toParamName(codegenParameter.baseName);
             codegenParameter.baseType = codegenModel.classname;
             codegenParameter.dataType = getTypeDeclaration(codegenModel.classname);
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
             codegenParameter.description = codegenModel.description;
             codegenParameter.isNullable = codegenModel.isNullable;
             imports.add(codegenParameter.baseType);
@@ -8196,6 +8253,8 @@ public class DefaultCodegen implements CodegenConfig {
                 codegenParameter.paramName = toParamName(codegenParameter.baseName);
                 codegenParameter.baseType = codegenParameter.baseName;
                 codegenParameter.dataType = getTypeDeclaration(codegenModelName);
+                codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+                codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
                 codegenParameter.description = codegenProperty.getDescription();
                 codegenParameter.isNullable = codegenProperty.isNullable;
             } else {
@@ -8227,6 +8286,8 @@ public class DefaultCodegen implements CodegenConfig {
                     codegenParameter.paramName = toParamName(codegenParameter.baseName);
                     codegenParameter.baseType = codegenModelName;
                     codegenParameter.dataType = getTypeDeclaration(codegenModelName);
+                    codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+                    codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
                     codegenParameter.description = codegenModelDescription;
                     imports.add(codegenParameter.baseType);
 
@@ -8284,6 +8345,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.items = codegenProperty.items;
             codegenParameter.mostInnerItems = codegenProperty.mostInnerItems;
             codegenParameter.dataType = getTypeDeclaration(schema);
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
             codegenParameter.baseType = getSchemaType(inner);
             codegenParameter.isContainer = Boolean.TRUE;
             codegenParameter.isMap = Boolean.TRUE;
@@ -8307,6 +8370,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.isPrimitiveType = true;
             codegenParameter.baseType = codegenProperty.baseType;
             codegenParameter.dataType = codegenProperty.dataType;
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
             codegenParameter.description = codegenProperty.description;
             codegenParameter.paramName = toParamName(codegenParameter.baseName);
             codegenParameter.pattern = codegenProperty.pattern;
@@ -8340,6 +8405,8 @@ public class DefaultCodegen implements CodegenConfig {
                 codegenParameter.isPrimitiveType = true;
                 codegenParameter.baseType = codegenProperty.baseType;
                 codegenParameter.dataType = codegenProperty.dataType;
+                codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+                codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
                 codegenParameter.description = codegenProperty.description;
                 codegenParameter.isNullable = codegenProperty.isNullable;
                 codegenParameter.paramName = toParamName(codegenParameter.baseName);
@@ -8394,6 +8461,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.items = codegenProperty.items;
             codegenParameter.mostInnerItems = codegenProperty.mostInnerItems;
             codegenParameter.dataType = getTypeDeclaration(schema);
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
             codegenParameter.baseType = getSchemaType(inner);
             codegenParameter.isContainer = Boolean.TRUE;
             codegenParameter.isNullable = codegenProperty.isNullable;

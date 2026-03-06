@@ -32,7 +32,7 @@ public class {{classname}}SrvImpl implements {{classname}}Srv {
     @Deprecated
     {{/isDeprecated}}
     @Override
-    public {{>responseCustomType}} {{operationId}}({{#allParams}}{{>queryCustomParams}}{{>pathCustomParams}}{{>bodyCustomParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
+    public {{>responseCustomTypeBean}} {{operationId}}({{#allParams}}{{>queryCustomParamsBean}}{{>pathCustomParamsBean}}{{>bodyCustomParamsBean}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}}{
         return null;
     }
 

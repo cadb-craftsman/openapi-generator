@@ -58,6 +58,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.removeStart;
@@ -451,12 +453,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelServiceFilename(templateName, modelName, outputDir);
-                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
-                String filename = config.modelServiceFilename(templateName, modelName);
+                String filename = config.modelServiceFilename(templateName,  toModelNameBean(modelName));
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                //System.out.println("generateModel: " + templateName + " " + filename);
+                System.out.println("generateModel: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -475,7 +477,7 @@ public class DefaultGenerator implements Generator {
                 System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
-                String filename = config.modelPersistenceFilename(templateName, modelName);
+                String filename = config.modelPersistenceFilename(templateName, toModelNameEntity(modelName));
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
                 System.out.println("generateModel: " + templateName + " " + filename);
             }
@@ -562,6 +564,8 @@ public class DefaultGenerator implements Generator {
                 schemaMap.put(name, schema);
                 ModelsMap models = processModels(config, schemaMap);
                 models.put("classname", config.toModelName(name));
+                models.put("classnameBean", toModelNameBean(name));
+                models.put("classnameEntity", toModelNameEntity(name));
                 models.putAll(config.additionalProperties());
                 allProcessedModels.put(name, models);
             } catch (Exception e) {
@@ -2348,5 +2352,29 @@ public class DefaultGenerator implements Generator {
     private String removeTrailingSlash(String value) {
         return StringUtils.removeEnd(value, "/");
     }
+    
+    private String toModelNameBean(final String name) {
+    	String className = name;
+
+        if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Bean");
+        }
+        
+        return className;
+    }    
+
+    private String toModelNameEntity(final String name) {
+    	String className = name;
+
+    	if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Entity");
+        }
+        
+        return className;
+    } 
 
 }

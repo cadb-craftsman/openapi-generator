@@ -129,7 +129,7 @@ public interface CodegenConfig {
     String toApiVarName(String name);
 
     String toModelName(String name);
-    
+
     String toExceprionsName(String name);
     
     String toMappersName(String name);
