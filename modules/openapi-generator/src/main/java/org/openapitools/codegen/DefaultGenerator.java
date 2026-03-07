@@ -946,21 +946,17 @@ public class DefaultGenerator implements Generator {
                 // to generate service files
                 for (String templateName : config.serviceTemplateFiles().keySet()) {
                     File written = null;
-                    
-                    for(int i = 0; i < operation.getImports().size(); i++) {
-                    	for(Map.Entry entry : operation.getImports().get(i).entrySet()) {
+
+                    for(int i = 0; i < operation.getImportsBean().size(); i++) {
+                    	for(Map.Entry entry : operation.getImportsBean().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			//System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
+                    			System.out.println("operation service: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
                     			//System.out.println("oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
-                        			newTag = entry.getValue().toString().replace(".dto.", ".service.");
-                        			//System.out.println("newTag: " + newTag);
-                        			entry.setValue(newTag);
-                    			}else if(oldTag.contains(".persistence.")){
-                        			newTag = entry.getValue().toString().replace(".persistence.", ".service.");
-                        			//System.out.println("newTag: " + newTag);
+                        			newTag = toModelNameBean(entry.getValue().toString().replace(".dto.", ".service."));
+                        			System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}
                     		}
@@ -995,21 +991,17 @@ public class DefaultGenerator implements Generator {
                 // to generate repository files
                 for (String templateName : config.repositoryTemplateFiles().keySet()) {
                     File written = null;
-                    
-                    for(int i = 0; i < operation.getImports().size(); i++) {
-                    	for(Map.Entry entry : operation.getImports().get(i).entrySet()) {
+
+                    for(int i = 0; i < operation.getImportsEntity().size(); i++) {
+                    	for(Map.Entry entry : operation.getImportsEntity().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			//System.out.println("operation: " + entry.getKey() + " , " + entry.getValue());
+                    			System.out.println("operation repository: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
                     			//System.out.println("oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
-                        			newTag = entry.getValue().toString().replace(".dto.", ".persistence.");
-                        			//System.out.println("newTag: " + newTag);
-                        			entry.setValue(newTag);
-                    			}else if(oldTag.contains(".service.")){
-                        			newTag = entry.getValue().toString().replace(".service.", ".persistence.");
-                        			//System.out.println("newTag: " + newTag);
+                        			newTag = toModelNameEntity(entry.getValue().toString().replace(".dto.", ".persistence."));
+                        			System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}
                     		}
@@ -1972,10 +1964,14 @@ public class DefaultGenerator implements Generator {
 
         Map<String, String> mappings = getAllImportsMappings(allImports);
         Set<Map<String, String>> imports = toImportsObjects(mappings);
+        Set<Map<String, String>> importsBean = toImportsObjectsBean(mappings);
+        Set<Map<String, String>> importsEntity = toImportsObjectsEntity(mappings);
 
         //Some codegen implementations rely on a list interface for the imports
         operations.setImports(new ArrayList<>(imports));
-
+        operations.setImportsBean(new ArrayList<>(importsBean));
+        operations.setImportsEntity(new ArrayList<>(importsEntity));
+        
         // add a flag to indicate whether there's any {{import}}
         if (!imports.isEmpty()) {
             operations.put("hasImport", true);
@@ -2019,7 +2015,7 @@ public class DefaultGenerator implements Generator {
 
         //Some codegen implementations rely on a list interface for the imports
         operations.setImports(new ArrayList<>(imports));
-
+        
         // add a flag to indicate whether there's any {{import}}
         if (!imports.isEmpty()) {
             operations.put("hasImport", true);
@@ -2068,7 +2064,49 @@ public class DefaultGenerator implements Generator {
         });
         return result;
     }
+    
+    /**
+     * Using an import map created via {@link #getAllImportsMappings(Set)} to build a list import objects.
+     * The import objects have two keys: import and classname which hold the key and value of the initial map entry.
+     *
+     * @param mappedImports Map of fully qualified import and import
+     * @return The set of unique imports
+     */
+    private Set<Map<String, String>> toImportsObjectsBean(Map<String, String> mappedImports) {
+        Set<Map<String, String>> result = new TreeSet<>(
+                Comparator.comparing(o -> o.get("classname"))
+        );
 
+        mappedImports.forEach((key, value) -> {
+            Map<String, String> im = new LinkedHashMap<>();
+            im.put("import", key);
+            im.put("classname", value);
+            result.add(im);
+        });
+        return result;
+    }    
+
+    /**
+     * Using an import map created via {@link #getAllImportsMappings(Set)} to build a list import objects.
+     * The import objects have two keys: import and classname which hold the key and value of the initial map entry.
+     *
+     * @param mappedImports Map of fully qualified import and import
+     * @return The set of unique imports
+     */
+    private Set<Map<String, String>> toImportsObjectsEntity(Map<String, String> mappedImports) {
+        Set<Map<String, String>> result = new TreeSet<>(
+                Comparator.comparing(o -> o.get("classname"))
+        );
+
+        mappedImports.forEach((key, value) -> {
+            Map<String, String> im = new LinkedHashMap<>();
+            im.put("import", key);
+            im.put("classname", value);
+            result.add(im);
+        });
+        return result;
+    }    
+    
     private ModelsMap processModels(CodegenConfig config, Map<String, Schema> definitions) {
         ModelsMap objs = new ModelsMap();
         objs.put("package", config.modelPackage());
