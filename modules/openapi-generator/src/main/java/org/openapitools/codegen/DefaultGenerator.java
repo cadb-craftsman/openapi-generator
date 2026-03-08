@@ -453,12 +453,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelServiceFilename(templateName, modelName, outputDir);
-                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelServiceFilename(templateName,  toModelNameBean(modelName));
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModel: " + templateName + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -474,12 +474,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
-                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelPersistenceFilename(templateName, toModelNameEntity(modelName));
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModel: " + templateName + " " + filename);
+                //System.out.println("generateModel: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -950,13 +950,13 @@ public class DefaultGenerator implements Generator {
                     for(int i = 0; i < operation.getImportsBean().size(); i++) {
                     	for(Map.Entry entry : operation.getImportsBean().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			System.out.println("operation service: " + entry.getKey() + " , " + entry.getValue());
+                    			//System.out.println("operation service: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
                     			//System.out.println("oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
                         			newTag = toModelNameBean(entry.getValue().toString().replace(".dto.", ".service."));
-                        			System.out.println("newTag: " + newTag);
+                        			//System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}
                     		}
@@ -995,13 +995,13 @@ public class DefaultGenerator implements Generator {
                     for(int i = 0; i < operation.getImportsEntity().size(); i++) {
                     	for(Map.Entry entry : operation.getImportsEntity().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			System.out.println("operation repository: " + entry.getKey() + " , " + entry.getValue());
+                    			//System.out.println("operation repository: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
                     			//System.out.println("oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
                         			newTag = toModelNameEntity(entry.getValue().toString().replace(".dto.", ".persistence."));
-                        			System.out.println("newTag: " + newTag);
+                        			//System.out.println("newTag: " + newTag);
                         			entry.setValue(newTag);
                     			}
                     		}
