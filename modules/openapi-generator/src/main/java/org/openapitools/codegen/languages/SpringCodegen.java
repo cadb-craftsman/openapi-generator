@@ -88,7 +88,7 @@ public class SpringCodegen extends AbstractJavaCodegen
     public static final String USE_TAGS = "useTags";
     public static final String SPRING_BOOT = "spring-boot";
 	public static final String SPRING_BOOT_MYBATIS = "spring-boot-mybatis";
-	public static final String SPRING_BOOT_CUSTOM = "spring-boot-custom";
+	public static final String SPRING_BOOT_JPA = "spring-boot-jpa";
     public static final String SPRING_CLOUD_LIBRARY = "spring-cloud";
     public static final String SPRING_HTTP_INTERFACE = "spring-http-interface";
     public static final String API_FIRST = "apiFirst";
@@ -345,7 +345,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 		supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
 		supportedLibraries.put(SPRING_BOOT_MYBATIS, "Spring-boot-mybatis Server application.");
-		supportedLibraries.put(SPRING_BOOT_CUSTOM, "Spring-boot-custom Server application.");
+		supportedLibraries.put(SPRING_BOOT_JPA, "Spring-boot-jpa Server application.");
 		supportedLibraries.put(SPRING_CLOUD_LIBRARY, "Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
 		supportedLibraries.put(SPRING_HTTP_INTERFACE, "Spring 6 HTTP interfaces (testing)");
 		setLibrary(SPRING_BOOT);
@@ -641,7 +641,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 		supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
 		
-		if (SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+		if (SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 			//supportingFiles.add(new SupportingFile("LICENSE.mustache", "", "LICENSE"));
 			supportingFiles.add(new SupportingFile("mvnw.mustache", "", "mvnw"));
 			supportingFiles.add(new SupportingFile("mvnw.cmd.mustache", "", "mvnw.cmd"));
@@ -655,7 +655,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		if (!interfaceOnly) {
 			
 			// If is Spring Boot library
-			if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+			if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 				if (useSwaggerUI && selectedDocumentationProviderRequiresSwaggerUiBootstrap()) {
 					supportingFiles.add(new SupportingFile("swagger-ui.mustache", "src/main/resources/static", "swagger-ui.html"));
 					//supportingFiles.add(new SupportingFile("springbootApiTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "ApiTest.java"));
@@ -687,7 +687,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 				additionalProperties.put(USE_FEIGN_CLIENT, "true");
 
 			// Else if is Spring Boot library
-			} else if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+			} else if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 
 			    /***
 			     * @Craftsman
@@ -695,7 +695,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			     */
 				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
 
-				if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+				if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 					
 					//Generate Classes for api controller package of the project.
 					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
@@ -752,12 +752,12 @@ public class SpringCodegen extends AbstractJavaCodegen
 						if(SPRING_BOOT_MYBATIS.equals(library)) {
 							configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
 							configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
-						}else if(SPRING_BOOT_CUSTOM.equals(library)){
+						}else if(SPRING_BOOT_JPA.equals(library)){
 							configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
 							configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
 						}
 						
-						if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_CUSTOM.equals(library)) {
+						if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 							//Generate classes of config package for all WebClients of the project.
 							configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
 							configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");							
@@ -775,12 +775,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 		
 	    /***
 	     * @Craftsman
-	     * We dont use this class for the generated project  
+	     * We dont use this class for the generated project
+	     */  
 		if (SPRING_BOOT.equals(library)) {
-			supportingFiles.add(new SupportingFile("apiUtil.mustache",
-					(sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "ApiUtil.java"));
+			//supportingFiles.add(new SupportingFile("apiUtil.mustache",
+			//		(sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "ApiUtil.java"));
 		}
-		*/
+		
 
 		if (delegatePattern && !delegateMethod) {
 			additionalProperties.put("isDelegate", true);

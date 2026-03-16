@@ -1,0 +1,1 @@
+{{#isBodyParam}}{{^reactive}}{{>nullableAnnotation}}{{>optionalDataTypeEntity}}{{/reactive}}{{#reactive}}{{^isArray}}Mono<{{{dataType}}}>{{/isArray}}{{#isArray}}Flux<{{{baseType}}}>{{/isArray}}{{/reactive}} {{paramName}}{{/isBodyParam}}
