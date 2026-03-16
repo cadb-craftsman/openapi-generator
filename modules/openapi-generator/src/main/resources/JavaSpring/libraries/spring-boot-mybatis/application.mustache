@@ -13,7 +13,7 @@ spring:
     timeout-per-shutdown-phase: 15s  
   config:
     #(Only for local environment.)
-    import: "optional:configserver:" 
+    import: "optional:file:.env[.properties]"
   cloud:
     config: 
       enabled: false
@@ -34,10 +34,10 @@ spring:
     - default        
   ############## Datasource configuration ###############
   datasource:
-    url: jdbc:h2:file:./target/data/products-db
+    url: ${DATABASE_URL}
     driverClassName: org.h2.Driver
-    username: sa
-    password:
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
     hikari:
       connection-timeout: 2000
       maximum-pool-size: 5 
@@ -157,7 +157,7 @@ app:
     package: ${info.app.group}
     path: /api/v1/service/* 
 ############## AppClient properties ###############
-config:
+web:
   clients:
     - 
       name: webClientZero

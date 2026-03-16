@@ -11,6 +11,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -33,26 +34,29 @@ import {{basePackage}}.webclients.{{classname}}WebClient;
 public class {{classname}}DocConfig {
 
     @Bean(name = "{{configPackage}}.{{classname}}DocConfig.apiInfo")
-    OpenAPI apiInfo() {
+    OpenAPI getApiInfo(@Value("${app.openapi.title}") String title,
+    		@Value("${app.openapi.description}") String description,
+    		@Value("${app.openapi.contact.name}") String contactName,
+			@Value("${app.openapi.contact.url}") String contactUrl,
+			@Value("${app.openapi.license.name}") String licenseName,
+			@Value("${app.openapi.license.url}") String licenseUrl,
+			@Value("${springdoc.api-docs.version}") String appVersion) {
         return new OpenAPI()
                 .info(
-                        new Info(){{#appName}}
-                                .title("{{appName}}"){{/appName}}
-                                .description("{{{appDescription}}}"){{#termsOfService}}
-                                .termsOfService("{{termsOfService}}"){{/termsOfService}}{{#openAPI}}{{#info}}{{#contact}}
+                        new Info()
+                                .title(title)
+                                .description(description)
                                 .contact(
-                                        new Contact(){{#infoName}}
-                                                .name("{{infoName}}"){{/infoName}}{{#infoUrl}}
-                                                .url("{{infoUrl}}"){{/infoUrl}}{{#infoEmail}}
-                                                .email("{{infoEmail}}"){{/infoEmail}}
-                                ){{/contact}}{{#license}}
+                                        new Contact()
+                                                .name(contactName)
+                                                .url(contactUrl)
+                                )
                                 .license(
                                         new License()
-                                                {{#licenseInfo}}.name("{{licenseInfo}}")
-                                                {{/licenseInfo}}{{#licenseUrl}}.url("{{licenseUrl}}")
-                                                {{/licenseUrl}}
-                                ){{/license}}{{/info}}{{/openAPI}}
-                                .version("{{appVersion}}")
+                                                .name(licenseName)
+                                                .url(licenseUrl)
+                                )
+                                .version(appVersion)
                 ){{#hasAuthMethods}}
                 .components(
                         new Components(){{#authMethods}}
