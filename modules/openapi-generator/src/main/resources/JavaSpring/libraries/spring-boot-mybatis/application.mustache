@@ -35,7 +35,7 @@ spring:
   ############## Datasource configuration ###############
   datasource:
     url: ${DATABASE_URL}
-    driverClassName: org.h2.Driver
+    driverClassName: ${DATABASE_DRIVER_CLASS}
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     hikari:
@@ -53,10 +53,10 @@ spring:
     console.settings.trace: false
   ############## Datasource configuration Mysql ###############
   #datasource:
-  #   url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/bbdd
-  #   driverClassName: com.mysql.cj.jdbc.Driver
-  #   username: usr
-  #   password: pwd
+  #   url: ${DATABASE_URL}
+  #   driverClassName: ${DATABASE_DRIVER_CLASS}
+  #   username: ${DATABASE_USER}
+  #   password: ${DATABASE_PASSWORD}
   #   hikari:
   #     connection-timeout: 2000
   #     maximum-pool-size: 5

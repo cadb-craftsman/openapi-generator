@@ -646,6 +646,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			supportingFiles.add(new SupportingFile("mvnw.mustache", "", "mvnw"));
 			supportingFiles.add(new SupportingFile("mvnw.cmd.mustache", "", "mvnw.cmd"));
 			supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
+			supportingFiles.add(new SupportingFile("env.mustache", "", ".env"));
 			supportingFiles.add(new SupportingFile("dockerignore.mustache", "", ".dockerignore"));
 			supportingFiles.add(new SupportingFile("Containerfile.mustache", "", "Containerfile"));
 			supportingFiles.add(new SupportingFile("bitbucket-pipelines.mustache", "", "bitbucket-pipelines.yml"));

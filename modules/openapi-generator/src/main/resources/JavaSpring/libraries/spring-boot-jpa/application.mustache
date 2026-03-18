@@ -13,7 +13,7 @@ spring:
     timeout-per-shutdown-phase: 15s  
   config:
     #(Only for local environment.)
-    import: "optional:configserver:" 
+    import: "optional:file:.env[.properties]"
   cloud:
     config: 
       enabled: false
@@ -34,10 +34,10 @@ spring:
     - default        
   ############## Datasource configuration ###############
   datasource:
-    url: jdbc:h2:file:./target/data/products-db
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
+    url: ${DATABASE_URL}
+    driverClassName: ${DATABASE_DRIVER_CLASS}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
     hikari:
       connection-timeout: 2000
       maximum-pool-size: 5 
@@ -53,10 +53,10 @@ spring:
     console.settings.trace: false
   ############## Datasource configuration Mysql ###############
   #datasource:
-  #   url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/bbdd
-  #   driverClassName: com.mysql.cj.jdbc.Driver
-  #   username: usr
-  #   password: pwd
+  #   url: ${DATABASE_URL}
+  #   driverClassName: ${DATABASE_DRIVER_CLASS}
+  #   username: ${DATABASE_USER}
+  #   password: ${DATABASE_PASSWORD}
   #   hikari:
   #     connection-timeout: 2000
   #     maximum-pool-size: 5

@@ -2991,6 +2991,14 @@ public class DefaultCodegen implements CodegenConfig {
         	Pattern p = Pattern.compile("(?i)dto");
         	Matcher m = p.matcher(name);
         	className = m.replaceAll("Bean");
+        } else if (name.toLowerCase().contains("response")){ 
+        	Pattern p = Pattern.compile("(?i)response");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Bean");
+        } else if (name.toLowerCase().contains("request")){ 
+        	Pattern p = Pattern.compile("(?i)request");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Bean");
         }
         
         return className;
@@ -3012,7 +3020,15 @@ public class DefaultCodegen implements CodegenConfig {
         	Pattern p = Pattern.compile("(?i)dto");
         	Matcher m = p.matcher(name);
         	className = m.replaceAll("Entity");
-        }
+        } else if (name.toLowerCase().contains("response")){ 
+        	Pattern p = Pattern.compile("(?i)response");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Entity");
+        } else if (name.toLowerCase().contains("request")){ 
+        	Pattern p = Pattern.compile("(?i)request");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Entity");
+        }   
         
         return className;
 

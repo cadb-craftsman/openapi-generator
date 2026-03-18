@@ -2,7 +2,9 @@
  * {{description}}{{^description}}{{classname}}{{/description}}{{#isDeprecated}}
  * @deprecated{{/isDeprecated}}
  */
-
+ 
+{{#importsBean}}import {{import}};
+{{/importsBean}}
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
