@@ -4629,6 +4629,8 @@ public class DefaultCodegen implements CodegenConfig {
             property.enumName = toEnumName(property);
         } else {
             property.datatypeWithEnum = property.dataType;
+            property.datatypeWithEnumBean = toModelNameBean(property.dataType);
+            property.datatypeWithEnumEntity = toModelNameEntity(property.dataType);
         }
 
         property.setTypeProperties(p, openAPI);
