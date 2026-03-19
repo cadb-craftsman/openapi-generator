@@ -5,10 +5,13 @@
 
 {{#importsEntity}}import {{import}};
 {{/importsEntity}}
+import java.net.URI;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import {{basePackage}}.domain.model.persistence.*;
+import org.springframework.lang.Nullable;
 
 {{>typeInfoAnnotation}}
 @Data
