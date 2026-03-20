@@ -2,7 +2,7 @@
 FROM bellsoft/liberica-runtime-container:jre-21.0.6-musl as builder
 WORKDIR /workspace
 LABEL version="1.0.0"
-LABEL email="cadb.craftsman@gmail.com"
+LABEL email="area.arquitectura@amaseguros.com"
 COPY maven/target/*.jar application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
@@ -17,8 +17,8 @@ COPY --from=builder workspace/snapshot-dependencies/ ./
 RUN mkdir -p /workspace/target/logs
 COPY --from=builder workspace/application/ ./
 # Copy self signed certified
-#COPY maven/src/main/resources/certs/self_signed.pem /usr/share/ca-certificates/self_signed.pem
-#RUN keytool -importcert -cacerts -file /usr/share/ca-certificates/self_signed.pem -cacerts -keypass changeit -storepass changeit -noprompt -alias "*.self_signed"
+COPY maven/src/main/resources/certs/amaseguros.local.2027.pem /usr/share/ca-certificates/amaseguros.local.2027.pem
+RUN keytool -importcert -cacerts -file /usr/share/ca-certificates/amaseguros.local.2027.pem -cacerts -keypass changeit -storepass changeit -noprompt -alias "*.amaseguros.local.2027"
 # Create user and group
 RUN addgroup -g 1000 -S spring && adduser -u 1000 -S -D -H spring -G spring
 # Change user and group of folder and subfolders 

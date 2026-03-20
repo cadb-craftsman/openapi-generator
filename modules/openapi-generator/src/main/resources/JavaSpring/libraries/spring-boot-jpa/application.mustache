@@ -157,22 +157,20 @@ app:
     package: ${info.app.group}
     path: /api/v1/service/* 
 ############## AppClient properties ###############
-config:
+web:
   clients:
     - 
-      name: webClientZero
-      url: "http://localhost:8080"
-      api: "/api/v1/"
+      name: ${WEBCLIENT_NAME_0}
+      url: ${WEBCLIENT_URL_0}
+      api: ${WEBCLIENT_API_0}
       timeout: 120
       trace: true
       retry: 3
 
     -
-      name: webClientOne
-      url: "http://localhost:8080"
-      api: "/api/v1/"
+      name: ${WEBCLIENT_NAME_1}
+      url: ${WEBCLIENT_URL_1}
+      api: ${WEBCLIENT_API_1}
       timeout: 120
       trace: true
-      retry: 3      
-      paths:
-
+      retry: 3

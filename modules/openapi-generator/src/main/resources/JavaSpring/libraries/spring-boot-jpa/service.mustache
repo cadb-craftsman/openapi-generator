@@ -1,7 +1,7 @@
 package {{basePackage}}.services;
 
-{{#imports}}import {{import}};
-{{/imports}}
+{{#importsBean}}import {{import}};
+{{/importsBean}}
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +12,7 @@ public interface {{classname}}Srv {
     {{#isDeprecated}}
     @Deprecated
     {{/isDeprecated}}
-    {{>responseCustomType}} {{operationId}}({{#allParams}}{{>queryCustomParams}}{{>pathCustomParams}}{{>bodyCustomParams}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
+    {{>responseCustomTypeBean}} {{operationId}}({{#allParams}}{{>queryCustomParamsBean}}{{>pathCustomParamsBean}}{{>bodyCustomParamsBean}}{{^-last}}, {{/-last}}{{/allParams}}){{#unhandledException}} throws Exception{{/unhandledException}};
 
 {{/operation}}
 }

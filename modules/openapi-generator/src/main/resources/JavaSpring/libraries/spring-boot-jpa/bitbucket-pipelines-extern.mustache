@@ -1,0 +1,74 @@
+options:
+  max-time: 120
+  docker: false
+clone:
+  enabled: true
+definitions:
+   services:
+      docker:
+         image: docker:dind
+pipelines:
+  branches:
+    main:
+      - step:
+          name: test
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'
+            - 'esprolrbrunner'
+          script:
+            - echo ------------------------------------stest------------------------------------------;          
+            - mvn clean -U test;
+            #- mvn -X clean -U test;                  
+      - step:
+          name: build
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell' 
+            - 'esprolrbrunner'
+          script:
+            - echo ------------------------------------sbuild------------------------------------------;
+            # Command to generate OCI from paketo buildpacks and graalvm native image
+            - mvn clean -DskipTests -Pnative spring-boot:build-image;
+            #- mvn -X clean -DskipTests -Pnative spring-boot:build-image;
+            # Command to generate OCI from Dockerfile multi build
+            #- mvn clean -DskipTests -Pcontainer package k8s:build;
+            #- mvn -X clean -DskipTests -Pcontainer package k8s:build;  
+      - step:
+          name: release
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'
+            - 'esprolrbrunner'
+          script:
+            - echo ------------------------------------srelease------------------------------------------
+            - mvn -Prelease k8s:push;
+            #- mvn -X -Prelease k8s:push;
+            - PRELEASE=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{sub(/-.*/,x)}1');
+            - git remote set-url origin https://$BITBUCKET_USER:$APP_PASSWORD@bitbucket.org/$BITBUCKET_REPO_FULL_NAME.git
+            - git tag $PRELEASE;
+            - git push origin $PRELEASE;			
+      - step:
+          name: deploy
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'
+            - 'esprolrbrunner'
+          script:
+            - echo ------------------------------------sdeploy------------------------------------------;
+            - echo deploy to cluster; 
+            - PVERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout);
+            - PARTIFACT=$(mvn --non-recursive help:evaluate -Dexpression=project.artifactId -q -DforceStdout);
+            - PRELEASE=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{sub(/-.*/,x)}1');
+            - docker tag $NEXUS_AMASEGUROS/$COMPANY_NAME/$PARTIFACT:$PVERSION $GCP_ZONE/$GCP_PROJECT_COMMON/$PARTIFACT/$COMPANY_NAME/$PARTIFACT:$PRELEASE;
+            - docker push $GCP_ZONE/$GCP_PROJECT_COMMON/$PARTIFACT/$COMPANY_NAME/$PARTIFACT:$PRELEASE;
+      - step:
+          name: clean
+          runs-on: 
+            - 'self.hosted'
+            - 'linux.shell'
+            - 'esprolrbrunner'
+          script:
+            - echo ------------------------------------sclean------------------------------------------;
+            - echo clean images from runner
+            - docker image prune -f

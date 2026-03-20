@@ -115,6 +115,9 @@ public class SpringCodegen extends AbstractJavaCodegen
     public static final String JACKSON3_PACKAGE = "tools.jackson";
     public static final String JACKSON_PACKAGE = "jacksonPackage";
     public static final String ADDITIONAL_NOT_NULL_ANNOTATIONS = "additionalNotNullAnnotations";
+    
+    public static final String COMPANY = "company";
+    public static final String COMPANY_CRAFTSMAN = "craftsman";
 
 	@Getter
 	public enum RequestMappingMode {
@@ -191,6 +194,8 @@ public class SpringCodegen extends AbstractJavaCodegen
     protected boolean useJackson3 = false;
     @Getter @Setter
     protected boolean additionalNotNullAnnotations = false;
+    @Getter @Setter
+    protected String company = "craftsman";
     
 	public SpringCodegen() {
 		super();
@@ -342,6 +347,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         
 		cliOptions.add(CliOption.newBoolean(USE_DEDUCTION_FOR_ONE_OF_INTERFACES, "whether to use deduction for generated oneOf interfaces", useDeductionForOneOfInterfaces));
 		cliOptions.add(CliOption.newString(SPRING_API_VERSION, "Value for 'version' attribute in @RequestMapping (for Spring 7 and above)."));
+		cliOptions.add(CliOption.newString(COMPANY, "Value for 'company' attribute in config.json file", company));
 
 		supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
 		supportedLibraries.put(SPRING_BOOT_MYBATIS, "Spring-boot-mybatis Server application.");
@@ -481,6 +487,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		modelDocTemplateFiles.remove("model_doc.mustache");
 		apiDocTemplateFiles.remove("api_doc.mustache");
 
+		convertPropertyToStringAndWriteBack(COMPANY, this::setCompany);
         convertPropertyToStringAndWriteBack(TITLE, this::setTitle);
         convertPropertyToStringAndWriteBack(CONFIG_PACKAGE, this::setConfigPackage);
         convertPropertyToStringAndWriteBack(BASE_PACKAGE, this::setBasePackage);
@@ -516,6 +523,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         additionalProperties.put(INCLUDE_HTTP_REQUEST_CONTEXT, this.getIncludeHttpRequestContext());
         }
 
+		convertPropertyToStringAndWriteBack(COMPANY, this::setCompany);
 		convertPropertyToStringAndWriteBack(TITLE, this::setTitle);
 		convertPropertyToStringAndWriteBack(CONFIG_PACKAGE, this::setConfigPackage);
 		convertPropertyToStringAndWriteBack(BASE_PACKAGE, this::setBasePackage);
@@ -648,8 +656,13 @@ public class SpringCodegen extends AbstractJavaCodegen
 			supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
 			supportingFiles.add(new SupportingFile("env.mustache", "", ".env"));
 			supportingFiles.add(new SupportingFile("dockerignore.mustache", "", ".dockerignore"));
-			supportingFiles.add(new SupportingFile("Containerfile.mustache", "", "Containerfile"));
-			supportingFiles.add(new SupportingFile("bitbucket-pipelines.mustache", "", "bitbucket-pipelines.yml"));
+			if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
+				supportingFiles.add(new SupportingFile("Containerfile.mustache", "", "Containerfile"));
+				supportingFiles.add(new SupportingFile("bitbucket-pipelines.mustache", "", "bitbucket-pipelines.yml"));
+			}else {
+				supportingFiles.add(new SupportingFile("Containerfile-extern.mustache", "", "Containerfile"));
+				supportingFiles.add(new SupportingFile("bitbucket-pipelines-extern.mustache", "", "bitbucket-pipelines.yml"));
+			}
 		}
 
 		// If is different than interface
@@ -741,10 +754,15 @@ public class SpringCodegen extends AbstractJavaCodegen
 					//Generate Static resources of the project.
 					supportingFiles.add(new SupportingFile("application.mustache", resourceFolder, "application.yml"));
 					supportingFiles.add(new SupportingFile("openapi.mustache", resourceFolder, "openapi.yaml"));
-					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
 					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
 					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
-					supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
+
+					if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
+						supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
+					}else {
+						supportingFiles.add(new SupportingFile("banner-extern.mustache", resourceFolder, "banner.txt"));
+						supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
+					}	
 				}
 
 				if (!reactive && !apiFirst) {
