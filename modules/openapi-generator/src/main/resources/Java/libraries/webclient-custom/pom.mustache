@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Parent empresarial Amaseguros -->
+    <parent>
+        <groupId>com.amaseguros.cloudnative</groupId>
+        <artifactId>spring-boot-openapi-client-bom</artifactId>
+        <version>1.0.X</version>
+        <relativePath/>
+    </parent>
+
+    <!-- Variables dinámicas del cliente -->
+    <groupId>{{groupId}}</groupId>
+    <artifactId>{{artifactId}}</artifactId>
+    <version>{{artifactVersion}}</version>
+    <packaging>jar</packaging>
+    <name>{{appName}}</name>
+    <description>{{appDescription}}</description>
+
+    <properties>
+        <!-- Solo properties específicas del cliente -->
+        <swagger-annotations.version>2.2.8</swagger-annotations.version>
+    </properties>
+
+    <dependencies>
+        <!-- Solo dependencias específicas del cliente que no están en el padre -->
+
+        <!-- Swagger annotations -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger-annotations.version}</version>
+        </dependency>
+
+        <!-- Testing (específico del cliente) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot Plugin con skip -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Compiler Plugin (específico del cliente) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- Información organizacional -->
+    <organization>
+        <name>Amaseguros</name>
+        <url>https://www.amaseguros.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>{{developerName}}</name>
+            <organization>{{developerOrganization}}</organization>
+        </developer>
+    </developers>
+</project>

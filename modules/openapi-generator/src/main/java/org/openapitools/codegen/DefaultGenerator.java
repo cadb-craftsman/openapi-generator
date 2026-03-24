@@ -453,12 +453,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelServiceFilename(templateName, modelName, outputDir);
-                System.out.println("generateModelService: " + templateName + " " + outputDir + " " + filename);
+                //System.out.println("generateModelService: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelServiceFilename(templateName,  toModelNameBean(modelName));
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModelService: " + templateName + " " + filename);
+                //System.out.println("generateModelService: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -474,12 +474,12 @@ public class DefaultGenerator implements Generator {
             if (config.templateOutputDirs().containsKey(templateName)) {
                 String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                 String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
-                System.out.println("generateModelPersistence: " + templateName + " " + outputDir + " " + filename);
+                //System.out.println("generateModelPersistence: " + templateName + " " + outputDir + " " + filename);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
             } else {
                 String filename = config.modelPersistenceFilename(templateName, toModelNameEntity(modelName));
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModelPersistence: " + templateName + " " + filename);
+                //System.out.println("generateModelPersistence: " + templateName + " " + filename);
             }
 
             if (written != null) {

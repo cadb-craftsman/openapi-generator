@@ -17,13 +17,36 @@
 
 package org.openapitools.codegen.languages;
 
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.media.Schema;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
+import static java.util.Collections.sort;
+import static org.openapitools.codegen.CodegenConstants.X_IMPLEMENTS;
+import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
-import org.openapitools.codegen.*;
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
+import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.CodegenType;
+import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.VendorExtension;
 import org.openapitools.codegen.languages.features.BeanValidationFeatures;
 import org.openapitools.codegen.languages.features.GzipFeatures;
 import org.openapitools.codegen.languages.features.PerformBeanValidationFeatures;
@@ -39,18 +62,11 @@ import org.openapitools.codegen.utils.ProcessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-import static java.util.Collections.sort;
-import static org.openapitools.codegen.CodegenConstants.SERIALIZATION_LIBRARY;
-import static org.openapitools.codegen.CodegenConstants.X_IMPLEMENTS;
-import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.media.Schema;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 public class JavaClientCodegen extends AbstractJavaCodegen
         implements BeanValidationFeatures, PerformBeanValidationFeatures, GzipFeatures {
@@ -125,6 +141,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
     private static final String JACKSON_PACKAGE = "jacksonPackage";
 
     public static final String GENERATE_CLIENT_AS_BEAN = "generateClientAsBean";
+    
+    public static final String RESTTEMPLATE_CUSTOM = "resttemplate-custom";
+    public static final String WEBCLIENT_CUSTOM = "webclient-custom";
 
     protected String gradleWrapperPackage = "gradle.wrapper";
     protected boolean useRxJava = false;
@@ -291,6 +310,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         supportedLibraries.put(MICROPROFILE, "HTTP client: Microprofile client " + MICROPROFILE_REST_CLIENT_DEFAULT_VERSION + " (default, set desired version via `" + MICROPROFILE_REST_CLIENT_VERSION + "=x.x.x`). JSON processing: JSON-B 1.0.2 or Jackson 2.17.1");
         supportedLibraries.put(APACHE, "HTTP client: Apache httpclient 5.2.1. JSON processing: Jackson 2.17.1");
 
+        supportedLibraries.put(RESTTEMPLATE_CUSTOM, "HTTP client: Spring RestTemplate 5.3.33 (6.2.x if `useJakartaEe=true`, 7.x.x if `useSpringBoot4=true`). JSON processing: Jackson 2.x (3.x if `useJackson3=true`)");
+        supportedLibraries.put(WEBCLIENT_CUSTOM, "HTTP client: Spring WebClient 5.1.18. JSON processing: Jackson 2.17.1");
+
         CliOption libraryOption = new CliOption(CodegenConstants.LIBRARY, "library template (sub-template) to use");
         libraryOption.setEnum(supportedLibraries);
         // set okhttp-gson as the default
@@ -371,6 +393,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         final boolean libRetrofit2 = isLibrary(RETROFIT_2);
         final boolean libVertx = isLibrary(VERTX);
         final boolean libWebClient = isLibrary(WEBCLIENT);
+        
+        final boolean libWebClientCustom = isLibrary(WEBCLIENT_CUSTOM);
+        final boolean libRestTemplateCustom = isLibrary(RESTTEMPLATE_CUSTOM);
 
         // default jackson unless overridden by setSerializationLibrary
         this.jackson = !additionalProperties.containsKey(CodegenConstants.SERIALIZATION_LIBRARY) ||
@@ -409,7 +434,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         writePropertyBack(SINGLE_REQUEST_PARAMETER, getSingleRequestParameter());
         writePropertyBack(STATIC_REQUEST, getStaticRequest());
 
-        if (libWebClient && (useSealedOneOfInterfaces || useJakartaEe)) {
+        if ((libWebClient || libWebClientCustom) && (useSealedOneOfInterfaces || useJakartaEe)) {
             writePropertyBack(JAVA_17, true);
         }
 
@@ -500,18 +525,31 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         authFolder = (sourceFolder + '/' + invokerPackage + ".auth").replace(".", "/");
 
         //Common files
-        supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("README.mustache", "", "README.md").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("build.gradle.mustache", "", "build.gradle").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("build.sbt.mustache", "", "build.sbt").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("settings.gradle.mustache", "", "settings.gradle").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("gradle.properties.mustache", "", "gradle.properties").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("manifest.mustache", projectFolder, "AndroidManifest.xml").doNotOverwrite());
-        supportingFiles.add(new SupportingFile("travis.mustache", "", ".travis.yml"));
-        supportingFiles.add(new SupportingFile("ApiClient.mustache", invokerFolder, "ApiClient.java"));
-        supportingFiles.add(new SupportingFile("ServerConfiguration.mustache", invokerFolder, "ServerConfiguration.java"));
-        supportingFiles.add(new SupportingFile("ServerVariable.mustache", invokerFolder, "ServerVariable.java"));
-        supportingFiles.add(new SupportingFile("maven.yml.mustache", ".github/workflows", "maven.yml"));
+        if(libRestTemplateCustom || libWebClientCustom) {
+            supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("README.mustache", "", "README.md").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("build.gradle.mustache", "", "build.gradle").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("settings.gradle.mustache", "", "settings.gradle").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("gradle.properties.mustache", "", "gradle.properties").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("Jenkinsfile.mustache", "", "Jenkinsfile").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("ApiClient.mustache", invokerFolder, "ApiClient.java"));
+            supportingFiles.add(new SupportingFile("ServerConfiguration.mustache", invokerFolder, "ServerConfiguration.java"));
+            supportingFiles.add(new SupportingFile("ServerVariable.mustache", invokerFolder, "ServerVariable.java"));
+        }else {
+            supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("README.mustache", "", "README.md").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("build.gradle.mustache", "", "build.gradle").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("build.sbt.mustache", "", "build.sbt").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("settings.gradle.mustache", "", "settings.gradle").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("gradle.properties.mustache", "", "gradle.properties").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("manifest.mustache", projectFolder, "AndroidManifest.xml").doNotOverwrite());
+            supportingFiles.add(new SupportingFile("travis.mustache", "", ".travis.yml"));
+            supportingFiles.add(new SupportingFile("ApiClient.mustache", invokerFolder, "ApiClient.java"));
+            supportingFiles.add(new SupportingFile("ServerConfiguration.mustache", invokerFolder, "ServerConfiguration.java"));
+            supportingFiles.add(new SupportingFile("ServerVariable.mustache", invokerFolder, "ServerVariable.java"));
+            supportingFiles.add(new SupportingFile("maven.yml.mustache", ".github/workflows", "maven.yml"));
+        }
+
         if (dynamicOperations) {
             supportingFiles.add(new SupportingFile("openapi.mustache", projectFolder + "/resources/openapi", "openapi.yaml"));
             supportingFiles.add(new SupportingFile("apiOperation.mustache", invokerFolder, "ApiOperation.java"));
@@ -520,12 +558,12 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         }
 
         // helper for client library that allow to parse/format java.time.OffsetDateTime or org.threeten.bp.OffsetDateTime
-        if (additionalProperties.containsKey("jsr310") && (libWebClient || libVertx || libRestTemplate || libRestEasy
+        if (additionalProperties.containsKey("jsr310") && (libWebClient || libWebClientCustom || libVertx || libRestTemplate || libRestTemplateCustom || libRestEasy
                 || libMicroprofile || libJersey2 || libJersey3 || libApache || libRestClient)) {
             supportingFiles.add(new SupportingFile("JavaTimeFormatter.mustache", invokerFolder, "JavaTimeFormatter.java"));
         }
 
-        if (!(libRestTemplate || libRestAssured || libNative || libMicroprofile)) {
+        if (!(libRestTemplate || libRestTemplateCustom || libRestAssured || libNative || libMicroprofile)) {
             supportingFiles.add(new SupportingFile("StringUtil.mustache", invokerFolder, "StringUtil.java"));
         }
 
@@ -545,7 +583,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
                 gradleWrapperPackage.replace(".", File.separator), "gradle-wrapper.properties"));
         supportingFiles.add(new SupportingFile("gradle-wrapper.jar",
                 gradleWrapperPackage.replace(".", File.separator), "gradle-wrapper.jar"));
-        supportingFiles.add(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
+        if(!(libRestTemplateCustom || libWebClientCustom)) {
+        	supportingFiles.add(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
+        }
         supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
 
         if (performBeanValidation) {
@@ -567,18 +607,18 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             reservedWords.remove("file");
         }
 
-        if (!(libFeign || libRestTemplate || libRetrofit2 || libGoogleApiClient || libRestAssured || libWebClient
+        if (!(libFeign || libRestTemplate || libRestTemplateCustom || libRetrofit2 || libGoogleApiClient || libRestAssured || libWebClient || libWebClientCustom
                 || libMicroprofile || libRestClient)) {
             supportingFiles.add(new SupportingFile("apiException.mustache", invokerFolder, "ApiException.java"));
             supportingFiles.add(new SupportingFile("Configuration.mustache", invokerFolder, "Configuration.java"));
             supportingFiles.add(new SupportingFile("Pair.mustache", invokerFolder, "Pair.java"));
         }
 
-        if (!(libFeign || libRestTemplate || libRetrofit2 || libGoogleApiClient || libRestAssured || libNative || libMicroprofile)) {
+        if (!(libFeign || libRestTemplate || libRestTemplateCustom || libRetrofit2 || libGoogleApiClient || libRestAssured || libNative || libMicroprofile)) {
             supportingFiles.add(new SupportingFile("auth/Authentication.mustache", authFolder, "Authentication.java"));
         }
 
-        if (libApache || libRestTemplate) {
+        if (libApache || libRestTemplate || libRestTemplateCustom) {
             supportingFiles.add(new SupportingFile("BaseApi.mustache", invokerFolder, "BaseApi.java"));
         }
 
@@ -680,7 +720,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         } else if (libRestEasy) {
             supportingFiles.add(new SupportingFile("JSON.mustache", invokerFolder, "JSON.java"));
             forceSerializationLibrary(SERIALIZATION_LIBRARY_JACKSON);
-        } else if (libRestTemplate) {
+        } else if (libRestTemplate ||  libRestTemplateCustom) {
             forceSerializationLibrary(SERIALIZATION_LIBRARY_JACKSON);
             supportingFiles.add(new SupportingFile("auth/Authentication.mustache", authFolder, "Authentication.java"));
 
@@ -690,7 +730,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             // The flag below should be set for all Java libraries, but the templates need to be ported
             // one by one for each library.
             supportsAdditionalPropertiesWithComposedSchema = true;
-        } else if (libWebClient) {
+        } else if (libWebClient || libWebClientCustom) {
             forceSerializationLibrary(SERIALIZATION_LIBRARY_JACKSON);
 
             // Composed schemas can have the 'additionalProperties' keyword, as specified in JSON schema.
