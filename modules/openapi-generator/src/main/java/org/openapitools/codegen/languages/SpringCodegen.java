@@ -91,6 +91,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String SPRING_BOOT_JPA = "spring-boot-jpa";
     public static final String SPRING_CLOUD_LIBRARY = "spring-cloud";
     public static final String SPRING_HTTP_INTERFACE = "spring-http-interface";
+    public static final String USE_HTTP_SERVICE_PROXY_FACTORY_INTERFACES_CONFIGURATOR = "useHttpServiceProxyFactoryInterfacesConfigurator";
+    public static final String HTTP_INTERFACES_CONFIGURATOR_DEPENDENCY = "httpInterfacesConfiguratorDependency";
     public static final String API_FIRST = "apiFirst";
     public static final String SPRING_CONTROLLER = "useSpringController";
     public static final String HATEOAS = "hateoas";
@@ -172,7 +174,7 @@ public class SpringCodegen extends AbstractJavaCodegen
     @Setter protected boolean generateGenericResponseEntity = false;
     @Setter protected boolean useEnumCaseInsensitive = false;
     @Getter @Setter
-    protected boolean useSpringBoot3 = false;
+    protected boolean useSpringBoot3 = true;
     @Getter @Setter
     protected boolean useSpringBoot4 = false;
     @Getter @Setter
@@ -194,6 +196,7 @@ public class SpringCodegen extends AbstractJavaCodegen
     protected boolean useJackson3 = false;
     @Getter @Setter
     protected boolean additionalNotNullAnnotations = false;
+
     @Getter @Setter
     protected String company = "craftsman";
     
@@ -210,6 +213,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 				.includeGlobalFeatures(GlobalFeature.XMLStructureDefinitions)
 				.includeSchemaSupportFeatures(SchemaSupportFeature.Polymorphism)
 				.excludeParameterFeatures(ParameterFeature.Cookie));
+    @Setter boolean useHttpServiceProxyFactoryInterfacesConfigurator = false;
 
 		useBeanValidation = true;
 		outputFolder = "generated-code/javaSpring";
@@ -349,6 +353,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		cliOptions.add(CliOption.newString(SPRING_API_VERSION, "Value for 'version' attribute in @RequestMapping (for Spring 7 and above)."));
 		cliOptions.add(CliOption.newString(COMPANY, "Value for 'company' attribute in config.json file", company));
 
+
 		supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
 		supportedLibraries.put(SPRING_BOOT_MYBATIS, "Spring-boot-mybatis Server application.");
 		supportedLibraries.put(SPRING_BOOT_JPA, "Spring-boot-jpa Server application.");
@@ -360,6 +365,21 @@ public class SpringCodegen extends AbstractJavaCodegen
 				.defaultValue(SPRING_BOOT);
 		library.setEnum(supportedLibraries);
 		cliOptions.add(library);
+        cliOptions.add(CliOption.newBoolean(USE_DEDUCTION_FOR_ONE_OF_INTERFACES, "whether to use deduction for generated oneOf interfaces", useDeductionForOneOfInterfaces));
+        cliOptions.add(CliOption.newString(SPRING_API_VERSION, "Value for 'version' attribute in @RequestMapping (for Spring 7 and above)."));
+        cliOptions.add(CliOption.newString(USE_HTTP_SERVICE_PROXY_FACTORY_INTERFACES_CONFIGURATOR,
+            "Generate HttpInterfacesAbstractConfigurator based on an HttpServiceProxyFactory instance (as opposed to a WebClient instance, when disabled) for generating Spring HTTP interfaces.")
+            .defaultValue("false")
+        );
+        supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
+        supportedLibraries.put(SPRING_CLOUD_LIBRARY,
+                "Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
+        supportedLibraries.put(SPRING_HTTP_INTERFACE, "Spring 6 HTTP interfaces (testing). Requires Spring Boot 3 or 4.");
+        setLibrary(SPRING_BOOT);
+        final CliOption library = new CliOption(CodegenConstants.LIBRARY, CodegenConstants.LIBRARY_DESC)
+                .defaultValue(SPRING_BOOT);
+        library.setEnum(supportedLibraries);
+        cliOptions.add(library);
 
         cliOptions.add(CliOption.newBoolean(ADDITIONAL_NOT_NULL_ANNOTATIONS,
                 "Add @NotNull to path variables (required by default) and requestBody.",
@@ -454,12 +474,18 @@ public class SpringCodegen extends AbstractJavaCodegen
 		// super.ProcessOpts() is called
 		super.processOpts();
 
-		if (SPRING_HTTP_INTERFACE.equals(library)) {
-			documentationProvider = DocumentationProvider.NONE;
-			annotationLibrary = AnnotationLibrary.NONE;
-			useJakartaEe = true;
-			useBeanValidation = false;
-			performBeanValidation = false;
+        if (SPRING_HTTP_INTERFACE.equals(library)) {
+            if (documentationProvider != null) {
+                additionalProperties.remove(documentationProvider.getPropertyName());
+            }
+            if (annotationLibrary != null) {
+                additionalProperties.remove(annotationLibrary.getPropertyName());
+            }
+            documentationProvider = DocumentationProvider.NONE;
+            annotationLibrary = AnnotationLibrary.NONE;
+            useJakartaEe = true;
+            useBeanValidation = false;
+            performBeanValidation = false;
 
 			additionalProperties.put(USE_JAKARTA_EE, useJakartaEe);
 			additionalProperties.put(USE_BEANVALIDATION, useBeanValidation);
@@ -578,13 +604,12 @@ public class SpringCodegen extends AbstractJavaCodegen
         convertPropertyToBooleanAndWriteBack(USE_JACKSON_3, this::setUseJackson3);
         convertPropertyToBooleanAndWriteBack(USE_SPRING_BOOT3, this::setUseSpringBoot3);
         convertPropertyToBooleanAndWriteBack(USE_SPRING_BOOT4, this::setUseSpringBoot4);
-        if(isUseSpringBoot3() && isUseSpringBoot4()){
-            throw new IllegalArgumentException("Choose between Spring Boot 3 and Spring Boot 4");
+
+        if (isUseSpringBoot4()) {
+            setUseSpringBoot3(false);
         }
+
         if (isUseSpringBoot3() || isUseSpringBoot4()) {
-            if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
-                throw new IllegalArgumentException(DocumentationProvider.SPRINGFOX.getPropertyName() + " is not supported with Spring Boot > 3.x");
-            }
             if (AnnotationLibrary.SWAGGER1.equals(getAnnotationLibrary())) {
                 throw new IllegalArgumentException(AnnotationLibrary.SWAGGER1.getPropertyName() + " is not supported with Spring Boot > 3.x");
             }
@@ -602,7 +627,9 @@ public class SpringCodegen extends AbstractJavaCodegen
         } else {
             this.applyJackson2Package();
         }
+
         convertPropertyToStringAndWriteBack(RESOURCE_FOLDER, this::setResourceFolder);
+
 		convertPropertyToBooleanAndWriteBack(USE_ENUM_CASE_INSENSITIVE, this::setUseEnumCaseInsensitive);
 		convertPropertyToBooleanAndWriteBack(USE_SPRING_BOOT3, this::setUseSpringBoot3);
 		
@@ -619,6 +646,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 			applyJakartaPackage();
 		}
 		convertPropertyToStringAndWriteBack(RESOURCE_FOLDER, this::setResourceFolder);
+        convertPropertyToBooleanAndWriteBack(USE_HTTP_SERVICE_PROXY_FACTORY_INTERFACES_CONFIGURATOR, this::setUseHttpServiceProxyFactoryInterfacesConfigurator);
         convertPropertyToBooleanAndWriteBack(ADDITIONAL_NOT_NULL_ANNOTATIONS, this::setAdditionalNotNullAnnotations);
 
         // override parent one
@@ -628,7 +656,6 @@ public class SpringCodegen extends AbstractJavaCodegen
         importMapping.put("Nullable", "org.springframework.lang.Nullable");
         importMapping.put("org.springframework.core.io.Resource", "org.springframework.core.io.Resource");
         importMapping.put("DateTimeFormat", "org.springframework.format.annotation.DateTimeFormat");
-        importMapping.put("ApiIgnore", "springfox.documentation.annotations.ApiIgnore");
         importMapping.put("ParameterObject", "org.springdoc.api.annotations.ParameterObject");
         if (isUseSpringBoot3() || isUseSpringBoot4()) {
             importMapping.put("ParameterObject", "org.springdoc.core.annotations.ParameterObject");
@@ -691,15 +718,49 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 				supportingFiles.add(new SupportingFile("clientConfiguration.mustache", (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "ClientConfiguration.java"));
 
-				apiTemplateFiles.put("apiClient.mustache", "Client.java");
-				if (!additionalProperties.containsKey(SINGLE_CONTENT_TYPES)) {
-					additionalProperties.put(SINGLE_CONTENT_TYPES, "true");
-					this.setSingleContentTypes(true);
-				}
-				// @RequestMapping not supported with spring cloud openfeign.
-				setRequestMappingMode(RequestMappingMode.none);
-				additionalProperties.put(USE_FEIGN_CLIENT, "true");
+                apiTemplateFiles.put("apiClient.mustache", "Client.java");
+                if (!additionalProperties.containsKey(SINGLE_CONTENT_TYPES)) {
+                    additionalProperties.put(SINGLE_CONTENT_TYPES, "true");
+                    this.setSingleContentTypes(true);
+                }
+                // @RequestMapping not supported with spring cloud openfeign.
+                setRequestMappingMode(RequestMappingMode.none);
+                additionalProperties.put(USE_FEIGN_CLIENT, "true");
+            } else if (SPRING_BOOT.equals(library)) {
+                apiTemplateFiles.put("apiController.mustache", "Controller.java");
+                supportingFiles.add(new SupportingFile("application.mustache",
+                        ("src.main.resources").replace(".", java.io.File.separator), "application.properties"));
+                supportingFiles.add(new SupportingFile("homeController.mustache",
+                        (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
+                        "HomeController.java"));
+                supportingFiles.add(new SupportingFile("openapi.mustache",
+                        ("src/main/resources").replace("/", java.io.File.separator), "openapi.yaml"));
+                if (!reactive && !apiFirst) {
+                    if (DocumentationProvider.SPRINGDOC.equals(getDocumentationProvider())) {
+                        supportingFiles.add(new SupportingFile("springdocDocumentationConfig.mustache",
+                                (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator),
+                                "SpringDocConfiguration.java"));
+                    }
+                }
+            } else if (SPRING_HTTP_INTERFACE.equals(library)) {
+                if (!(isUseSpringBoot3() || isUseSpringBoot4())) {
+                    throw new IllegalArgumentException("Library '" + SPRING_HTTP_INTERFACE + "' is only supported with Spring Boot 3 or 4");
+                }
 
+                String httpInterfacesAbstractConfiguratorFile = useHttpServiceProxyFactoryInterfacesConfigurator ?
+                    "httpServiceProxyFactoryInterfacesConfigurator.mustache" :
+                    "httpInterfacesConfiguration.mustache";
+
+                supportingFiles.add(new SupportingFile(httpInterfacesAbstractConfiguratorFile,
+                        (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "HttpInterfacesAbstractConfigurator.java"));
+                writePropertyBack(USE_BEANVALIDATION, false);
+
+                writePropertyBack(HTTP_INTERFACES_CONFIGURATOR_DEPENDENCY,
+                    useHttpServiceProxyFactoryInterfacesConfigurator ?
+                    "HttpServiceProxyFactory" :
+                    reactive ? "WebClient" : "RestClient"
+                );
+            }
 			// Else if is Spring Boot library
 			} else if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 
@@ -1315,9 +1376,6 @@ public class SpringCodegen extends AbstractJavaCodegen
         // add org.springframework.data.domain.Pageable import when needed
         if (codegenOperation.vendorExtensions.containsKey("x-spring-paginated")) {
             codegenOperation.imports.add("Pageable");
-            if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider())) {
-                codegenOperation.imports.add("ApiIgnore");
-            }
             if (DocumentationProvider.SPRINGDOC.equals(getDocumentationProvider())) {
                 codegenOperation.imports.add("ParameterObject");
             }
@@ -1337,9 +1395,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 
         addSpringNullableImportForOperation(codegenOperation);
 
-        if (DocumentationProvider.SPRINGFOX.equals(getDocumentationProvider()) && includeHttpRequestContext != null && includeHttpRequestContext) {
-            codegenOperation.imports.add("ApiIgnore");
-        }
         if (reactive && sse) {
             var MEDIA_EVENT_STREAM = "text/event-stream";
             // inspecting used streaming media types
