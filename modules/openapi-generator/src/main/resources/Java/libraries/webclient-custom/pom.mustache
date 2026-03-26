@@ -8,8 +8,8 @@
     <!-- Parent empresarial Amaseguros -->
     <parent>
         <groupId>com.amaseguros.cloudnative</groupId>
-        <artifactId>spring-boot-openapi-client-bom</artifactId>
-        <version>1.0.X</version>
+        <artifactId>spring-boot-backend-client-bom</artifactId>
+        <version>3.5.X-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -20,15 +20,13 @@
     <packaging>jar</packaging>
     <name>{{appName}}</name>
     <description>{{appDescription}}</description>
-
-    <properties>
-        <!-- Solo properties específicas del cliente -->
-        <swagger-annotations.version>2.2.8</swagger-annotations.version>
+	
+	<properties>
+        <project.jar.name>${project.artifactId}-${project.version}</project.jar.name>
+        <jenkinsUserDeploy>jenkins</jenkinsUserDeploy>
     </properties>
 
     <dependencies>
-        <!-- Solo dependencias específicas del cliente que no están en el padre -->
-
         <!-- Swagger annotations -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
@@ -71,26 +69,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
+                    <source>
+                    ${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>${junit-platform-surefire.version}</version>
+					</dependency>
+                </dependencies>
+			</plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar-maven-plugin.version}</version>
+            </plugin>			
         </plugins>
     </build>
-
-    <!-- Información organizacional -->
-    <organization>
-        <name>Amaseguros</name>
-        <url>https://www.amaseguros.com</url>
-    </organization>
-
-    <developers>
-        <developer>
-            <name>{{developerName}}</name>
-            <organization>{{developerOrganization}}</organization>
-        </developer>
-    </developers>
 </project>
