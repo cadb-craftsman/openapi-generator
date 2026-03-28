@@ -749,9 +749,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 
     					if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
     						supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
+    						supportingFiles.add(new SupportingFile("selfsigned.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "craftsman.pem"));
     					}else {
     						supportingFiles.add(new SupportingFile("banner-extern.mustache", resourceFolder, "banner.txt"));
-    						supportingFiles.add(new SupportingFile("amaseguros.local.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
+    						supportingFiles.add(new SupportingFile("selfsigned.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
     					}	
     				}
 
