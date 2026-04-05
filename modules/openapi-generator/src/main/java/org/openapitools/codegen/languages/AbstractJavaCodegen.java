@@ -1039,7 +1039,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     
     @Override
     public String toApiTestFilename(String name) {
-        return toApiName(name) + "Test";
+        return toApiName(name);
     }
 
     @Override
@@ -1049,12 +1049,12 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     
     @Override
     public String toServiceTestFilename(String name) {
-        return toServiceName(name) + "Test";
+        return toServiceName(name);
     }
     
     @Override
     public String toRepositoryTestFilename(String name) {
-        return toRepositoryName(name) + "Test";
+        return toRepositoryName(name);
     }
     
     @Override

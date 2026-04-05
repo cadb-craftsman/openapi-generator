@@ -76,6 +76,9 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 	public static final String RESOURCE_FOLDER = "resourceFolder";
 	public static final String RESOURCE_FOLDER_DESC = "resource folder for generated resources";
+	
+	public static final String RESOURCE_TEST_FOLDER = "resourceTestFolder";
+	public static final String RESOURCE_TEST_FOLDER_DESC = "resource test folder for generated resources";	
 
 	public static final String CERTS_PACKAGE = "certs";
 	public static final String REPOSITORY_HANDLERS_PACKAGE = ".handlers";
@@ -144,6 +147,8 @@ public class SpringCodegen extends AbstractJavaCodegen
     protected String basePackage = "org.openapitools";
     @Getter @Setter
     protected String resourceFolder = projectFolder + "/resources";
+    @Getter @Setter
+    protected String resourceTestFolder = projectTestFolder + "/resources";
 	@Getter @Setter
 	protected String apacheMybatisPackage = "org.apache.ibatis.builder.xml";
 
@@ -344,6 +349,7 @@ public class SpringCodegen extends AbstractJavaCodegen
                 "Whether to generate constructors with required args for models",
                 generatedConstructorWithRequiredArgs));
         cliOptions.add(new CliOption(RESOURCE_FOLDER, RESOURCE_FOLDER_DESC).defaultValue(this.getResourceFolder()));
+        cliOptions.add(new CliOption(RESOURCE_TEST_FOLDER, RESOURCE_TEST_FOLDER_DESC).defaultValue(this.getResourceTestFolder()));
         cliOptions.add(CliOption.newBoolean(OPTIONAL_ACCEPT_NULLABLE,
                 "Use `ofNullable` instead of just `of` to accept null values when using Optional.",
                 optionalAcceptNullable));
@@ -607,6 +613,7 @@ public class SpringCodegen extends AbstractJavaCodegen
             this.applyJackson2Package();
         }
         convertPropertyToStringAndWriteBack(RESOURCE_FOLDER, this::setResourceFolder);
+        convertPropertyToStringAndWriteBack(RESOURCE_TEST_FOLDER, this::setResourceTestFolder);
         convertPropertyToBooleanAndWriteBack(USE_HTTP_SERVICE_PROXY_FACTORY_INTERFACES_CONFIGURATOR, this::setUseHttpServiceProxyFactoryInterfacesConfigurator);
         convertPropertyToBooleanAndWriteBack(ADDITIONAL_NOT_NULL_ANNOTATIONS, this::setAdditionalNotNullAnnotations);
 
@@ -662,8 +669,17 @@ public class SpringCodegen extends AbstractJavaCodegen
 				}
 				// rename template to SpringBootApplication.mustache
 				supportingFiles.add(new SupportingFile("openapi2SpringBoot.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplication.java"));
-				supportingFiles.add(new SupportingFile("SpringBootTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplicationTests.java"));
+				//supportingFiles.add(new SupportingFile("SpringBootTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplicationTests.java"));
 				supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "RFC3339DateFormat.java"));
+
+				if (SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
+					apiTestTemplateFiles.put("SpringBootApiTest.mustache", "ApiTest.java");
+					apiTestTemplateFiles.put("SpringBootServiceTest.mustache", "serviceTest.java");
+					apiTestTemplateFiles.put("SpringBootRepositoryTest.mustache", "RepositoryTest.java");
+					
+					supportingFiles.add(new SupportingFile("applicationTest.mustache", (resourceTestFolder + File.separator).replace(".", java.io.File.separator), "application-integration.yml"));
+					//supportingFiles.add(new SupportingFile("envTest.mustache", (resourceTestFolder + File.separator).replace(".", java.io.File.separator), "application-integration.yml"));
+				}
 			}
 			// If is Spring Cloud library 
 			if (SPRING_CLOUD_LIBRARY.equals(library)) {
