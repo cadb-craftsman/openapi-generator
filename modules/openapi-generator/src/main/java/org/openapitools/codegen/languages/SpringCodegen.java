@@ -224,6 +224,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		embeddedTemplateDir = templateDir = "JavaSpring";
 
 		apiPackage = "org.openapitools.api";
+		basePackage = "org.openapitools";
 		configPackage = "org.openapitools.config";
 		modelPackage = "org.openapitools.model";
 		modelServicePackage = "org.openapitools.model.service";
@@ -635,9 +636,17 @@ public class SpringCodegen extends AbstractJavaCodegen
         }
 
         if (isUseSpringBoot4()) {
-            supportingFiles.add(new SupportingFile("pom-sb4.mustache", "", "pom.xml"));
+        	if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)){
+        		supportingFiles.add(new SupportingFile("pom-sb4.mustache", "", "pom.xml"));	
+        	}else {
+        		supportingFiles.add(new SupportingFile("pom-sb4-extern.mustache", "", "pom.xml"));
+        	}
         } else if (isUseSpringBoot3()) {
-            supportingFiles.add(new SupportingFile("pom-sb3.mustache", "", "pom.xml"));
+        	if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)){
+        		supportingFiles.add(new SupportingFile("pom-sb3.mustache", "", "pom.xml"));
+        	}else {
+        		supportingFiles.add(new SupportingFile("pom-sb3-extern.mustache", "", "pom.xml"));
+        	}
         } else {
             supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
         }
@@ -674,7 +683,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 
 				if (SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 					apiTestTemplateFiles.put("SpringBootApiTest.mustache", "ApiTest.java");
-					apiTestTemplateFiles.put("SpringBootServiceTest.mustache", "serviceTest.java");
+					apiTestTemplateFiles.put("SpringBootServiceTest.mustache", "ServiceTest.java");
 					apiTestTemplateFiles.put("SpringBootRepositoryTest.mustache", "RepositoryTest.java");
 					
 					supportingFiles.add(new SupportingFile("applicationTest.mustache", (resourceTestFolder + File.separator).replace(".", java.io.File.separator), "application-integration.yml"));

@@ -206,7 +206,7 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> operationIdNameMapping = new HashMap<>();
     // a map to store the rules in OpenAPI Normalizer
     protected Map<String, String> openapiNormalizer = new HashMap<>();
-    @Setter protected String modelPackage = "", modelServicePackage = "", modelPersistencePackage = "",  apiPackage = "", configPackage = "", exceptionsPackage = "", mappersPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
+    @Setter protected String modelPackage = "", modelServicePackage = "", modelPersistencePackage = "",  apiPackage = "", basePackage = "", configPackage = "", exceptionsPackage = "", mappersPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
     protected String fileSuffix;
     @Getter
     @Setter
@@ -451,6 +451,7 @@ public class DefaultCodegen implements CodegenConfig {
         convertPropertyToStringAndWriteBack(CodegenConstants.TEMPLATE_DIR, this::setTemplateDir);
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        //convertPropertyToStringAndWriteBack(CodegenConstants.BASE_PACKAGE, this::setBasePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.CONFIG_PACKAGE, this::setConfigPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
@@ -1411,6 +1412,11 @@ public class DefaultCodegen implements CodegenConfig {
     @Override
     public String apiPackage() {
         return apiPackage;
+    }
+    
+    @Override
+    public String basePackage() {
+        return basePackage;
     }
     
     @Override
@@ -6989,6 +6995,20 @@ public class DefaultCodegen implements CodegenConfig {
         String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiTestFilenames);
         String suffix = apiTestTemplateFiles().get(templateName);
         return apiTestFileFolder() + File.separator + toApiTestFilename(uniqueTag) + suffix;
+    }
+    
+    /**
+     * Return the full path and API test file
+     *
+     * @param templateName template name
+     * @param tag          tag
+     * @return the API test file name with full path
+     */
+    @Override
+    public String apiTestFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiTestFilenames);
+        String suffix = apiTestTemplateFiles().get(templateName);
+        return outputDir + File.separator + toApiTestFilename(uniqueTag) + suffix;
     }
 
     @Override

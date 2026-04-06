@@ -62,6 +62,8 @@ public interface CodegenConfig {
 
     String apiPackage();
     
+    String basePackage();
+    
     String configPackage();
 
     String apiFileFolder();
@@ -361,6 +363,8 @@ public interface CodegenConfig {
     String configFilename(String templateName, String tag, String outputDir);    
 
     String apiTestFilename(String templateName, String tag);
+    
+    String apiTestFilename(String templateName, String tag, String outputDir);
 
     String apiDocFilename(String templateName, String tag);
 

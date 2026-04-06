@@ -312,6 +312,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
         cliOptions.add(new CliOption(CodegenConstants.MODEL_PACKAGE, CodegenConstants.MODEL_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.API_PACKAGE, CodegenConstants.API_PACKAGE_DESC));
+        //cliOptions.add(new CliOption(CodegenConstants.BASE_PACKAGE, CodegenConstants.BASE_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.CONFIG_PACKAGE, CodegenConstants.CONFIG_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.EXCEPTIONS_PACKAGE, CodegenConstants.EXCEPTIONS_PACKAGE_DESC));
         cliOptions.add(new CliOption(CodegenConstants.MAPPERS_PACKAGE, CodegenConstants.MAPPERS_PACKAGE_DESC));
@@ -508,6 +509,10 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         if (!additionalProperties.containsKey(CodegenConstants.API_PACKAGE)) {
             additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
         }
+
+        //if (!additionalProperties.containsKey(CodegenConstants.BASE_PACKAGE)) {
+        //    additionalProperties.put(CodegenConstants.BASE_PACKAGE, basePackage);
+        //}
         
         if (!additionalProperties.containsKey(CodegenConstants.CONFIG_PACKAGE)) {
             additionalProperties.put(CodegenConstants.CONFIG_PACKAGE, configPackage);
@@ -607,6 +612,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         convertPropertyToStringAndWriteBack(CodegenConstants.EXCEPTIONS_PACKAGE, this::setExceptionsPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.MAPPERS_PACKAGE, this::setMappersPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        //convertPropertyToStringAndWriteBack(CodegenConstants.BASE_PACKAGE, this::setBasePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.CONFIG_PACKAGE, this::setConfigPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
@@ -885,6 +891,8 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 	     */
         this.setApiPackage(sanitizePackageName(apiPackage));
         additionalProperties.remove(CodegenConstants.API_PACKAGE);
+        //this.setBasePackage(sanitizePackageName(basePackage));
+        //additionalProperties.remove(CodegenConstants.BASE_PACKAGE);
         this.setConfigPackage(sanitizePackageName(configPackage));
         additionalProperties.remove(CodegenConstants.CONFIG_PACKAGE);
         this.setModelPackage(sanitizePackageName(modelPackage));
@@ -934,7 +942,9 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
 
     @Override
     public String apiTestFileFolder() {
-        return (outputTestFolder + File.separator + testFolder + File.separator + apiPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    	String basePackage = apiPackage().replace("controller", "");
+    	//System.out.println("basePackage " + basePackage);
+        return (outputTestFolder + File.separator + testFolder + File.separator + basePackage.replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
 
     @Override

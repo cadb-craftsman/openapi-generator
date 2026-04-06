@@ -44,6 +44,9 @@ public class CodegenConstants {
 
     public static final String API_PACKAGE = "apiPackage";
     public static final String API_PACKAGE_DESC = "package for generated api classes";
+    
+    public static final String BASE_PACKAGE = "basePackage";
+    public static final String BASE_PACKAGE_DESC = "package for generated base classes";    
 
     public static final String API_SUFFIX = "apiSuffix";
     public static final String API_SUFFIX_DESC = "suffix for api classes";
