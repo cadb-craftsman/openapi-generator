@@ -725,11 +725,17 @@ public class SpringCodegen extends AbstractJavaCodegen
     				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
 
     				if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
-    					
-    					//Generate Classes for api controller package of the project.
-    					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
-    					apiTemplateFiles.put("apiController.mustache", "Controller.java");
-    					apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
+    					if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
+        					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
+    						apiTemplateFiles.put("api.mustache", ".java");
+        					apiTemplateFiles.put("apiController.mustache", "Controller.java");
+        					apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
+    					}else {
+        					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
+    						apiTemplateFiles.put("api-extern.mustache", ".java");
+        					apiTemplateFiles.put("apiController-extern.mustache", "Controller.java");
+        					apiTemplateFiles.put("apiControllerAdvice-extern.mustache", "ControllerAdvice.java");
+    					}
     					
     					//Generate Classes for models service and persistence packages of the project.
     					modelServiceTemplateFiles.put("modelService.mustache", ".java");
@@ -1031,6 +1037,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         if (operations != null) {
             final List<CodegenOperation> ops = operations.getOperation();
             for (final CodegenOperation operation : ops) {
+            	System.out.println("operation " + operation.operationId);
                 final List<CodegenResponse> responses = operation.responses;
                 if (responses != null) {
                     for (final CodegenResponse resp : responses) {
