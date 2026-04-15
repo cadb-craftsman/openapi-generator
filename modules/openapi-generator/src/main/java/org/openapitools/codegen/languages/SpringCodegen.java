@@ -1048,11 +1048,13 @@ public class SpringCodegen extends AbstractJavaCodegen
                             @Override
                             public void setReturnType(final String returnType) {
                                 resp.dataType = returnType;
+                                //System.out.println("resp.dataType " + resp.dataType);
                             }
 
                             @Override
                             public void setReturnContainer(final String returnContainer) {
                                 resp.containerType = returnContainer;
+                                //System.out.println("resp.containerType " + resp.containerType);
                             }
 
                             @Override
@@ -1068,11 +1070,13 @@ public class SpringCodegen extends AbstractJavaCodegen
                     @Override
                     public void setReturnType(final String returnType) {
                         operation.returnType = returnType;
+                        //System.out.println("operation.returnType " + operation.returnType);
                     }
 
                     @Override
                     public void setReturnContainer(final String returnContainer) {
                         operation.returnContainer = returnContainer;
+                        //System.out.println("operation.returnContainer " + operation.returnContainer);
                     }
 
                     @Override
