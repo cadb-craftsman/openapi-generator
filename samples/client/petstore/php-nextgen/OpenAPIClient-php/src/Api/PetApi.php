@@ -734,7 +734,7 @@ class PetApi
         // path params
         if ($pet_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'petId' . '}',
+                '{petId}',
                 ObjectSerializer::toPathValue($pet_id),
                 $resourcePath
             );
@@ -1593,7 +1593,7 @@ class PetApi
         // path params
         if ($pet_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'petId' . '}',
+                '{petId}',
                 ObjectSerializer::toPathValue($pet_id),
                 $resourcePath
             );
@@ -2248,7 +2248,7 @@ class PetApi
         // path params
         if ($pet_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'petId' . '}',
+                '{petId}',
                 ObjectSerializer::toPathValue($pet_id),
                 $resourcePath
             );
@@ -2564,7 +2564,7 @@ class PetApi
         // path params
         if ($pet_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'petId' . '}',
+                '{petId}',
                 ObjectSerializer::toPathValue($pet_id),
                 $resourcePath
             );
@@ -2574,7 +2574,7 @@ class PetApi
         $formDataProcessor = new FormDataProcessor();
 
         $formData = $formDataProcessor->prepare([
-            'additional_metadata' => $additional_metadata,
+            'additionalMetadata' => $additional_metadata,
             'file' => $file,
         ]);
 
@@ -2886,7 +2886,7 @@ class PetApi
         // path params
         if ($pet_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'petId' . '}',
+                '{petId}',
                 ObjectSerializer::toPathValue($pet_id),
                 $resourcePath
             );
@@ -2896,8 +2896,8 @@ class PetApi
         $formDataProcessor = new FormDataProcessor();
 
         $formData = $formDataProcessor->prepare([
-            'additional_metadata' => $additional_metadata,
-            'required_file' => $required_file,
+            'additionalMetadata' => $additional_metadata,
+            'requiredFile' => $required_file,
         ]);
 
         $formParams = $formDataProcessor->flatten($formData);

@@ -658,7 +658,7 @@ class FakeApi
         // path params
         if ($pet_id !== null) {
             $resourcePath = str_replace(
-                '{' . 'pet_id' . '}',
+                '{pet_id}',
                 ObjectSerializer::toPathValue($pet_id),
                 $resourcePath
             );
@@ -5933,7 +5933,7 @@ class FakeApi
             'byte' => $byte,
             'binary' => $binary,
             'date' => $date,
-            'date_time' => $date_time,
+            'dateTime' => $date_time,
             'password' => $password,
             'callback' => $callback,
         ]);

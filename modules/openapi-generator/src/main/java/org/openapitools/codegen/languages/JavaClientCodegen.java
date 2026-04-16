@@ -34,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,9 +66,11 @@ import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.servers.Server;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+
 
 public class JavaClientCodegen extends AbstractJavaCodegen
         implements BeanValidationFeatures, PerformBeanValidationFeatures, GzipFeatures {
@@ -195,6 +199,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
 
     @Setter protected int maxAttemptsForRetry = 1;
     @Setter protected long waitTimeMillis = 10l;
+    private final Set<String> JSPECIFY_SUPPORTED_LIBRARIES = new TreeSet<>(Arrays.asList(RESTCLIENT, WEBCLIENT, NATIVE, RESTTEMPLATE));
 
     private static class MpRestClientVersion {
         public final String rootPackage;
@@ -293,6 +298,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         cliOptions.add(CliOption.newBoolean(SUPPORT_VERTX_FUTURE, "Also generate api methods that return a vertx Future instead of taking a callback. Only `vertx` supports this option. Requires vertx 4 or greater.", this.supportVertxFuture));
         cliOptions.add(CliOption.newBoolean(USE_SEALED_ONE_OF_INTERFACES, "Generate the oneOf interfaces as sealed interfaces. Only supported for WebClient and RestClient.", this.useSealedOneOfInterfaces));
         cliOptions.add(CliOption.newBoolean(USE_UNARY_INTERCEPTOR, "If true it will generate ResponseInterceptors using a UnaryOperator. This can be usefull for manipulating the request before it gets passed, for example doing your own decryption", this.useUnaryInterceptor));
+        cliOptions.add(CliOption.newBoolean(USE_JSPECIFY, "Use Jspecify for null checks. Only supported for " + JSPECIFY_SUPPORTED_LIBRARIES, useJspecify));
 
         supportedLibraries.put(JERSEY2, "HTTP client: Jersey client 2.25.1. JSON processing: Jackson 2.17.1");
         supportedLibraries.put(JERSEY3, "HTTP client: Jersey client 3.1.1. JSON processing: Jackson 2.17.1");
@@ -342,6 +348,15 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         mpRestClientVersions.put("1.4.1", new MpRestClientVersion("javax", "pom.mustache"));
         mpRestClientVersions.put("2.0", new MpRestClientVersion("javax", "pom.mustache"));
         mpRestClientVersions.put("3.0", new MpRestClientVersion("jakarta", "pom_3.0.mustache"));
+    }
+
+    @Override
+    public void setUseJspecify(boolean useJspecify) {
+        // currently only available for a limited set of libraries
+        if (useJspecify && !JSPECIFY_SUPPORTED_LIBRARIES.contains(library)) {
+            throw new IllegalArgumentException("useJspecify is only suppored in these libraries: " + JSPECIFY_SUPPORTED_LIBRARIES);
+        }
+        super.setUseJspecify(useJspecify);
     }
 
     @Override
@@ -828,6 +843,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         } else {
             LOGGER.error("Unknown library option (-l/--library): {}", getLibrary());
         }
+        if (useJspecify) {
+            applyJspecify();
+        }
 
         if (usePlayWS) {
             // remove unsupported auth
@@ -1053,6 +1071,15 @@ public class JavaClientCodegen extends AbstractJavaCodegen
     }
 
     @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
+        CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
+        if (useJspecify) {
+            addNullableImportForOperation(op);
+        }
+        return op;
+    }
+
+    @Override
     public String apiFilename(String templateName, String tag) {
         if (isLibrary(VERTX)) {
             String suffix = apiTemplateFiles().get(templateName);
@@ -1181,6 +1208,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
 
         if (!AnnotationLibrary.SWAGGER2.equals(getAnnotationLibrary())) {
             codegenModel.imports.remove("Schema");
+        }
+        if (useJspecify) {
+            codegenModel.imports.add("Nullable");
         }
 
         return codegenModel;
@@ -1390,5 +1420,18 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         List<VendorExtension> extensions = super.getSupportedVendorExtensions();
         extensions.add(VendorExtension.X_WEBCLIENT_BLOCKING);
         return extensions;
+    }
+
+    @Override
+    protected void applyJspecify() {
+        super.applyJspecify();
+        if (Boolean.TRUE.equals(additionalProperties.get(CodegenConstants.GENERATE_APIS))) {
+            supportingFiles.add(new SupportingFile("invokerPackageInfo.mustache",
+                    (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator),
+                    "package-info.java"));
+        }
+        //  nullable_var_annotations.mustache generates nullable annotations as @{{javaxPackage}}.annotation.Nullable
+        // override the default pattern for the "find and replace"
+        jSpecifyNullableLambda.setNullableAnnotation("@" + additionalProperties.get(JAVAX_PACKAGE) + ".annotation.Nullable");
     }
 }

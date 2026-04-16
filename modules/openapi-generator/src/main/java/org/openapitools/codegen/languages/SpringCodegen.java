@@ -342,7 +342,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         cliOptions.add(CliOption.newBoolean(USE_SPRING_BOOT4,
                 "Generate code and provide dependencies for use with Spring Boot 4.x. (Use jakarta instead of javax in imports). Enabling this option will also enable `useJakartaEe`.",
                 useSpringBoot4));
-        cliOptions.add(CliOption.newBoolean(USE_JACKSON_3, "Set it in order to use jackson 3 dependencies (only allowed when `" + USE_SPRING_BOOT4 + "` is set and incompatible with `"+OPENAPI_NULLABLE+"`).", useJackson3));
+        cliOptions.add(CliOption.newBoolean(USE_JACKSON_3, "Set it in order to use jackson 3 dependencies (only allowed when `" + USE_SPRING_BOOT4 + "` is set).", useJackson3));
         cliOptions.add(new CliOption(INCLUDE_HTTP_REQUEST_CONTEXT,
                 "Whether to include HttpServletRequest (blocking) or ServerWebExchange (reactive) as additional parameter in generated methods. Defaults to 'true' for reactive and 'false' for blocking.",
                 SchemaTypeUtil.BOOLEAN_TYPE).defaultValue("true (reactive) / false (blocking)"));
@@ -372,6 +372,7 @@ public class SpringCodegen extends AbstractJavaCodegen
             "Generate HttpInterfacesAbstractConfigurator based on an HttpServiceProxyFactory instance (as opposed to a WebClient instance, when disabled) for generating Spring HTTP interfaces.")
             .defaultValue("false")
         );
+        cliOptions.add(CliOption.newBoolean(USE_JSPECIFY, "Use Jspecify for null checks", useJspecify));
         supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
         supportedLibraries.put(SPRING_CLOUD_LIBRARY,
                 "Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
@@ -605,9 +606,6 @@ public class SpringCodegen extends AbstractJavaCodegen
         if(isUseJackson3() && !isUseSpringBoot4()){
             throw new IllegalArgumentException("useJackson3 is only available with Spring Boot >= 4");
         }
-        if(isUseJackson3() && isOpenApiNullable()){
-            throw new IllegalArgumentException("openApiNullable cannot be set with useJackson3");
-        }
         if(this.useJackson3){
             this.applyJackson3Package();
         } else {
@@ -622,7 +620,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         importMapping.put("JsonDeserialize", (useJackson3 ? JACKSON3_PACKAGE : JACKSON2_PACKAGE) + ".databind.annotation.JsonDeserialize");
 
         typeMapping.put("file", "org.springframework.core.io.Resource");
-        importMapping.put("Nullable", "org.springframework.lang.Nullable");
+        importMapping.put("Nullable", useJspecify? "org.jspecify.annotations.Nullable": "org.springframework.lang.Nullable");
         importMapping.put("org.springframework.core.io.Resource", "org.springframework.core.io.Resource");
         importMapping.put("DateTimeFormat", "org.springframework.format.annotation.DateTimeFormat");
         importMapping.put("ParameterObject", "org.springdoc.api.annotations.ParameterObject");
@@ -931,6 +929,10 @@ public class SpringCodegen extends AbstractJavaCodegen
 			webClientsTemplateFiles.clear();
 		}
 		supportsAdditionalPropertiesWithComposedSchema = true;
+        if (useJspecify) {
+            applyJspecify();
+        }
+
 	}
 
     protected void applyJackson2Package() {
@@ -1369,7 +1371,9 @@ public class SpringCodegen extends AbstractJavaCodegen
             codegenOperation.imports.addAll(provideArgsClassSet);
         }
 
-        addSpringNullableImportForOperation(codegenOperation);
+        if (isSpringCodegen()) {
+            addNullableImportForOperation(codegenOperation);
+        }
 
         if (reactive && sse) {
             var MEDIA_EVENT_STREAM = "text/event-stream";
@@ -1535,18 +1539,6 @@ public class SpringCodegen extends AbstractJavaCodegen
     private void addSpringNullableImport(Set<String> imports) {
         if (isSpringCodegen()) {
             imports.add("Nullable");
-        }
-    }
-
-    /**
-     * Adds Spring Nullable import if any parameter is nullable or optional.
-     */
-    private void addSpringNullableImportForOperation(CodegenOperation codegenOperation) {
-        if (isSpringCodegen()) {
-            codegenOperation.allParams.stream()
-                .filter(CodegenParameter::notRequiredOrIsNullable)
-                .findAny()
-                .ifPresent(param -> codegenOperation.imports.add("Nullable"));
         }
     }
 }
