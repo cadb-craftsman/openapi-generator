@@ -160,6 +160,8 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     protected String sourceFolder = projectFolder + "/java";
     @Getter @Setter
     protected String testFolder = projectTestFolder + "/java";
+    @Getter @Setter
+    protected String resourceFolder = projectFolder + "/resources";    
 
     protected enum ENUM_PROPERTY_NAMING_TYPE {MACRO_CASE, legacy, original}
 
@@ -1022,17 +1024,17 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
     public String serviceFileFolder() {
         return (outputFolder + File.separator + sourceFolder + File.separator + servicePackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
-    
-    @Override
-    public String repositoryTestFileFolder() {
-        return (outputTestFolder + File.separator + testFolder + File.separator + repositoryPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
-    }
 
     @Override
     public String repositoryFileFolder() {
         return (outputFolder + File.separator + sourceFolder + File.separator + repositoryPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
     }
-    
+
+    @Override
+    public String repositoryMybatisFileFolder() {
+        return (outputTestFolder + File.separator + resourceFolder + File.separator + repositoryPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);
+    }
+
     @Override
     public String webClientsTestFileFolder() {
         return (outputTestFolder + File.separator + testFolder + File.separator + webClientsPackage().replace('.', File.separatorChar)).replace('/', File.separatorChar);

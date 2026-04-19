@@ -245,7 +245,7 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> apiTestTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTestTemplateFiles = new HashMap<>();
     protected Map<String, String> serviceTestTemplateFiles = new HashMap<>();
-    protected Map<String, String> repositoryTestTemplateFiles = new HashMap<>();
+    protected Map<String, String> repositoryMybatisTemplateFiles = new HashMap<>();
     
     protected Map<String, String> apiDocTemplateFiles = new HashMap<>();
     protected Map<String, String> modelDocTemplateFiles = new HashMap<>();
@@ -1551,8 +1551,8 @@ public class DefaultCodegen implements CodegenConfig {
 	}
 
 	@Override
-	public Map<String, String> repositoryTestTemplateFiles() {
-        return repositoryTestTemplateFiles;
+	public Map<String, String> repositoryMybatisTemplateFiles() {
+        return repositoryMybatisTemplateFiles;
 	}
 
     @Override
@@ -1601,6 +1601,11 @@ public class DefaultCodegen implements CodegenConfig {
 	}
 
 	@Override
+	public String repositoryMybatisFileFolder() {
+		return outputFolder + File.separator + repositoryPackage().replace('.', File.separatorChar);
+	}	
+	
+	@Override
 	public String webClientsFileFolder() {
 		return outputFolder + File.separator + webClientsPackage().replace('.', File.separatorChar);
 	}
@@ -1618,11 +1623,6 @@ public class DefaultCodegen implements CodegenConfig {
 	@Override
 	public String serviceTestFileFolder() {
         return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
-	}
-
-	@Override
-	public String repositoryTestFileFolder() {
-		return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
 	}
 
 	@Override
@@ -6969,6 +6969,20 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = repositoryTemplateFiles().get(templateName);
         return outputDir + File.separator + toRepositoryFilename(uniqueTag) + suffix;			
 	}
+	
+	@Override
+	public String repositoryMybatisFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryMybatisTemplateFiles().get(templateName);
+        return repositoryMybatisFileFolder() + File.separator + toRepositoryFilename(uniqueTag) + suffix;
+	}
+
+	@Override
+	public String repositoryMybatisFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryMybatisTemplateFiles().get(templateName);
+        return outputDir + File.separator + toRepositoryFilename(uniqueTag) + suffix;			
+	}	
 
 	@Override
 	public String webClientsFilename(String templateName, String tag) {

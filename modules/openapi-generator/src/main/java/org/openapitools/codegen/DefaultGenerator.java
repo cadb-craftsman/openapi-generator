@@ -989,8 +989,7 @@ public class DefaultGenerator implements Generator {
                 
                 // to generate repository files
                 for (String templateName : config.repositoryTemplateFiles().keySet()) {
-                    File written = null;
-
+                	File written = null;
                     for(int i = 0; i < operation.getImportsEntity().size(); i++) {
                     	for(Map.Entry entry : operation.getImportsEntity().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
@@ -1031,6 +1030,34 @@ public class DefaultGenerator implements Generator {
                         }
                     }
                 }
+                
+                // to generate repository files
+                for (String templateName : config.repositoryMybatisTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.repositoryMybatisFilename(templateName, tag, outputDir);
+                        // do not overwrite repository interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.repositoryMybatisFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "repository");
+                        }
+                    }
+                }                
                 
                 // to generate webclients files
                 for (String templateName : config.webClientsTemplateFiles().keySet()) {
@@ -1735,7 +1762,7 @@ public class DefaultGenerator implements Generator {
 								config.repositoryTemplateFiles().put(templateFile, templateExt);
 								break;
                             case RepositoryTests:
-								config.repositoryTestTemplateFiles().put(templateFile, templateExt);
+								config.repositoryMybatisTemplateFiles().put(templateFile, templateExt);
 								break;
 							case WebClients:
 								config.webClientsTemplateFiles().put(templateFile, templateExt);

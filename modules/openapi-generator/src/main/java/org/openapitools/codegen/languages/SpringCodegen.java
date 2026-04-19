@@ -634,17 +634,9 @@ public class SpringCodegen extends AbstractJavaCodegen
         }
 
         if (isUseSpringBoot4()) {
-        	if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)){
-        		supportingFiles.add(new SupportingFile("pom-sb4.mustache", "", "pom.xml"));	
-        	}else {
-        		supportingFiles.add(new SupportingFile("pom-sb4-extern.mustache", "", "pom.xml"));
-        	}
+        	supportingFiles.add(new SupportingFile("pom-sb4.mustache", "", "pom.xml"));	
         } else if (isUseSpringBoot3()) {
-        	if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)){
-        		supportingFiles.add(new SupportingFile("pom-sb3.mustache", "", "pom.xml"));
-        	}else {
-        		supportingFiles.add(new SupportingFile("pom-sb3-extern.mustache", "", "pom.xml"));
-        	}
+        	supportingFiles.add(new SupportingFile("pom-sb3.mustache", "", "pom.xml"));
         } else {
             supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
         }
@@ -658,13 +650,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 			supportingFiles.add(new SupportingFile("gitignore.mustache", "", ".gitignore"));
 			supportingFiles.add(new SupportingFile("env.mustache", "", ".env"));
 			supportingFiles.add(new SupportingFile("dockerignore.mustache", "", ".dockerignore"));
-			if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
-				supportingFiles.add(new SupportingFile("Containerfile.mustache", "", "Containerfile"));
-				supportingFiles.add(new SupportingFile("bitbucket-pipelines.mustache", "", "bitbucket-pipelines.yml"));
-			}else {
-				supportingFiles.add(new SupportingFile("Containerfile-extern.mustache", "", "Containerfile"));
-				supportingFiles.add(new SupportingFile("bitbucket-pipelines-extern.mustache", "", "bitbucket-pipelines.yml"));
-			}
+			supportingFiles.add(new SupportingFile("Containerfile.mustache", "", "Containerfile"));
+			supportingFiles.add(new SupportingFile("bitbucket-pipelines.mustache", "", "bitbucket-pipelines.yml"));
 		}
 
 		// If is different than interface
@@ -685,7 +672,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 					apiTestTemplateFiles.put("SpringBootRepositoryTest.mustache", "RepositoryTest.java");
 					
 					supportingFiles.add(new SupportingFile("applicationTest.mustache", (resourceTestFolder + File.separator).replace(".", java.io.File.separator), "application-integration.yml"));
-					//supportingFiles.add(new SupportingFile("envTest.mustache", (resourceTestFolder + File.separator).replace(".", java.io.File.separator), "application-integration.yml"));
 				}
 			}
 			// If is Spring Cloud library 
@@ -723,17 +709,10 @@ public class SpringCodegen extends AbstractJavaCodegen
     				supportingFiles.add(new SupportingFile("homeController.mustache", (sourceFolder + File.separator + apiPackage).replace(".", java.io.File.separator), "HttpController.java"));
 
     				if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
-    					if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
-        					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
-    						apiTemplateFiles.put("api.mustache", ".java");
-        					apiTemplateFiles.put("apiController.mustache", "Controller.java");
-        					apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
-    					}else {
-        					//apiTemplateFiles.put("homeController.mustache", "HttpController.java");
-    						apiTemplateFiles.put("api-extern.mustache", ".java");
-        					apiTemplateFiles.put("apiController-extern.mustache", "Controller.java");
-        					apiTemplateFiles.put("apiControllerAdvice-extern.mustache", "ControllerAdvice.java");
-    					}
+
+    					apiTemplateFiles.put("api.mustache", ".java");
+        				apiTemplateFiles.put("apiController.mustache", "Controller.java");
+        				apiTemplateFiles.put("apiControllerAdvice.mustache", "ControllerAdvice.java");
     					
     					//Generate Classes for models service and persistence packages of the project.
     					modelServiceTemplateFiles.put("modelService.mustache", ".java");
@@ -766,7 +745,9 @@ public class SpringCodegen extends AbstractJavaCodegen
     						//Generate Static resources for mybatis project.
     						supportingFiles.add(new SupportingFile("mybatis-3-config.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-config.dtd"));
     						supportingFiles.add(new SupportingFile("mybatis-3-mapper.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-mapper.dtd"));				
-    						supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
+    						//supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
+    						
+    						repositoryMybatisTemplateFiles.put("mybatisRepository.mustache", "Repository.xml");
     						
     					}
 
@@ -776,13 +757,13 @@ public class SpringCodegen extends AbstractJavaCodegen
     					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
     					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
 
-    					if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
-    						supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
-    						supportingFiles.add(new SupportingFile("selfsigned.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "craftsman.pem"));
-    					}else {
-    						supportingFiles.add(new SupportingFile("banner-extern.mustache", resourceFolder, "banner.txt"));
-    						supportingFiles.add(new SupportingFile("selfsigned.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
-    					}	
+    					//if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
+    					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
+    					supportingFiles.add(new SupportingFile("selfsigned.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), company + ".pem"));
+    					//}else {
+    					//	supportingFiles.add(new SupportingFile("banner-extern.mustache", resourceFolder, "banner.txt"));
+    					//	supportingFiles.add(new SupportingFile("selfsigned.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
+    					//}	
     				}
 
     				if (!reactive && !apiFirst) {

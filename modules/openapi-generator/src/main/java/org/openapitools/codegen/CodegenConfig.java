@@ -116,7 +116,7 @@ public interface CodegenConfig {
     
     String repositoryFileFolder();
     
-    String repositoryTestFileFolder();
+    String repositoryMybatisFileFolder();
     
     String webClientsPackage();
     
@@ -240,7 +240,7 @@ public interface CodegenConfig {
     
     Map<String, String> serviceTestTemplateFiles();
     
-    Map<String, String> repositoryTestTemplateFiles();
+    Map<String, String> repositoryMybatisTemplateFiles();
 
     Map<String, String> apiDocTemplateFiles();
 
@@ -375,6 +375,10 @@ public interface CodegenConfig {
     String repositoryFilename(String templateName, String repositoryName);
 
     String repositoryFilename(String templateName, String repositoryName, String outputDir);
+    
+    String repositoryMybatisFilename(String templateName, String repositoryName);
+
+    String repositoryMybatisFilename(String templateName, String repositoryName, String outputDir);    
     
     String webClientsFilename(String templateName, String webClientsName);
 
