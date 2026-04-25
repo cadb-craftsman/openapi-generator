@@ -63,6 +63,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String TITLE = "title";
 	public static final String SERVER_PORT = "serverPort";
 	public static final String CONFIG_PACKAGE = "configPackage";
+	public static final String CONFIG_NATIVE_PACKAGE = ".config";
 	public static final String BASE_PACKAGE = "basePackage";
 	public static final String INTERFACE_ONLY = "interfaceOnly";
 	public static final String USE_FEIGN_CLIENT_URL = "useFeignClientUrl";
@@ -265,8 +266,8 @@ public class SpringCodegen extends AbstractJavaCodegen
 		additionalProperties.put("closebrace", CLOSE_BRACE);
 
         cliOptions.add(new CliOption(TITLE, "server title name or client service name").defaultValue(title));
-       // cliOptions.add(new CliOption(CONFIG_PACKAGE, "configuration package for generated code")
-       //         .defaultValue(this.getConfigPackage()));
+        cliOptions.add(new CliOption(CONFIG_PACKAGE, "configuration package for generated code")
+                .defaultValue(this.getConfigPackage()));
         cliOptions.add(new CliOption(BASE_PACKAGE, "base package (invokerPackage) for generated code")
                 .defaultValue(this.getBasePackage()));
         cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY,
@@ -659,13 +660,12 @@ public class SpringCodegen extends AbstractJavaCodegen
 			if (SPRING_BOOT.equals(library) || SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 				if (useSwaggerUI && selectedDocumentationProviderRequiresSwaggerUiBootstrap()) {
 					supportingFiles.add(new SupportingFile("swagger-ui.mustache", "src/main/resources/static", "swagger-ui.html"));
-					//supportingFiles.add(new SupportingFile("springbootApiTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "ApiTest.java"));
 				}
 				// rename template to SpringBootApplication.mustache
 				supportingFiles.add(new SupportingFile("openapi2SpringBoot.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplication.java"));
-				//supportingFiles.add(new SupportingFile("SpringBootTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplicationTests.java"));
 				supportingFiles.add(new SupportingFile("RFC3339DateFormat.mustache", (sourceFolder + File.separator + basePackage).replace(".", java.io.File.separator), "RFC3339DateFormat.java"));
-
+				//supportingFiles.add(new SupportingFile("SpringBootTest.mustache", (testFolder + File.separator + basePackage).replace(".", java.io.File.separator), "OpenApiGeneratorApplicationTests.java"));
+				
 				if (SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
 					apiTestTemplateFiles.put("SpringBootApiTest.mustache", "ApiTest.java");
 					apiTestTemplateFiles.put("SpringBootServiceTest.mustache", "ServiceTest.java");
@@ -745,10 +745,9 @@ public class SpringCodegen extends AbstractJavaCodegen
     						//Generate Static resources for mybatis project.
     						supportingFiles.add(new SupportingFile("mybatis-3-config.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-config.dtd"));
     						supportingFiles.add(new SupportingFile("mybatis-3-mapper.mustache", (resourceFolder + File.separator  + apacheMybatisPackage).replace(".", java.io.File.separator), "mybatis-3-mapper.dtd"));				
-    						//supportingFiles.add(new SupportingFile("mybatisRepository.mustache", (resourceFolder + File.separator  + repositoryPackage).replace(".", java.io.File.separator), "MyBatisSampleRepository.xml"));
     						
+    						//Generate Mybatis.xml file with operations and querys
     						repositoryMybatisTemplateFiles.put("mybatisRepository.mustache", "Repository.xml");
-    						
     					}
 
     					//Generate Static resources of the project.
@@ -756,31 +755,32 @@ public class SpringCodegen extends AbstractJavaCodegen
     					supportingFiles.add(new SupportingFile("openapi.mustache", resourceFolder, "openapi.yaml"));
     					supportingFiles.add(new SupportingFile("schema.mustache", resourceFolder, "schema.sql"));
     					supportingFiles.add(new SupportingFile("type.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "type"));
-
-    					//if(company.equalsIgnoreCase(COMPANY_CRAFTSMAN)) {
     					supportingFiles.add(new SupportingFile("banner.mustache", resourceFolder, "banner.txt"));
     					supportingFiles.add(new SupportingFile("selfsigned.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), company + ".pem"));
-    					//}else {
-    					//	supportingFiles.add(new SupportingFile("banner-extern.mustache", resourceFolder, "banner.txt"));
-    					//	supportingFiles.add(new SupportingFile("selfsigned.cert.mustache", (resourceFolder + File.separator + SpringCodegen.CERTS_PACKAGE).replace(".", java.io.File.separator), "amaseguros.local.2017.pem"));
-    					//}	
+
     				}
 
     				if (!reactive && !apiFirst) {
     					if (DocumentationProvider.SPRINGDOC.equals(getDocumentationProvider())) {
 
     						if(SPRING_BOOT_MYBATIS.equals(library)) {
-    							configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
-    							configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
+    							//configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
+    							//configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
+    							supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorDocConfig.java"));
+    							supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorNativeConfig.java"));
     						}else if(SPRING_BOOT_JPA.equals(library)){
-    							configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
-    							configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
+    							//configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
+    							//configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
+    							supportingFiles.add(new SupportingFile("springbootDocConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorDocConfig.java"));
+    							supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorNativeConfig.java"));
     						}
     						
     						if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
     							//Generate classes of config package for all WebClients of the project.
-    							configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
-    							configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");							
+    							//configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
+    							//configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");	
+    							supportingFiles.add(new SupportingFile("springbootWebClientConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClientConfig.java"));
+    							supportingFiles.add(new SupportingFile("springbootWebClientProperties.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClientProperties.java"));    							
     						}
     					} 
     				}                
