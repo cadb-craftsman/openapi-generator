@@ -3009,22 +3009,13 @@ public class DefaultCodegen implements CodegenConfig {
         } else if (name.toLowerCase().contains("response")){ 
         	Pattern p = Pattern.compile("(?i)response");
         	Matcher m = p.matcher(name);
-        	className = m.replaceAll("Bean");
+        	className = m.replaceAll("RspBean");
         } else if (name.toLowerCase().contains("request")){ 
         	Pattern p = Pattern.compile("(?i)request");
         	Matcher m = p.matcher(name);
-        	className = m.replaceAll("Bean");
+        	className = m.replaceAll("ReqBean");
         }
 
-        /*
-        if (className.contains("List<")){
-        	String cname = className.replace("List<", "");
-        	cname = cname.replace(">", "");
-        	className = cname;
-        }
-        System.out.println("className Bean " + className);
-        */
-        
         return className;
 
     }    
@@ -3047,22 +3038,13 @@ public class DefaultCodegen implements CodegenConfig {
         } else if (name.toLowerCase().contains("response")){ 
         	Pattern p = Pattern.compile("(?i)response");
         	Matcher m = p.matcher(name);
-        	className = m.replaceAll("Entity");
+        	className = m.replaceAll("RspEntity");
         } else if (name.toLowerCase().contains("request")){ 
         	Pattern p = Pattern.compile("(?i)request");
         	Matcher m = p.matcher(name);
-        	className = m.replaceAll("Entity");
+        	className = m.replaceAll("ReqEntity");
         } 
 
-    	/*
-        if (className.contains("List<")){
-        	String cname = className.replace("List<", "");
-        	cname = cname.replace(">", "");
-        	className = cname;
-        }
-        System.out.println("className Entity " + className);
-        */
-    	
         return className;
 
     }    
