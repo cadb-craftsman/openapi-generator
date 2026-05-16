@@ -189,21 +189,40 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> parameterNameMapping = new HashMap<>();
     // a map to store the mapping between model name and the name provided by the user
     protected Map<String, String> modelNameMapping = new HashMap<>();
+
+    /***
+     * @Craftsman
+     * Add mappings for service, repository and webClients.  
+     */
+    // a map to store the mapping between service name and the name provided by the user
+    protected Map<String, String> serviceNameMapping = new HashMap<>();
+    // a map to store the mapping between service name and the name provided by the user
+    protected Map<String, String> repositoryNameMapping = new HashMap<>();
+    // a map to store the mapping between service name and the name provided by the user
+    protected Map<String, String> webClientsNameMapping = new HashMap<>();
+
     // a map to store the mapping between enum name and the name provided by the user
     protected Map<String, String> enumNameMapping = new HashMap<>();
     // a map to store the mapping between operation id name and the name provided by the user
     protected Map<String, String> operationIdNameMapping = new HashMap<>();
     // a map to store the rules in OpenAPI Normalizer
     protected Map<String, String> openapiNormalizer = new HashMap<>();
-    @Setter
-    protected String modelPackage = "", apiPackage = "";
+    @Setter protected String modelPackage = "", modelServicePackage = "", modelPersistencePackage = "",  apiPackage = "", basePackage = "", configPackage = "", exceptionsPackage = "", mappersPackage = "", servicePackage = "", repositoryPackage = "", webClientsPackage = "";
     protected String fileSuffix;
     @Getter
     @Setter
     protected String modelNamePrefix = "", modelNameSuffix = "";
-    @Getter
-    @Setter
-    protected String apiNamePrefix = "", apiNameSuffix = "Api";
+    @Getter @Setter
+    protected String apiNamePrefix = "", apiNameSuffix = "";
+    //protected String apiNamePrefix = "", apiNameSuffix = "Api";
+    @Getter @Setter
+    protected String configNamePrefix = "", configNameSuffix = "";    
+    @Getter @Setter
+    protected String serviceNamePrefix = "", serviceNameSuffix = "";
+    @Getter @Setter
+    protected String repositoryNamePrefix = "", repositoryNameSuffix = "";
+    @Getter @Setter
+    protected String webClientsNamePrefix = "", webClientsNameSuffix = "";
     protected String testPackage = "";
     @Setter
     protected String filesMetadataFilename = "FILES";
@@ -214,9 +233,21 @@ public class DefaultCodegen implements CodegenConfig {
     API templates may be written multiple times; APIs are grouped by tag and the file is written once per tag group.
     */
     protected Map<String, String> apiTemplateFiles = new HashMap<>();
+    protected Map<String, String> configTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTemplateFiles = new HashMap<>();
+    protected Map<String, String> modelServiceTemplateFiles = new HashMap<>();
+    protected Map<String, String> modelPersistenceTemplateFiles = new HashMap<>();
+    protected Map<String, String> exceptionsTemplateFiles = new HashMap<>();
+    protected Map<String, String> mappersTemplateFiles = new HashMap<>();
+    protected Map<String, String> serviceTemplateFiles = new HashMap<>();
+    protected Map<String, String> repositoryTemplateFiles = new HashMap<>();
+    protected Map<String, String> webClientsTemplateFiles = new HashMap<>();
+    
     protected Map<String, String> apiTestTemplateFiles = new HashMap<>();
     protected Map<String, String> modelTestTemplateFiles = new HashMap<>();
+    protected Map<String, String> serviceTestTemplateFiles = new HashMap<>();
+    protected Map<String, String> repositoryMybatisTemplateFiles = new HashMap<>();
+    
     protected Map<String, String> apiDocTemplateFiles = new HashMap<>();
     protected Map<String, String> modelDocTemplateFiles = new HashMap<>();
     protected Map<String, String> reservedWordsMappings = new HashMap<>();
@@ -350,7 +381,19 @@ public class DefaultCodegen implements CodegenConfig {
 
     // A cache to efficiently lookup schema `toModelName()` based on the schema Key
     private final Map<String, String> schemaKeyToModelNameCache = new HashMap<>();
+    
+    /***
+     * @Craftsman
+     * Add cache for service, repository and webClients  
+     */
+    // A cache to efficiently lookup schema `toServiceName()` based on the schema Key
+    private final Map<String, String> schemaKeyToServiceNameCache = new HashMap<>();
 
+    // A cache to efficiently lookup schema `toRepositoryName()` based on the schema Key
+    private final Map<String, String> schemaKeyToRepositoryNameCache = new HashMap<>();
+
+    // A cache to efficiently lookup schema `toWebClientsName()` based on the schema Key
+    private final Map<String, String> schemaKeyToWebClientsNameCache = new HashMap<>();
     protected boolean loadDeepObjectIntoItems = true;
 
     // if true then baseTypes will be imported
@@ -409,6 +452,11 @@ public class DefaultCodegen implements CodegenConfig {
         convertPropertyToStringAndWriteBack(CodegenConstants.TEMPLATE_DIR, this::setTemplateDir);
         convertPropertyToStringAndWriteBack(CodegenConstants.MODEL_PACKAGE, this::setModelPackage);
         convertPropertyToStringAndWriteBack(CodegenConstants.API_PACKAGE, this::setApiPackage);
+        //convertPropertyToStringAndWriteBack(CodegenConstants.BASE_PACKAGE, this::setBasePackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.CONFIG_PACKAGE, this::setConfigPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.SERVICE_PACKAGE, this::setServicePackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.REPOSITORY_PACKAGE, this::setRepositoryPackage);
+        convertPropertyToStringAndWriteBack(CodegenConstants.WEBCLIENTS_PACKAGE, this::setWebClientsPackage);
 
         convertPropertyToBooleanAndWriteBack(CodegenConstants.HIDE_GENERATION_TIMESTAMP, this::setHideGenerationTimestamp);
         // put the value back in additionalProperties for backward compatibility with generators not using yet convertPropertyToBooleanAndWriteBack
@@ -553,6 +601,8 @@ public class DefaultCodegen implements CodegenConfig {
                 objsValue.put("package", modelPackage());
                 objsValue.setImports(importsValue);
                 objsValue.put("classname", cm.classname);
+                objsValue.put("classnameBean", cm.classnameBean);
+                objsValue.put("classnameEntity", cm.classnameEntity);
                 objsValue.putAll(additionalProperties);
                 objs.put(cm.name, objsValue);
             }
@@ -1351,11 +1401,56 @@ public class DefaultCodegen implements CodegenConfig {
     public String modelPackage() {
         return modelPackage;
     }
+    
+	@Override
+	public String modelServicePackage() {
+        return modelServicePackage;
+	}
+
+	@Override
+	public String modelPersistencePackage() {
+        return modelPersistencePackage;
+	}    
 
     @Override
     public String apiPackage() {
         return apiPackage;
     }
+    
+    @Override
+    public String basePackage() {
+        return basePackage;
+    }
+    
+    @Override
+    public String configPackage() {
+        return configPackage;
+    }
+    
+	@Override
+	public String exceptionsPackage() {
+		return exceptionsPackage;
+	}
+
+	@Override
+	public String mappersPackage() {
+		return mappersPackage;
+	}    
+    
+	@Override
+	public String servicePackage() {		
+		return servicePackage;
+	}
+
+	@Override
+	public String repositoryPackage() {
+		return repositoryPackage;
+	}
+
+	@Override
+	public String webClientsPackage() {
+		return webClientsPackage;
+	}
 
     @Override
     public String fileSuffix() {
@@ -1405,21 +1500,116 @@ public class DefaultCodegen implements CodegenConfig {
     public Map<String, String> apiTemplateFiles() {
         return apiTemplateFiles;
     }
+    
+    @Override
+    public Map<String, String> configTemplateFiles() {
+        return configTemplateFiles;
+    }
 
     @Override
     public Map<String, String> modelTemplateFiles() {
         return modelTemplateFiles;
     }
+    
+	@Override
+	public Map<String, String> modelServiceTemplateFiles() {
+		return modelServiceTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> modelPersistenceTemplateFiles() {
+		return modelPersistenceTemplateFiles;
+	}
+	
+	@Override
+	public Map<String, String> exceptionsTemplateFiles() {
+		return exceptionsTemplateFiles;
+	}  	
+
+	@Override
+	public Map<String, String> mappersTemplateFiles() {
+		return mappersTemplateFiles;
+	}  	
+
+	@Override
+	public Map<String, String> serviceTemplateFiles() {
+		return serviceTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> repositoryTemplateFiles() {
+		return repositoryTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> webClientsTemplateFiles() {
+		return webClientsTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> serviceTestTemplateFiles() {
+        return serviceTestTemplateFiles;
+	}
+
+	@Override
+	public Map<String, String> repositoryMybatisTemplateFiles() {
+        return repositoryMybatisTemplateFiles;
+	}
 
     @Override
     public String apiFileFolder() {
         return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
     }
+    
+	@Override
+	public String configFileFolder() {
+        return outputFolder + File.separator + configPackage().replace('.', File.separatorChar);
+	}    
 
     @Override
     public String modelFileFolder() {
         return outputFolder + File.separator + modelPackage().replace('.', File.separatorChar);
     }
+
+	@Override
+	public String modelServiceFileFolder() {
+        return outputFolder + File.separator + modelServicePackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String modelPersistenceFileFolder() {
+        return outputFolder + File.separator + modelPersistencePackage().replace('.', File.separatorChar);
+	}    
+
+	@Override
+	public String exceptionsFileFolder() {
+        return outputFolder + File.separator + exceptionsPackage().replace('.', File.separatorChar);
+	}
+	
+	@Override
+	public String mappersFileFolder() {
+        return outputFolder + File.separator + mappersPackage().replace('.', File.separatorChar);
+	} 	
+	
+	@Override
+	public String serviceFileFolder() {
+        return outputFolder + File.separator + servicePackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String repositoryFileFolder() {
+		return outputFolder + File.separator + repositoryPackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String repositoryMybatisFileFolder() {
+		return outputFolder + File.separator + repositoryPackage().replace('.', File.separatorChar);
+	}	
+	
+	@Override
+	public String webClientsFileFolder() {
+		return outputFolder + File.separator + webClientsPackage().replace('.', File.separatorChar);
+	}
 
     @Override
     public String apiTestFileFolder() {
@@ -1430,6 +1620,16 @@ public class DefaultCodegen implements CodegenConfig {
     public String modelTestFileFolder() {
         return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
     }
+    
+	@Override
+	public String serviceTestFileFolder() {
+        return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
+	}
+
+	@Override
+	public String webClientsTestFileFolder() {
+		return outputFolder + File.separator + testPackage().replace('.', File.separatorChar);
+	}
 
     @Override
     public String apiDocFileFolder() {
@@ -1541,6 +1741,17 @@ public class DefaultCodegen implements CodegenConfig {
     public String toApiFilename(String name) {
         return toApiName(name);
     }
+    
+    /**
+     * Return the file name of the Config
+     *
+     * @param name the file name of the Config
+     * @return the file name of the Config
+     */
+	@Override
+	public String toConfigFilename(String name) {
+		return toConfigName(name);
+	}
 
     /**
      * Return the file name of the Api Documentation
@@ -1585,7 +1796,82 @@ public class DefaultCodegen implements CodegenConfig {
     public String toModelFilename(String name) {
         return camelize(name);
     }
+    
+    /**
+     * Return the capitalized file name of the model service
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */    
+	@Override
+	public String toModelServiceFilename(String name) {
+		return camelize(name);
+	}
 
+    /**
+     * Return the capitalized file name of the model persistence
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+	@Override
+	public String toModelPersistenceFilename(String name) {
+		return camelize(name);	
+	}
+	
+	@Override
+	public String toExceprionsName(String name) {
+		return camelize(name);	
+	}
+
+	@Override
+	public String toMappersName(String name) {
+		return camelize(name);	
+	}
+
+	@Override
+	public String toExceptionsFilename(String name) {
+		return camelize(name);	
+	}
+
+	@Override
+	public String toMappersFilename(String name) {
+		return camelize(name);	
+	}	
+
+    /**
+     * Return the capitalized file name of the model
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toServiceFilename(String name) {
+        return toServiceName(name);
+    }
+    
+    /**
+     * Return the capitalized file name of the model
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toRepositoryFilename(String name) {
+        return toRepositoryName(name);
+    }
+    
+    /**
+     * Return the capitalized file name of the model
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toWebClientsFilename(String name) {
+        return toWebClientsName(name);
+    }
+    
     /**
      * Return the capitalized file name of the model test
      *
@@ -1595,6 +1881,39 @@ public class DefaultCodegen implements CodegenConfig {
     @Override
     public String toModelTestFilename(String name) {
         return camelize(name) + "Test";
+    }
+    
+    /**
+     * Return the capitalized file name of the model test
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toServiceTestFilename(String name) {
+        return toServiceName(name) + "Test";
+    }
+    
+    /**
+     * Return the capitalized file name of the model test
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toRepositoryTestFilename(String name) {
+        return toRepositoryName(name) + "Test";
+    }
+    
+    /**
+     * Return the capitalized file name of the model test
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */
+    @Override
+    public String toWebClientsTestFilename(String name) {
+        return toWebClientsName(name) + "Test";
     }
 
     /**
@@ -2644,6 +2963,14 @@ public class DefaultCodegen implements CodegenConfig {
         }
         return camelize(apiNamePrefix + "_" + name + "_" + apiNameSuffix);
     }
+    
+	@Override
+	public String toConfigName(String name) {
+        if (name.length() == 0) {
+            return "DefaultConfig";
+        }
+        return camelize(configNamePrefix + "_" + name + "_" + configNameSuffix);
+	}    
 
     /**
      * Converts the OpenAPI schema name to a model name suitable for the current code generator.
@@ -2668,6 +2995,121 @@ public class DefaultCodegen implements CodegenConfig {
         schemaKeyToModelNameCache.put(name, camelizedName);
         return camelizedName;
     }
+    
+    /**
+     * Converts the OpenAPI schema name to a model name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */
+    public String toModelNameBean(final String name) {
+    	String className = name;
+
+        if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Bean");
+        } else if (name.toLowerCase().contains("response")){ 
+        	Pattern p = Pattern.compile("(?i)response");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("RspBean");
+        } else if (name.toLowerCase().contains("request")){ 
+        	Pattern p = Pattern.compile("(?i)request");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("ReqBean");
+        }
+
+        return className;
+
+    }    
+
+    /**
+     * Converts the OpenAPI schema name to a model name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */
+    public String toModelNameEntity(final String name) {
+    	String className = name;
+
+    	if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Entity");
+        } else if (name.toLowerCase().contains("response")){ 
+        	Pattern p = Pattern.compile("(?i)response");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("RspEntity");
+        } else if (name.toLowerCase().contains("request")){ 
+        	Pattern p = Pattern.compile("(?i)request");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("ReqEntity");
+        } 
+
+        return className;
+
+    }    
+    
+    
+    /**
+     * Converts the OpenAPI schema name to a service name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */	
+    @Override
+	public String toServiceName(String name) {
+        if (name.length() == 0) {
+            return "DefaultSrv";
+        }
+        return camelize(serviceNamePrefix + "_" + name + "_" + serviceNameSuffix);
+	}
+
+    /**
+     * Converts the OpenAPI schema name to a repository name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */	    
+	@Override
+	public String toRepositoryName(String name) {
+        if (name.length() == 0) {
+            return "DefaultRepository";
+        }
+        return camelize(repositoryNamePrefix + "_" + name + "_" + repositoryNameSuffix);
+	}
+
+    /**
+     * Converts the OpenAPI schema name to a webClients name suitable for the current code generator.
+     * May be overridden for each programming language.
+     * In case the name belongs to the TypeSystem it won't be renamed.
+     *
+     * @param name the name of the model
+     * @return capitalized model name
+     */	
+	@Override
+	public String toWebClientsName(String name) {
+        // obtain the name from serviceNameMapping directly if provided
+        if (webClientsNameMapping.containsKey(name)) {
+            return webClientsNameMapping.get(name);
+        }
+
+        if (schemaKeyToWebClientsNameCache.containsKey(name)) {
+            return schemaKeyToWebClientsNameCache.get(name);
+        }
+
+        String camelizedName = camelize(webClientsNamePrefix + "_" + name + "_" + webClientsNameSuffix);
+        schemaKeyToWebClientsNameCache.put(name, camelizedName);
+        return camelizedName;
+	}
 
     private static class NamedSchema {
 
@@ -3102,6 +3544,8 @@ public class DefaultCodegen implements CodegenConfig {
         m.description = escapeText(schema.getDescription());
         m.unescapedDescription = schema.getDescription();
         m.classname = toModelName(name);
+        m.classnameBean = toModelNameBean(m.classname);
+        m.classnameEntity = toModelNameEntity(m.classname);
         m.classVarName = toVarName(name);
         m.classFilename = toModelFilename(name);
         m.modelJson = Json.pretty(schema);
@@ -4203,6 +4647,8 @@ public class DefaultCodegen implements CodegenConfig {
             property.enumName = toEnumName(property);
         } else {
             property.datatypeWithEnum = property.dataType;
+            property.datatypeWithEnumBean = toModelNameBean(property.dataType);
+            property.datatypeWithEnumEntity = toModelNameEntity(property.dataType);
         }
 
         property.setTypeProperties(p, openAPI);
@@ -4655,6 +5101,8 @@ public class DefaultCodegen implements CodegenConfig {
 
             op.defaultResponse = toDefaultValue(responseSchema);
             op.returnType = cm.dataType;
+            op.returnTypeBean = toModelNameBean(cm.dataType);
+            op.returnTypeEntity = toModelNameEntity(cm.dataType);		
             op.returnFormat = cm.dataFormat;
             op.hasReference = schemas != null && schemas.containsKey(op.returnBaseType);
 
@@ -5551,11 +5999,15 @@ public class DefaultCodegen implements CodegenConfig {
 
         if (parameterModelName != null) {
             codegenParameter.dataType = parameterModelName;
+            codegenParameter.dataTypeBean = toModelNameBean(parameterModelName);
+            codegenParameter.dataTypeEntity = toModelNameEntity(parameterModelName);
             if (ModelUtils.isObjectSchema(parameterSchema) || ModelUtils.isComposedSchema(parameterSchema)) {
                 codegenProperty.complexType = codegenParameter.dataType;
             }
         } else {
             codegenParameter.dataType = codegenProperty.dataType;
+            codegenParameter.dataTypeBean = toModelNameBean(codegenProperty.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenProperty.dataType);
         }
 
         if (ModelUtils.isArraySchema(parameterSchema)) {
@@ -6372,7 +6824,11 @@ public class DefaultCodegen implements CodegenConfig {
     }
 
     private final Map<String, String> seenApiFilenames = new HashMap<String, String>();
-
+    
+    /***
+     * @Craftsman
+     * Implementation of api, model, service, repository, webClients file name  
+     */
     @Override
     public String apiFilename(String templateName, String tag) {
         String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
@@ -6386,6 +6842,20 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = apiTemplateFiles().get(templateName);
         return outputDir + File.separator + toApiFilename(uniqueTag) + suffix;
     }
+    
+    @Override
+    public String configFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = configTemplateFiles().get(templateName);
+        return configFileFolder() + File.separator + toConfigFilename(uniqueTag) + suffix;
+    }
+
+    @Override
+    public String configFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = configTemplateFiles().get(templateName);
+        return outputDir + File.separator + toConfigFilename(uniqueTag) + suffix;
+    }    
 
     private final Map<String, String> seenModelFilenames = new HashMap<String, String>();
 
@@ -6402,6 +6872,118 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = modelTemplateFiles().get(templateName);
         return outputDir + File.separator + toModelFilename(uniqueModelName) + suffix;
     }
+    
+	@Override
+	public String modelServiceFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelServiceTemplateFiles().get(templateName);
+        return modelServiceFileFolder() + File.separator + toModelServiceFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String modelServiceFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelServiceTemplateFiles().get(templateName);
+        return outputDir + File.separator + toModelServiceFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String modelPersistenceFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelPersistenceTemplateFiles().get(templateName);
+        return modelPersistenceFileFolder() + File.separator + toModelPersistenceFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String modelPersistenceFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelPersistenceTemplateFiles().get(templateName);
+        return outputDir + File.separator + toModelPersistenceFilename(uniqueModelName) + suffix;
+	} 
+	
+	@Override
+	public String exceptionsFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = exceptionsTemplateFiles().get(templateName);
+        return exceptionsFileFolder() + File.separator + toExceptionsFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String exceptionsFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = exceptionsTemplateFiles().get(templateName);
+        return outputDir + File.separator + toExceptionsFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String mappersFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = mappersTemplateFiles().get(templateName);
+        return mappersFileFolder() + File.separator + toMappersFilename(uniqueModelName) + suffix;
+	}
+
+	@Override
+	public String mappersFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = mappersTemplateFiles().get(templateName);
+        return outputDir + File.separator + toMappersFilename(uniqueModelName) + suffix;
+	}	
+    
+	@Override
+	public String serviceFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = serviceTemplateFiles().get(templateName);
+        return serviceFileFolder() + File.separator + toServiceFilename(uniqueTag) + suffix;
+	}
+
+	@Override
+	public String serviceFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = serviceTemplateFiles().get(templateName);
+        return outputDir + File.separator + toServiceFilename(uniqueTag) + suffix;		
+	}
+
+	@Override
+	public String repositoryFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryTemplateFiles().get(templateName);
+        return repositoryFileFolder() + File.separator + toRepositoryFilename(uniqueTag) + suffix;
+	}
+
+	@Override
+	public String repositoryFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryTemplateFiles().get(templateName);
+        return outputDir + File.separator + toRepositoryFilename(uniqueTag) + suffix;			
+	}
+	
+	@Override
+	public String repositoryMybatisFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryMybatisTemplateFiles().get(templateName);
+        return repositoryMybatisFileFolder() + File.separator + toRepositoryFilename(uniqueTag) + suffix;
+	}
+
+	@Override
+	public String repositoryMybatisFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = repositoryMybatisTemplateFiles().get(templateName);
+        return outputDir + File.separator + toRepositoryFilename(uniqueTag) + suffix;			
+	}	
+
+	@Override
+	public String webClientsFilename(String templateName, String tag) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = webClientsTemplateFiles().get(templateName);
+        return webClientsFileFolder() + File.separator + toWebClientsFilename(uniqueTag) + suffix;
+	}
+
+	@Override
+	public String webClientsFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiFilenames);
+        String suffix = webClientsTemplateFiles().get(templateName);
+        return outputDir + File.separator + toWebClientsFilename(uniqueTag) + suffix;	
+	}    
 
     private final Map<String, String> seenApiDocFilenames = new HashMap<String, String>();
 
@@ -6434,6 +7016,20 @@ public class DefaultCodegen implements CodegenConfig {
         String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiTestFilenames);
         String suffix = apiTestTemplateFiles().get(templateName);
         return apiTestFileFolder() + File.separator + toApiTestFilename(uniqueTag) + suffix;
+    }
+    
+    /**
+     * Return the full path and API test file
+     *
+     * @param templateName template name
+     * @param tag          tag
+     * @return the API test file name with full path
+     */
+    @Override
+    public String apiTestFilename(String templateName, String tag, String outputDir) {
+        String uniqueTag = uniqueCaseInsensitiveString(tag, seenApiTestFilenames);
+        String suffix = apiTestTemplateFiles().get(templateName);
+        return outputDir + File.separator + toApiTestFilename(uniqueTag) + suffix;
     }
 
     @Override
@@ -7559,6 +8155,8 @@ public class DefaultCodegen implements CodegenConfig {
 
         codegenParameter.baseType = codegenProperty.baseType;
         codegenParameter.dataType = codegenProperty.dataType;
+        codegenParameter.dataTypeBean = toModelNameBean(codegenProperty.dataType);
+        codegenParameter.dataTypeEntity = toModelNameEntity(codegenProperty.dataType);
         codegenParameter.baseName = codegenProperty.baseName;
         codegenParameter.paramName = toParamName(codegenParameter.baseName);
         codegenParameter.nameInCamelCase = camelize(codegenParameter.paramName, LOWERCASE_FIRST_LETTER);
@@ -7751,6 +8349,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.paramName = toParamName(codegenParameter.baseName);
             codegenParameter.baseType = codegenModel.classname;
             codegenParameter.dataType = getTypeDeclaration(codegenModel.classname);
+            codegenParameter.dataTypeBean = toModelNameBean(getTypeDeclaration(codegenModel.classname));
+            codegenParameter.dataTypeEntity = toModelNameEntity(getTypeDeclaration(codegenModel.classname));
             codegenParameter.description = codegenModel.description;
             codegenParameter.isNullable = codegenModel.isNullable;
             imports.add(codegenParameter.baseType);
@@ -7767,6 +8367,8 @@ public class DefaultCodegen implements CodegenConfig {
                 codegenParameter.paramName = toParamName(codegenParameter.baseName);
                 codegenParameter.baseType = codegenParameter.baseName;
                 codegenParameter.dataType = getTypeDeclaration(codegenModelName);
+                codegenParameter.dataTypeBean = toModelNameBean(getTypeDeclaration(codegenModelName));
+                codegenParameter.dataTypeEntity = toModelNameEntity(getTypeDeclaration(codegenModelName));
                 codegenParameter.description = codegenProperty.getDescription();
                 codegenParameter.isNullable = codegenProperty.isNullable;
             } else {
@@ -7798,6 +8400,8 @@ public class DefaultCodegen implements CodegenConfig {
                     codegenParameter.paramName = toParamName(codegenParameter.baseName);
                     codegenParameter.baseType = codegenModelName;
                     codegenParameter.dataType = getTypeDeclaration(codegenModelName);
+                    codegenParameter.dataTypeBean = toModelNameBean(getTypeDeclaration(codegenModelName));
+                    codegenParameter.dataTypeEntity = toModelNameEntity(getTypeDeclaration(codegenModelName));
                     codegenParameter.description = codegenModelDescription;
                     imports.add(codegenParameter.baseType);
 
@@ -7855,6 +8459,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.items = codegenProperty.items;
             codegenParameter.mostInnerItems = codegenProperty.mostInnerItems;
             codegenParameter.dataType = getTypeDeclaration(schema);
+            codegenParameter.dataTypeBean = toModelNameBean(getTypeDeclaration(schema));
+            codegenParameter.dataTypeEntity = toModelNameEntity(getTypeDeclaration(schema));
             codegenParameter.baseType = getSchemaType(inner);
             codegenParameter.isContainer = Boolean.TRUE;
             codegenParameter.isMap = Boolean.TRUE;
@@ -7878,6 +8484,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.isPrimitiveType = true;
             codegenParameter.baseType = codegenProperty.baseType;
             codegenParameter.dataType = codegenProperty.dataType;
+            codegenParameter.dataTypeBean = toModelNameBean(codegenProperty.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenProperty.dataType);
             codegenParameter.description = codegenProperty.description;
             codegenParameter.paramName = toParamName(codegenParameter.baseName);
             codegenParameter.pattern = codegenProperty.pattern;
@@ -7911,6 +8519,8 @@ public class DefaultCodegen implements CodegenConfig {
                 codegenParameter.isPrimitiveType = true;
                 codegenParameter.baseType = codegenProperty.baseType;
                 codegenParameter.dataType = codegenProperty.dataType;
+                codegenParameter.dataTypeBean = toModelNameBean(codegenProperty.dataType);
+                codegenParameter.dataTypeEntity = toModelNameEntity(codegenProperty.dataType);
                 codegenParameter.description = codegenProperty.description;
                 codegenParameter.isNullable = codegenProperty.isNullable;
                 codegenParameter.paramName = toParamName(codegenParameter.baseName);
@@ -7965,6 +8575,8 @@ public class DefaultCodegen implements CodegenConfig {
             codegenParameter.items = codegenProperty.items;
             codegenParameter.mostInnerItems = codegenProperty.mostInnerItems;
             codegenParameter.dataType = getTypeDeclaration(schema);
+            codegenParameter.dataTypeBean = toModelNameBean(codegenParameter.dataType);
+            codegenParameter.dataTypeEntity = toModelNameEntity(codegenParameter.dataType);
             codegenParameter.baseType = getSchemaType(inner);
             codegenParameter.isContainer = Boolean.TRUE;
             codegenParameter.isNullable = codegenProperty.isNullable;

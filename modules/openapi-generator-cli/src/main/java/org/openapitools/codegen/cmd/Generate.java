@@ -113,9 +113,19 @@ public class Generate extends OpenApiGeneratorCommand {
             description = CodegenConstants.API_PACKAGE_DESC)
     private String apiPackage;
 
+    private String configPackage;
+    
     @Option(name = {"--model-package"}, title = "model package",
             description = CodegenConstants.MODEL_PACKAGE_DESC)
     private String modelPackage;
+    
+    private String modelServicePackage;
+    private String modelPersistencePackage;
+    private String exceptionsPackage;
+    private String mappersPackage;
+    private String servicePackage;
+    private String repositoryPackage;
+    private String webClientsPackage;
 
     @Option(name = {"--api-name-suffix"}, title = "api name suffix",
             description = CodegenConstants.API_NAME_SUFFIX_DESC)
@@ -417,9 +427,41 @@ public class Generate extends OpenApiGeneratorCommand {
         if (isNotEmpty(apiPackage)) {
             configurator.setApiPackage(apiPackage);
         }
+        
+        if (isNotEmpty(configPackage)) {
+            configurator.setConfigPackage(configPackage);
+        }
 
         if (isNotEmpty(modelPackage)) {
             configurator.setModelPackage(modelPackage);
+        }
+        
+        if (isNotEmpty(modelServicePackage)) {
+            configurator.setModelServicePackage(modelServicePackage);
+        }
+        
+        if (isNotEmpty(modelPersistencePackage)) {
+            configurator.setModelPersistencePackage(modelPersistencePackage);
+        }
+
+        if (isNotEmpty(exceptionsPackage)) {
+            configurator.setExceptionsPackage(exceptionsPackage);
+        }
+        
+        if (isNotEmpty(mappersPackage)) {
+            configurator.setMappersPackage(mappersPackage);
+        }        
+        
+        if (isNotEmpty(servicePackage)) {
+            configurator.setServicePackage(servicePackage);
+        }
+        
+        if (isNotEmpty(repositoryPackage)) {
+            configurator.setRepositoryPackage(repositoryPackage);
+        }
+        
+        if (isNotEmpty(webClientsPackage)) {
+            configurator.setWebClientsPackage(webClientsPackage);
         }
 
         if (isNotEmpty(apiNameSuffix)) {
@@ -505,6 +547,7 @@ public class Generate extends OpenApiGeneratorCommand {
         if (globalProperties != null && !globalProperties.isEmpty()) {
             applyGlobalPropertiesKvpList(globalProperties, configurator);
         }
+        
         applyInstantiationTypesKvpList(instantiationTypes, configurator);
         applyImportMappingsKvpList(importMappings, configurator);
         applySchemaMappingsKvpList(schemaMappings, configurator);

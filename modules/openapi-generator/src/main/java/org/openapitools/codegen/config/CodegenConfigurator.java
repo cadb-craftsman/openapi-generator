@@ -74,6 +74,14 @@ public class CodegenConfigurator {
     private Map<String, String> nameMappings = new HashMap<>();
     private Map<String, String> parameterNameMappings = new HashMap<>();
     private Map<String, String> modelNameMappings = new HashMap<>();
+    
+    private Map<String, String> configNameMappings = new HashMap<>();
+    private Map<String, String> exceptionsNameMappings = new HashMap<>();
+    private Map<String, String> mappersNameMappings = new HashMap<>();
+    private Map<String, String> serviceNameMappings = new HashMap<>();
+    private Map<String, String> repositoryNameMappings = new HashMap<>();
+    private Map<String, String> webClientsNameMappings = new HashMap<>();
+    
     private Map<String, String> enumNameMappings = new HashMap<>();
     private Map<String, String> operationIdNameMappings = new HashMap<>();
     private Map<String, String> openapiNormalizer = new HashMap<>();
@@ -106,6 +114,7 @@ public class CodegenConfigurator {
             configurator.generatorName = generatorSettings.getGeneratorName();
             configurator.inputSpec = workflowSettings.getInputSpec();
             configurator.templatingEngineName = workflowSettings.getTemplatingEngineName();
+            
             if (workflowSettings.getGlobalProperties() != null) {
                 configurator.globalProperties.putAll(workflowSettings.getGlobalProperties());
             }
@@ -136,8 +145,26 @@ public class CodegenConfigurator {
             if (generatorSettings.getParameterNameMappings() != null) {
                 configurator.parameterNameMappings.putAll(generatorSettings.getParameterNameMappings());
             }
+            if (generatorSettings.getConfigNameMappings() != null) {
+                configurator.configNameMappings.putAll(generatorSettings.getConfigNameMappings());
+            }
             if (generatorSettings.getModelNameMappings() != null) {
                 configurator.modelNameMappings.putAll(generatorSettings.getModelNameMappings());
+            }
+            if (generatorSettings.getExceptionsNameMappings() != null) {
+                configurator.exceptionsNameMappings.putAll(generatorSettings.getExceptionsNameMappings());
+            }
+            if (generatorSettings.getMappersNameMappings() != null) {
+                configurator.mappersNameMappings.putAll(generatorSettings.getMappersNameMappings());
+            }            
+            if (generatorSettings.getServiceNameMappings() != null) {
+                configurator.serviceNameMappings.putAll(generatorSettings.getServiceNameMappings());
+            }
+            if (generatorSettings.getRepositoryNameMappings() != null) {
+                configurator.repositoryNameMappings.putAll(generatorSettings.getRepositoryNameMappings());
+            }
+            if (generatorSettings.getWebClientsNameMappings() != null) {
+                configurator.webClientsNameMappings.putAll(generatorSettings.getWebClientsNameMappings());
             }
             if (generatorSettings.getEnumNameMappings() != null) {
                 configurator.enumNameMappings.putAll(generatorSettings.getEnumNameMappings());
@@ -256,6 +283,36 @@ public class CodegenConfigurator {
         return this;
     }
 
+    public CodegenConfigurator addExceptionsNameMapping(String key, String value) {
+        this.exceptionsNameMappings.put(key, value);
+        generatorSettingsBuilder.withExceptionsNameMapping(key, value);
+        return this;
+    }
+    
+    public CodegenConfigurator addMappersNameMapping(String key, String value) {
+        this.mappersNameMappings.put(key, value);
+        generatorSettingsBuilder.withMappersNameMapping(key, value);
+        return this;
+    }    
+    
+    public CodegenConfigurator addServiceNameMapping(String key, String value) {
+        this.serviceNameMappings.put(key, value);
+        generatorSettingsBuilder.withServiceNameMapping(key, value);
+        return this;
+    }
+    
+    public CodegenConfigurator addRepositoryNameMapping(String key, String value) {
+        this.repositoryNameMappings.put(key, value);
+        generatorSettingsBuilder.withRepositoryNameMapping(key, value);
+        return this;
+    }
+    
+    public CodegenConfigurator addWebClientsNameMapping(String key, String value) {
+        this.webClientsNameMappings.put(key, value);
+        generatorSettingsBuilder.withWebClientsNameMapping(key, value);
+        return this;
+    }
+
     public CodegenConfigurator addEnumNameMapping(String key, String value) {
         this.enumNameMappings.put(key, value);
         generatorSettingsBuilder.withEnumNameMapping(key, value);
@@ -327,6 +384,14 @@ public class CodegenConfigurator {
             addAdditionalProperty(CodegenConstants.API_PACKAGE, apiPackage);
         }
         generatorSettingsBuilder.withApiPackage(apiPackage);
+        return this;
+    }
+    
+    public CodegenConfigurator setConfigPackage(String configPackage) {
+        if (StringUtils.isNotEmpty(configPackage)) {
+            addAdditionalProperty(CodegenConstants.CONFIG_PACKAGE, configPackage);
+        }
+        generatorSettingsBuilder.withConfigPackage(configPackage);
         return this;
     }
 
@@ -561,6 +626,62 @@ public class CodegenConfigurator {
             addAdditionalProperty(CodegenConstants.MODEL_PACKAGE, modelPackage);
         }
         generatorSettingsBuilder.withModelPackage(modelPackage);
+        return this;
+    }
+
+    public CodegenConfigurator setModelServicePackage(String modelServicePackage) {
+        if (StringUtils.isNotEmpty(modelServicePackage)) {
+            addAdditionalProperty(CodegenConstants.MODEL_SERVICE_PACKAGE, modelServicePackage);
+        }
+        generatorSettingsBuilder.withModelServicePackage(modelServicePackage);
+        return this;
+    }
+    
+    public CodegenConfigurator setModelPersistencePackage(String modelPersistencePackage) {
+        if (StringUtils.isNotEmpty(modelPersistencePackage)) {
+            addAdditionalProperty(CodegenConstants.MODEL_PERSISTENCE_PACKAGE, modelPersistencePackage);
+        }
+        generatorSettingsBuilder.withModelPersistencePackage(modelPersistencePackage);
+        return this;
+    }
+    
+    public CodegenConfigurator setExceptionsPackage(String exceptionsPackage) {
+        if (StringUtils.isNotEmpty(exceptionsPackage)) {
+            addAdditionalProperty(CodegenConstants.EXCEPTIONS_PACKAGE, exceptionsPackage);
+        }
+        generatorSettingsBuilder.withExceptionsPackage(exceptionsPackage);
+        return this;
+    }
+    
+    public CodegenConfigurator setMappersPackage(String mappersPackage) {
+        if (StringUtils.isNotEmpty(mappersPackage)) {
+            addAdditionalProperty(CodegenConstants.MAPPERS_PACKAGE, mappersPackage);
+        }
+        generatorSettingsBuilder.withMappersPackage(mappersPackage);
+        return this;
+    }     
+    
+    public CodegenConfigurator setServicePackage(String servicePackage) {
+        if (StringUtils.isNotEmpty(servicePackage)) {
+            addAdditionalProperty(CodegenConstants.SERVICE_PACKAGE, servicePackage);
+        }
+        generatorSettingsBuilder.withServicePackage(servicePackage);
+        return this;
+    }
+    
+    public CodegenConfigurator setRepositoryPackage(String repositoryPackage) {
+        if (StringUtils.isNotEmpty(repositoryPackage)) {
+            addAdditionalProperty(CodegenConstants.REPOSITORY_PACKAGE, repositoryPackage);
+        }
+        generatorSettingsBuilder.withRepositoryPackage(repositoryPackage);
+        return this;
+    }
+    
+    public CodegenConfigurator setWebClientsPackage(String webClientsPackage) {
+        if (StringUtils.isNotEmpty(webClientsPackage)) {
+            addAdditionalProperty(CodegenConstants.WEBCLIENTS_PACKAGE, webClientsPackage);
+        }
+        generatorSettingsBuilder.withWebClientsPackage(webClientsPackage);
         return this;
     }
 

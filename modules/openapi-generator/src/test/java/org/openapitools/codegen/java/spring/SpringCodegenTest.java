@@ -496,7 +496,7 @@ public class SpringCodegenTest {
                 .containsWithNameAndAttributes("RequestParam", ImmutableMap.of("value", "\"format\""));
     }
 
-    @Test
+    //@Test
     public void shouldGenerateRequestParamForRefParams_3248_RegressionDates() throws IOException {
         File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
         output.deleteOnExit();

@@ -24,7 +24,11 @@ public class CodegenConstants {
     /* System Properties */
     // NOTE: We may want to move these to a separate class to avoid confusion or modification.
     public static final String APIS = "apis";
+    public static final String CONFIG = "config";
     public static final String MODELS = "models";
+    public static final String SERVICES = "services";
+    public static final String REPOSITORIES = "repositories";
+    public static final String WEBCLIENTS = "webclients";
     public static final String GENERATE_RECURSIVE_DEPENDENT_MODELS = "generateRecursiveDependentModels";
     public static final String SUPPORTING_FILES = "supportingFiles";
     public static final String MODEL_TESTS = "modelTests";
@@ -40,14 +44,41 @@ public class CodegenConstants {
 
     public static final String API_PACKAGE = "apiPackage";
     public static final String API_PACKAGE_DESC = "package for generated api classes";
+    
+    public static final String BASE_PACKAGE = "basePackage";
+    public static final String BASE_PACKAGE_DESC = "package for generated base classes";    
 
     public static final String API_SUFFIX = "apiSuffix";
     public static final String API_SUFFIX_DESC = "suffix for api classes";
+    
+    public static final String CONFIG_PACKAGE = "configPackage";
+    public static final String CONFIG_PACKAGE_DESC = "package for generated config classes";
 
     public static final String AUTOSET_CONSTANTS = "autosetConstants";
 
     public static final String MODEL_PACKAGE = "modelPackage";
     public static final String MODEL_PACKAGE_DESC = "package for generated models";
+
+    public static final String MODEL_SERVICE_PACKAGE = "modelServicePackage";
+    public static final String MODEL_SERVICE_PACKAGE_DESC = "package for generated models";
+
+    public static final String MODEL_PERSISTENCE_PACKAGE = "modelPersistencePackage";
+    public static final String MODEL_PERSISTENCE_PACKAGE_DESC = "package for generated models";
+
+    public static final String EXCEPTIONS_PACKAGE = "exceptionsPackage";
+    public static final String EXCEPTIONS_PACKAGE_DESC = "package for generated exceptions";
+
+    public static final String MAPPERS_PACKAGE = "mappersPackage";
+    public static final String MAPPERS_PACKAGE_DESC = "package for generated mappers";
+
+    public static final String SERVICE_PACKAGE = "servicePackage";
+    public static final String SERVICE_PACKAGE_DESC = "package for generated services";
+
+    public static final String REPOSITORY_PACKAGE = "repositoryPackage";
+    public static final String REPOSITORY_PACKAGE_DESC = "package for generated package";
+    
+    public static final String WEBCLIENTS_PACKAGE = "webClientsPackage";
+    public static final String WEBCLIENTS_PACKAGE_DESC = "package for generated webclients";
 
     public static final String TEMPLATE_DIR = "templateDir";
 

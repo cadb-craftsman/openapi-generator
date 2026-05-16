@@ -61,8 +61,14 @@ public interface CodegenConfig {
     String testPackage();
 
     String apiPackage();
+    
+    String basePackage();
+    
+    String configPackage();
 
     String apiFileFolder();
+    
+    String configFileFolder();
 
     String apiTestFileFolder();
 
@@ -83,12 +89,58 @@ public interface CodegenConfig {
     String modelDocFileFolder();
 
     String modelPackage();
+    
+    String modelServicePackage();
+    
+    String modelServiceFileFolder();
+
+    String modelPersistencePackage();
+
+    String modelPersistenceFileFolder();
+
+    String exceptionsPackage();
+    
+    String exceptionsFileFolder();
+    
+    String mappersPackage();
+    
+    String mappersFileFolder();
+    
+    String servicePackage();
+    
+    String serviceFileFolder();
+    
+    String serviceTestFileFolder();
+    
+    String repositoryPackage();
+    
+    String repositoryFileFolder();
+    
+    String repositoryMybatisFileFolder();
+    
+    String webClientsPackage();
+    
+    String webClientsFileFolder();
+    
+    String webClientsTestFileFolder();
 
     String toApiName(String name);
+    
+    String toConfigName(String name);
 
     String toApiVarName(String name);
 
     String toModelName(String name);
+
+    String toExceprionsName(String name);
+    
+    String toMappersName(String name);
+    
+    String toServiceName(String name);
+    
+    String toRepositoryName(String name);
+    
+    String toWebClientsName(String name);
 
     String toParamName(String name);
 
@@ -163,12 +215,32 @@ public interface CodegenConfig {
     Map<String, String> openapiNormalizer();
 
     Map<String, String> apiTemplateFiles();
+    
+    Map<String, String> configTemplateFiles();
 
     Map<String, String> modelTemplateFiles();
+    
+    Map<String, String> modelServiceTemplateFiles();
+    
+    Map<String, String> modelPersistenceTemplateFiles();
+    
+    Map<String, String> exceptionsTemplateFiles();
+    
+    Map<String, String> mappersTemplateFiles();
+    
+    Map<String, String> serviceTemplateFiles();
+    
+    Map<String, String> repositoryTemplateFiles();
+    
+    Map<String, String> webClientsTemplateFiles();
 
     Map<String, String> apiTestTemplateFiles();
 
     Map<String, String> modelTestTemplateFiles();
+    
+    Map<String, String> serviceTestTemplateFiles();
+    
+    Map<String, String> repositoryMybatisTemplateFiles();
 
     Map<String, String> apiDocTemplateFiles();
 
@@ -189,14 +261,41 @@ public interface CodegenConfig {
     TemplatingEngineAdapter processTemplatingEngine(TemplatingEngineAdapter templatingEngine);
 
     String sanitizeTag(String tag);
+    
+    /***
+     * @Craftsman
+     * Definition of api, model, service, repository, webClients file name  
+     */
 
     String toApiFilename(String name);
+    
+    String toConfigFilename(String name);
 
     String toModelFilename(String name);
+    
+    String toModelServiceFilename(String name);
+    
+    String toModelPersistenceFilename(String name);
+    
+    String toExceptionsFilename(String name);
+    
+    String toMappersFilename(String name);
+
+    String toServiceFilename(String name);
+
+    String toRepositoryFilename(String name);
+
+    String toWebClientsFilename(String name);
 
     String toApiTestFilename(String name);
 
     String toModelTestFilename(String name);
+
+    String toServiceTestFilename(String name);
+
+    String toRepositoryTestFilename(String name);
+    
+    String toWebClientsTestFilename(String name);
 
     String toApiDocFilename(String name);
 
@@ -230,17 +329,60 @@ public interface CodegenConfig {
 
     void postProcessParameter(CodegenParameter parameter);
 
+    /***
+     * @Craftsman
+     * Definition of api, model, service, repository, webClients file name  
+     */
+
     String modelFilename(String templateName, String modelName);
 
     String modelFilename(String templateName, String modelName, String outputDir);
 
+    String modelServiceFilename(String templateName, String modelName);
+
+    String modelServiceFilename(String templateName, String modelName, String outputDir);    
+    
+    String modelPersistenceFilename(String templateName, String modelName);
+
+    String modelPersistenceFilename(String templateName, String modelName, String outputDir);   
+    
+    String exceptionsFilename(String templateName, String modelName);
+
+    String exceptionsFilename(String templateName, String modelName, String outputDir);
+    
+    String mappersFilename(String templateName, String modelName);
+
+    String mappersFilename(String templateName, String modelName, String outputDir); 
+    
     String apiFilename(String templateName, String tag);
 
     String apiFilename(String templateName, String tag, String outputDir);
+    
+    String configFilename(String templateName, String tag);
+
+    String configFilename(String templateName, String tag, String outputDir);    
 
     String apiTestFilename(String templateName, String tag);
+    
+    String apiTestFilename(String templateName, String tag, String outputDir);
 
     String apiDocFilename(String templateName, String tag);
+
+    String serviceFilename(String templateName, String serviceName);
+
+    String serviceFilename(String templateName, String serviceName, String outputDir);
+
+    String repositoryFilename(String templateName, String repositoryName);
+
+    String repositoryFilename(String templateName, String repositoryName, String outputDir);
+    
+    String repositoryMybatisFilename(String templateName, String repositoryName);
+
+    String repositoryMybatisFilename(String templateName, String repositoryName, String outputDir);    
+    
+    String webClientsFilename(String templateName, String webClientsName);
+
+    String webClientsFilename(String templateName, String webClientsName, String outputDir);
 
     boolean shouldOverwrite(String filename);
 
