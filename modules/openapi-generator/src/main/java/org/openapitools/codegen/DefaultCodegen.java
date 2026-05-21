@@ -5088,14 +5088,22 @@ public class DefaultCodegen implements CodegenConfig {
             if (ModelUtils.isArraySchema(responseSchema)) {
                 CodegenProperty innerProperty = fromProperty("response", ModelUtils.getSchemaItems(responseSchema), false);
                 op.returnBaseType = innerProperty.baseType;
+                op.returnBaseTypeBean = toModelNameBean(innerProperty.baseType);
+                op.returnBaseTypeEntity =  toModelNameEntity(innerProperty.baseType);
             } else if (ModelUtils.isMapSchema(responseSchema)) {
                 CodegenProperty innerProperty = fromProperty("response", ModelUtils.getAdditionalProperties(responseSchema), false);
                 op.returnBaseType = innerProperty.baseType;
+                op.returnBaseTypeBean = toModelNameBean(innerProperty.baseType);
+                op.returnBaseTypeEntity = toModelNameEntity(innerProperty.baseType);
             } else {
                 if (cm.complexType != null) {
                     op.returnBaseType = cm.complexType;
+                    op.returnBaseTypeBean = toModelNameBean(cm.complexType);
+                    op.returnBaseTypeEntity = toModelNameEntity(cm.complexType);
                 } else {
                     op.returnBaseType = cm.baseType;
+                    op.returnBaseTypeBean = toModelNameBean(cm.baseType);
+                    op.returnBaseTypeEntity = toModelNameEntity(cm.baseType);
                 }
             }
 

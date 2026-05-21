@@ -72,6 +72,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 	public static final String SERVER_PORT = "serverPort";
 	public static final String CONFIG_PACKAGE = "configPackage";
 	public static final String CONFIG_NATIVE_PACKAGE = ".config";
+	public static final String WEBCLIENT_PACKAGE = ".webclients";
 	public static final String BASE_PACKAGE = "basePackage";
 	public static final String INTERFACE_ONLY = "interfaceOnly";
 	public static final String USE_FEIGN_CLIENT_URL = "useFeignClientUrl";
@@ -801,8 +802,11 @@ public class SpringCodegen extends AbstractJavaCodegen
     					repositoryTemplateFiles.put("repository.mustache", "Repository.java");
     					
     					//Generate Packages for WebClients of the project.
-    					webClientsTemplateFiles.put("webclients.mustache", "WebClient.java");
+    					//webClientsTemplateFiles.put("webclients.mustache", "WebClient.java");
+						supportingFiles.add(new SupportingFile("webclients.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.WEBCLIENT_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClient.java"));
 
+						configTemplateFiles.put("springbootMapperConfig.mustache", "MapperConfig.java");
+						
     					if(SPRING_BOOT_MYBATIS.equals(library)) {
     						supportingFiles.add(new SupportingFile("stringTrimTypeHandler.mustache", (sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator), "StringTrimTypeHandler.java")); 
     						supportingFiles.add(new SupportingFile("yesNoTypeHandler.mustache", (sourceFolder + File.separator + repositoryPackage + SpringCodegen.REPOSITORY_HANDLERS_PACKAGE).replace(".", java.io.File.separator), "YesNoTypeHandler.java"));
@@ -829,23 +833,23 @@ public class SpringCodegen extends AbstractJavaCodegen
     					if (DocumentationProvider.SPRINGDOC.equals(getDocumentationProvider())) {
 
     						if(SPRING_BOOT_MYBATIS.equals(library)) {
-    							configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
-    							configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
-    							//supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorDocConfig.java"));
-    							//supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorNativeConfig.java"));
+    							//configTemplateFiles.put("springbootMyBatisDocConfig.mustache", "DocConfig.java");
+    							//configTemplateFiles.put("springbootMyBatisNativeConfig.mustache", "NativeConfig.java");
+    							supportingFiles.add(new SupportingFile("springbootMyBatisDocConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorDocConfig.java"));
+    							supportingFiles.add(new SupportingFile("springbootMyBatisNativeConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorNativeConfig.java"));
     						}else if(SPRING_BOOT_JPA.equals(library)){
-    							configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
-    							configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
-    							//supportingFiles.add(new SupportingFile("springbootDocConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorDocConfig.java"));
-    							//supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorNativeConfig.java"));
+    							//configTemplateFiles.put("springbootDocConfig.mustache", "DocConfig.java");
+    							//configTemplateFiles.put("springbootNativeConfig.mustache", "NativeConfig.java");
+    							supportingFiles.add(new SupportingFile("springbootDocConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorDocConfig.java"));
+    							supportingFiles.add(new SupportingFile("springbootNativeConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorNativeConfig.java"));
     						}
     						
     						if(SPRING_BOOT_MYBATIS.equals(library) || SPRING_BOOT_JPA.equals(library)) {
     							//Generate classes of config package for all WebClients of the project.
-    							configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
-    							configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");	
-    							//supportingFiles.add(new SupportingFile("springbootWebClientConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClientConfig.java"));
-    							//supportingFiles.add(new SupportingFile("springbootWebClientProperties.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClientProperties.java"));    							
+    							//configTemplateFiles.put("springbootWebClientConfig.mustache", "WebClientConfig.java");
+    							//configTemplateFiles.put("springbootWebClientProperties.mustache", "WebClientProperties.java");	
+    							supportingFiles.add(new SupportingFile("springbootWebClientConfig.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClientConfig.java"));
+    							supportingFiles.add(new SupportingFile("springbootWebClientProperties.mustache", (sourceFolder + File.separator + basePackage + SpringCodegen.CONFIG_NATIVE_PACKAGE).replace(".", java.io.File.separator), "OpenApiGeneratorWebClientProperties.java"));    							
     						}
     					} 
     				}                
