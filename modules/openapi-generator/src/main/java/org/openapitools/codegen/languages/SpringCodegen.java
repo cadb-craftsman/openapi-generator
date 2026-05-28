@@ -133,6 +133,7 @@ public class SpringCodegen extends AbstractJavaCodegen
     public static final String GENERATE_SORT_VALIDATION = "generateSortValidation";
     public static final String GENERATE_PAGEABLE_CONSTRAINT_VALIDATION = "generatePageableConstraintValidation";
     public static final String SUBSTITUTE_GENERIC_PAGED_MODEL = "substituteGenericPagedModel";
+    public static final String CLIENT_REGISTRATION_ID = "clientRegistrationId";
 
     public static final String COMPANY = "company";
     public static final String COMPANY_CRAFTSMAN = "craftsman";
@@ -218,6 +219,8 @@ public class SpringCodegen extends AbstractJavaCodegen
     @Setter protected boolean generateSortValidation = false;
     @Setter protected boolean generatePageableConstraintValidation = false;
     @Setter protected boolean substituteGenericPagedModel = false;
+    @Getter @Setter
+    protected String clientRegistrationId = null;
 
     // Map from operationId to allowed sort values for @ValidSort annotation generation
     private Map<String, List<String>> sortValidationEnums = new HashMap<>();
@@ -398,6 +401,7 @@ public class SpringCodegen extends AbstractJavaCodegen
             .defaultValue("false")
         );
         cliOptions.add(CliOption.newBoolean(USE_JSPECIFY, "Use Jspecify for null checks", useJspecify));
+        cliOptions.add(CliOption.newString(CLIENT_REGISTRATION_ID, "Client registration ID for OAuth2 in Spring HTTP Interface (@ClientRegistrationId annotation). Requires library=spring-http-interface and useSpringBoot4=true (Spring Security 7)."));
         supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
         supportedLibraries.put(SPRING_CLOUD_LIBRARY,
                 "Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
@@ -527,8 +531,18 @@ public class SpringCodegen extends AbstractJavaCodegen
             documentationProvider = DocumentationProvider.NONE;
             annotationLibrary = AnnotationLibrary.NONE;
             useJakartaEe = true;
-            useBeanValidation = false;
-            performBeanValidation = false;
+            if(additionalProperties.containsKey(USE_BEANVALIDATION)) {
+                useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
+            } else {
+                //default to false if not specified
+                useBeanValidation = false;
+            }
+            if(additionalProperties.containsKey(PERFORM_BEANVALIDATION)) {
+                performBeanValidation = convertPropertyToBoolean(PERFORM_BEANVALIDATION);
+            } else {
+                //default to false if not specified
+                performBeanValidation = false;
+            }
 
             additionalProperties.put(USE_JAKARTA_EE, useJakartaEe);
             additionalProperties.put(USE_BEANVALIDATION, useBeanValidation);
@@ -540,8 +554,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 
             applyJakartaPackage();
 
-            LOGGER.warn("For Spring HTTP Interface following options are disabled: documentProvider, annotationLibrary, useBeanValidation, performBeanValidation. "
-                    + "useJakartaEe defaulted to 'true'");
+            LOGGER.warn("For Spring HTTP Interface following options are disabled: documentProvider, annotationLibrary. useJakartaEe defaulted to 'true'. useBeanValidation and performBeanValidation are supported.");
         }
 
         // clear model and api doc template as this codegen
@@ -616,6 +629,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         convertPropertyToBooleanAndWriteBack(OPTIONAL_ACCEPT_NULLABLE, this::setOptionalAcceptNullable);
         convertPropertyToBooleanAndWriteBack(USE_SPRING_BUILT_IN_VALIDATION, this::setUseSpringBuiltInValidation);
         convertPropertyToBooleanAndWriteBack(CodegenConstants.USE_DEDUCTION_FOR_ONE_OF_INTERFACES, this::setUseDeductionForOneOfInterfaces);
+
 		convertPropertyToStringAndWriteBack(RESPONSE_WRAPPER, this::setResponseWrapper);
 		convertPropertyToBooleanAndWriteBack(USE_TAGS, this::setUseTags);
 		convertPropertyToBooleanAndWriteBack(USE_BEANVALIDATION, this::setUseBeanValidation);
@@ -632,7 +646,7 @@ public class SpringCodegen extends AbstractJavaCodegen
 		if (getDocumentationProvider().equals(DocumentationProvider.NONE)) {
 			this.setUseSwaggerUI(false);
 		}
-
+        convertPropertyToStringAndWriteBack(CLIENT_REGISTRATION_ID, this::setClientRegistrationId);
 		convertPropertyToBooleanAndWriteBack(UNHANDLED_EXCEPTION_HANDLING, this::setUnhandledException);
 		convertPropertyToBooleanAndWriteBack(USE_RESPONSE_ENTITY, this::setUseResponseEntity);
 		convertPropertyToBooleanAndWriteBack(GENERATE_GENERIC_RESPONSE_ENTITY, this::setGenerateGenericResponseEntity);
@@ -653,6 +667,14 @@ public class SpringCodegen extends AbstractJavaCodegen
 
         if (isUseSpringBoot4()) {
             setUseSpringBoot3(false);
+        }
+        if (isNotEmpty(clientRegistrationId)) {
+            if (!SPRING_HTTP_INTERFACE.equals(library)) {
+                throw new IllegalArgumentException(CLIENT_REGISTRATION_ID + " is only supported with the " + SPRING_HTTP_INTERFACE + " library");
+            }
+            if (!isUseSpringBoot4()) {
+                throw new IllegalArgumentException(CLIENT_REGISTRATION_ID + " requires " + USE_SPRING_BOOT4 + "=true because @ClientRegistrationId is provided by Spring Security 7");
+            }
         }
 
         if (isUseSpringBoot3() || isUseSpringBoot4()) {
@@ -865,7 +887,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 
                 supportingFiles.add(new SupportingFile(httpInterfacesAbstractConfiguratorFile,
                         (sourceFolder + File.separator + configPackage).replace(".", java.io.File.separator), "HttpInterfacesAbstractConfigurator.java"));
-                writePropertyBack(USE_BEANVALIDATION, false);
 
                 writePropertyBack(HTTP_INTERFACES_CONFIGURATOR_DEPENDENCY,
                     useHttpServiceProxyFactoryInterfacesConfigurator ?
@@ -1198,6 +1219,11 @@ public class SpringCodegen extends AbstractJavaCodegen
             // But use a sensible tag name if there is none
             objs.put("tagName", "default".equals(firstTagName) ? firstOperation.baseName : firstTagName);
             objs.put("tagDescription", escapeText(firstTag.getDescription()));
+
+            // Add clientRegistrationId for spring-http-interface with OAuth
+            if (SPRING_HTTP_INTERFACE.equals(library) && clientRegistrationId != null && !clientRegistrationId.isEmpty()) {
+                operations.put("clientRegistrationId", clientRegistrationId);
+            }
         }
 
         removeImport(objs, "java.util.List");
