@@ -1809,7 +1809,7 @@ public class DefaultCodegen implements CodegenConfig {
     	if (name.toLowerCase().contains("dto")){ 
         	Pattern p = Pattern.compile("(?i)dto");
         	Matcher m = p.matcher(name);
-        	className = m.replaceAll("enum");
+        	className = m.replaceAll("enums");
         }
 		return className;
 	}    
