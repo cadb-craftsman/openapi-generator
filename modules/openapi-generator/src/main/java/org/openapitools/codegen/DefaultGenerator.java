@@ -428,37 +428,36 @@ public class DefaultGenerator implements Generator {
     private void generateModel(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelTemplateFiles().keySet()) {
             File written;
-            if (config.templateOutputDirs().containsKey(templateName)) {
-                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
-                String filename = config.modelFilename(templateName, modelName, outputDir);
-                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
-            } else {
-                String filename = config.modelFilename(templateName, modelName);
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                //System.out.println("generateModel: " + templateName + " " + filename);
-
-            }
-
-            if (written != null) {
-                files.add(written);
-                if (config.isEnablePostProcessFile() && !dryRun) {
-                    config.postProcessFile(written, "model");
-                }
+            if(!toModelNameEnum(modelName)){
+	            if (config.templateOutputDirs().containsKey(templateName)) {
+	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+	                String filename = config.modelFilename(templateName, modelName, outputDir);
+	                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+	            } else {
+	                String filename = config.modelFilename(templateName, modelName);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+	                System.out.println("generateModel: " + templateName + " " + filename);
+	
+	            }
+	
+	            if (written != null) {
+	                files.add(written);
+	                if (config.isEnablePostProcessFile() && !dryRun) {
+	                    config.postProcessFile(written, "model");
+	                }
+	            }
             }
         }
-        
-        for (String templateName : config.modelServiceTemplateFiles().keySet()) {
-            File written;
-            if (config.templateOutputDirs().containsKey(templateName)) {
-                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
-                String filename = config.modelServiceFilename(templateName, modelName, outputDir);
-                //System.out.println("generateModelService: " + templateName + " " + outputDir + " " + filename);
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
-            } else {
-                String filename = config.modelServiceFilename(templateName,  toModelNameBean(modelName));
+    }
+    
+    private void generateModelEnum(List<File> files, Map<String, Object> models, String modelName) throws IOException {
+        for (String templateName : config.modelTemplateFiles().keySet()) {
+            File written = null;
+            if(toModelNameEnum(modelName)){
+                String filename = config.modelEnumFilename(templateName,  modelName);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                //System.out.println("generateModelService: " + templateName + " " + filename);
+                System.out.println("generateModelEnum: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -468,28 +467,58 @@ public class DefaultGenerator implements Generator {
                 }
             }
         } 
-        
+    }    
+    
+    private void generateModelService(List<File> files, Map<String, Object> models, String modelName) throws IOException {
+        for (String templateName : config.modelServiceTemplateFiles().keySet()) {
+            File written;
+            if(!toModelNameEnum(modelName)){
+	            if (config.templateOutputDirs().containsKey(templateName)) {
+	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+	                String filename = config.modelServiceFilename(templateName, modelName, outputDir);
+	                //System.out.println("generateModelService: " + templateName + " " + outputDir + " " + filename);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+	            } else {
+	                String filename = config.modelServiceFilename(templateName,  toModelNameBean(modelName));
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+	                //System.out.println("generateModelService: " + templateName + " " + filename);
+	            }
+	
+	            if (written != null) {
+	                files.add(written);
+	                if (config.isEnablePostProcessFile() && !dryRun) {
+	                    config.postProcessFile(written, "model");
+	                }
+	            }
+            }
+        } 
+    }
+    
+    private void generateModelPersistence(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelPersistenceTemplateFiles().keySet()) {
             File written;
-            if (config.templateOutputDirs().containsKey(templateName)) {
-                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
-                String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
-                //System.out.println("generateModelPersistence: " + templateName + " " + outputDir + " " + filename);
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
-            } else {
-                String filename = config.modelPersistenceFilename(templateName, toModelNameEntity(modelName));
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                //System.out.println("generateModelPersistence: " + templateName + " " + filename);
+            if(!toModelNameEnum(modelName)){
+	            if (config.templateOutputDirs().containsKey(templateName)) {
+	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+	                String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
+	                //System.out.println("generateModelPersistence: " + templateName + " " + outputDir + " " + filename);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+	            } else {
+	                String filename = config.modelPersistenceFilename(templateName, toModelNameEntity(modelName));
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+	                //System.out.println("generateModelPersistence: " + templateName + " " + filename);
+	            }
+	
+	            if (written != null) {
+	                files.add(written);
+	                if (config.isEnablePostProcessFile() && !dryRun) {
+	                    config.postProcessFile(written, "model");
+	                }
+	            }
             }
-
-            if (written != null) {
-                files.add(written);
-                if (config.isEnablePostProcessFile() && !dryRun) {
-                    config.postProcessFile(written, "model");
-                }
-            }
-        }        
+        } 
     }
+    
 
     void generateModels(List<File> files, List<ModelMap> allModels, List<String> unusedModels, List<ModelMap> aliasModels) {
         generateModels(files, allModels, unusedModels, aliasModels, new ArrayList<>(), DefaultGenerator.this::modelKeys);
@@ -599,7 +628,7 @@ public class DefaultGenerator implements Generator {
 
         // generate files based on processed models
         for (String modelName : allProcessedModels.keySet()) {
-        	//System.out.println("modelName: " + modelName);
+        	System.out.println("modelName: " + modelName);
 	
             ModelsMap models = allProcessedModels.get(modelName);
             
@@ -644,6 +673,12 @@ public class DefaultGenerator implements Generator {
 
                 // to generate model files
                 generateModel(files, models, modelName);
+                
+                generateModelEnum(files, models, modelName);
+                
+                generateModelService(files, models, modelName);
+                
+                generateModelPersistence(files, models, modelName);
 
                 // to generate model test files
                 generateModelTests(files, models, modelName);
@@ -2470,6 +2505,17 @@ public class DefaultGenerator implements Generator {
         } 
 
         return className;
+    } 
+    
+    private boolean toModelNameEnum(final String name) {
+
+    	if (name.toLowerCase().contains("enum")){ 
+        	Pattern p = Pattern.compile("(?i)enum");
+        	Matcher m = p.matcher(name);
+        	return m.find();
+        } 
+
+        return false;
     } 
 
 }

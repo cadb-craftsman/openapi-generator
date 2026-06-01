@@ -1804,6 +1804,23 @@ public class DefaultCodegen implements CodegenConfig {
      * @return the file name of the model
      */    
 	@Override
+	public String toModelEnumFilename(String name) {
+		String className = null;
+    	if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("enum");
+        }
+		return className;
+	}    
+    
+    /**
+     * Return the capitalized file name of the model service
+     *
+     * @param name the model name
+     * @return the file name of the model
+     */    
+	@Override
 	public String toModelServiceFilename(String name) {
 		return camelize(name);
 	}
@@ -6880,6 +6897,21 @@ public class DefaultCodegen implements CodegenConfig {
         String suffix = modelTemplateFiles().get(templateName);
         return outputDir + File.separator + toModelFilename(uniqueModelName) + suffix;
     }
+    
+	@Override
+	public String modelEnumFilename(String templateName, String modelName) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        String outputDir = toModelEnumFilename(modelFileFolder());
+        return outputDir + File.separator + uniqueModelName + suffix;
+	}
+
+	@Override
+	public String modelEnumFilename(String templateName, String modelName, String outputDir) {
+        String uniqueModelName = uniqueCaseInsensitiveString(modelName, seenModelFilenames);
+        String suffix = modelTemplateFiles().get(templateName);
+        return outputDir + File.separator + toModelEnumFilename(uniqueModelName) + suffix;
+	}    
     
 	@Override
 	public String modelServiceFilename(String templateName, String modelName) {

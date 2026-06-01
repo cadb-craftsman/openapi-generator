@@ -272,6 +272,8 @@ public interface CodegenConfig {
     String toConfigFilename(String name);
 
     String toModelFilename(String name);
+
+    String toModelEnumFilename(String name);
     
     String toModelServiceFilename(String name);
     
@@ -340,7 +342,11 @@ public interface CodegenConfig {
 
     String modelServiceFilename(String templateName, String modelName);
 
-    String modelServiceFilename(String templateName, String modelName, String outputDir);    
+    String modelServiceFilename(String templateName, String modelName, String outputDir);   
+    
+    String modelEnumFilename(String templateName, String modelName);
+
+    String modelEnumFilename(String templateName, String modelName, String outputDir);   
     
     String modelPersistenceFilename(String templateName, String modelName);
 
