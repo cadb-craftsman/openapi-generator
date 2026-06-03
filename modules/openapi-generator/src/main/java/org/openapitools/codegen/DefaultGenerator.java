@@ -428,16 +428,16 @@ public class DefaultGenerator implements Generator {
     private void generateModel(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelTemplateFiles().keySet()) {
             File written;
-            if(!toModelNameEnum(modelName)){
+            if(!isModelNameEnum(modelName)){
 	            if (config.templateOutputDirs().containsKey(templateName)) {
 	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
 	                String filename = config.modelFilename(templateName, modelName, outputDir);
-	                System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+	                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
 	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
 	            } else {
 	                String filename = config.modelFilename(templateName, modelName);
 	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-	                System.out.println("generateModel: " + templateName + " " + filename);
+	                //System.out.println("generateModel: " + templateName + " " + filename);
 	
 	            }
 	
@@ -454,10 +454,10 @@ public class DefaultGenerator implements Generator {
     private void generateModelEnum(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelTemplateFiles().keySet()) {
             File written = null;
-            if(toModelNameEnum(modelName)){
+            if(isModelNameEnum(modelName)){
                 String filename = config.modelEnumFilename(templateName,  modelName);
                 written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
-                System.out.println("generateModelEnum: " + templateName + " " + filename);
+                //System.out.println("generateModelEnum: " + templateName + " " + filename);
             }
 
             if (written != null) {
@@ -472,7 +472,7 @@ public class DefaultGenerator implements Generator {
     private void generateModelService(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelServiceTemplateFiles().keySet()) {
             File written;
-            if(!toModelNameEnum(modelName)){
+            if(!isModelNameEnum(modelName)){
 	            if (config.templateOutputDirs().containsKey(templateName)) {
 	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
 	                String filename = config.modelServiceFilename(templateName, modelName, outputDir);
@@ -497,7 +497,7 @@ public class DefaultGenerator implements Generator {
     private void generateModelPersistence(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelPersistenceTemplateFiles().keySet()) {
             File written;
-            if(!toModelNameEnum(modelName)){
+            if(!isModelNameEnum(modelName)){
 	            if (config.templateOutputDirs().containsKey(templateName)) {
 	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
 	                String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
@@ -628,7 +628,7 @@ public class DefaultGenerator implements Generator {
 
         // generate files based on processed models
         for (String modelName : allProcessedModels.keySet()) {
-        	System.out.println("modelName: " + modelName);
+        	//System.out.println("modelName: " + modelName);
 	
             ModelsMap models = allProcessedModels.get(modelName);
             
@@ -994,14 +994,14 @@ public class DefaultGenerator implements Generator {
                 // to generate service files
                 for (String templateName : config.serviceTemplateFiles().keySet()) {
                     File written = null;
-
+                    /*
                     for(int i = 0; i < operation.getImportsBean().size(); i++) {
                     	for(Map.Entry entry : operation.getImportsBean().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			//System.out.println("operation service: " + entry.getKey() + " , " + entry.getValue());
+                    			System.out.println("operation service: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
-                    			//System.out.println("oldTag: " + oldTag);
+                    			System.out.println("Service oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
                         			newTag = toModelNameBean(entry.getValue().toString().replace(".dto.", ".service."));
                         			//System.out.println("newTag: " + newTag);
@@ -1010,7 +1010,7 @@ public class DefaultGenerator implements Generator {
                     		}
                     	}
                     }
-                    
+                    */
                     if (config.templateOutputDirs().containsKey(templateName)) {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.serviceFilename(templateName, tag, outputDir);
@@ -1039,13 +1039,14 @@ public class DefaultGenerator implements Generator {
                 // to generate repository files
                 for (String templateName : config.repositoryTemplateFiles().keySet()) {
                 	File written = null;
-                    for(int i = 0; i < operation.getImportsEntity().size(); i++) {
+                    /*
+                	for(int i = 0; i < operation.getImportsEntity().size(); i++) {
                     	for(Map.Entry entry : operation.getImportsEntity().get(i).entrySet()) {
                     		if(entry.getKey().equals("import")) {
-                    			//System.out.println("operation repository: " + entry.getKey() + " , " + entry.getValue());
+                    			System.out.println("operation repository: " + entry.getKey() + " , " + entry.getValue());
                     			String oldTag = entry.getValue().toString();
                     			String newTag = null;
-                    			//System.out.println("oldTag: " + oldTag);
+                    			System.out.println("Repository oldTag: " + oldTag);
                     			if(oldTag.contains(".dto.")) {
                         			newTag = toModelNameEntity(entry.getValue().toString().replace(".dto.", ".persistence."));
                         			//System.out.println("newTag: " + newTag);
@@ -1054,6 +1055,7 @@ public class DefaultGenerator implements Generator {
                     		}
                     	}
                     }
+					*/
 
                     if (config.templateOutputDirs().containsKey(templateName)) {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
@@ -2136,8 +2138,9 @@ public class DefaultGenerator implements Generator {
 
         mappedImports.forEach((key, value) -> {
             Map<String, String> im = new LinkedHashMap<>();
-            im.put("import", key);
+            im.put("import",  toImportNameEnum(key));
             im.put("classname", value);
+            //System.out.println("Dtos import: " + toImportNameEnum(key) + " classname: " + value);
             result.add(im);
         });
         return result;
@@ -2157,8 +2160,16 @@ public class DefaultGenerator implements Generator {
 
         mappedImports.forEach((key, value) -> {
             Map<String, String> im = new LinkedHashMap<>();
-            im.put("import", key);
-            im.put("classname", value);
+            if(isModelNameEnum(key)) {
+                im.put("import",  toImportNameEnum(key));
+                im.put("classname", value);
+                //System.out.println("Beans import: " + toImportNameEnum(key) + " classname: " + value);
+            }else {
+                im.put("import",  toModelNameBean(toImportNameBeans(key)));
+                im.put("classname", toModelNameBean(value));
+                //System.out.println("Beans import: " + toModelNameBean(toImportNameBeans(key)) + " classname: " + toModelNameBean(value));
+            }
+            
             result.add(im);
         });
         return result;
@@ -2178,8 +2189,15 @@ public class DefaultGenerator implements Generator {
 
         mappedImports.forEach((key, value) -> {
             Map<String, String> im = new LinkedHashMap<>();
-            im.put("import", key);
-            im.put("classname", value);
+            if(isModelNameEnum(key)) {
+                im.put("import",  toImportNameEnum(key));
+                im.put("classname", value);
+                //System.out.println("Entities import: " + toImportNameEnum(key) + " classname: " + value);
+            }else {
+            	im.put("import",  toModelNameEntity(toImportNameEntity(key)));
+            	im.put("classname", toModelNameEntity(value));
+            	//System.out.println("Entities import: " + toModelNameEntity(toImportNameEntity(key)) + " classname: " + toModelNameEntity(value));
+            }
             result.add(im);
         });
         return result;
@@ -2224,12 +2242,37 @@ public class DefaultGenerator implements Generator {
             }
         }
         List<Map<String, String>> imports = new ArrayList<>();
+        List<Map<String, String>> importsBean = new ArrayList<>();
+        List<Map<String, String>> importsEntity = new ArrayList<>();
+        
         for (String s : importSet) {
             Map<String, String> item = new HashMap<>();
-            item.put("import", s);
+            Map<String, String> itemBean = new HashMap<>();
+            Map<String, String> itemEntity = new HashMap<>();
+            
+            if(isModelNameEnum(s)) {
+                item.put("import", toImportNameEnum(s));
+                itemBean.put("import", toImportNameEnum(s));
+                itemEntity.put("import", toImportNameEnum(s));
+            }else {
+                item.put("import", s);
+                itemBean.put("import", toImportNameBeans(s));
+                itemEntity.put("import", toImportNameEntity(s));
+            }
+
             imports.add(item);
+            importsBean.add(itemBean);
+            importsEntity.add(itemEntity);
+            
+            //System.out.println("item dto: " + item.get("import"));
+            //System.out.println("item bean: " + itemBean.get("import"));
+            //System.out.println("item entity: " + itemEntity.get("import"));
+
         }
         objs.setImports(imports);
+        objs.setImportsBean(importsBean);
+        objs.setImportsEntity(importsEntity);
+        
         config.postProcessModels(objs);
         return objs;
     }
@@ -2467,6 +2510,28 @@ public class DefaultGenerator implements Generator {
         return StringUtils.removeEnd(value, "/");
     }
     
+    private boolean isModelNameDto(String name) {
+
+    	if (name.toLowerCase().contains(".dto.")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	return m.find();
+        } 
+
+        return false;
+    }
+    
+    private boolean isModelNameEnum(String name) {
+
+    	if (name.toLowerCase().contains("enum")){ 
+        	Pattern p = Pattern.compile("(?i)enum");
+        	Matcher m = p.matcher(name);
+        	return m.find();
+        } 
+
+        return false;
+    }    
+    
     private String toModelNameBean(final String name) {
     	String className = name;
 
@@ -2506,16 +2571,47 @@ public class DefaultGenerator implements Generator {
 
         return className;
     } 
+
+    private String toImportNameEnum(String name) {
+    	String packageName = name;
+    	
+    	if(isModelNameEnum(name)) {
+        	if (name.toLowerCase().contains(".dto.")){ 
+            	Pattern p = Pattern.compile("(?i).dto.");
+            	Matcher m = p.matcher(name);
+            	packageName = m.replaceAll(".enums.");
+            } 
+    	}
+    	
+        return packageName;
+    }
     
-    private boolean toModelNameEnum(final String name) {
-
-    	if (name.toLowerCase().contains("enum")){ 
-        	Pattern p = Pattern.compile("(?i)enum");
-        	Matcher m = p.matcher(name);
-        	return m.find();
-        } 
-
-        return false;
+    private String toImportNameBeans(String name) {
+    	String packageName = name;
+    	
+    	if(isModelNameDto(name)) {
+        	if (name.toLowerCase().contains(".dto.")){ 
+            	Pattern p = Pattern.compile("(?i).dto.");
+            	Matcher m = p.matcher(name);
+            	packageName = m.replaceAll(".service.");
+            } 
+    	}
+    	
+        return packageName;
     } 
+    
+    private String toImportNameEntity(String name) {
+    	String packageName = name;
+    	
+    	if(isModelNameDto(name)) {
+        	if (name.toLowerCase().contains(".dto.")){ 
+            	Pattern p = Pattern.compile("(?i).dto.");
+            	Matcher m = p.matcher(name);
+            	packageName = m.replaceAll(".persistence.");
+            } 
+    	}
+    	
+        return packageName;
+    }     
 
 }
