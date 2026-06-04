@@ -2256,8 +2256,8 @@ public class DefaultGenerator implements Generator {
                 itemEntity.put("import", toImportNameEnum(s));
             }else {
                 item.put("import", s);
-                itemBean.put("import", toImportNameBeans(s));
-                itemEntity.put("import", toImportNameEntity(s));
+                itemBean.put("import", toModelNameBean(toImportNameBeans(s)));
+                itemEntity.put("import", toModelNameEntity(toImportNameEntity(s)));
             }
 
             imports.add(item);
