@@ -3037,8 +3037,10 @@ public class DefaultCodegen implements CodegenConfig {
         	Matcher m = p.matcher(name);
         	className = m.replaceAll("ReqBean");
         }
+        
+        //System.out.println("classname: " + cleanValidAnnotation(className));
 
-        return className;
+        return cleanValidAnnotation(className);
 
     }    
 
@@ -3066,10 +3068,31 @@ public class DefaultCodegen implements CodegenConfig {
         	Matcher m = p.matcher(name);
         	className = m.replaceAll("ReqEntity");
         } 
+    	
+        //System.out.println("classname: " + cleanValidAnnotation(className));
 
-        return className;
+        return cleanValidAnnotation(className);
 
-    }    
+    }
+    
+    
+    public String cleanValidAnnotation(final String name) {
+    	String className = name;
+    	if(name.toLowerCase().contains("@valid")) {
+    		Pattern p = Pattern.compile("(?i)@valid");
+        	Matcher m = p.matcher(name);
+        	className =  m.replaceAll("");
+    	}
+    	
+    	if(className.toLowerCase().contains("< ")) {
+    		Pattern p = Pattern.compile("(?i)< ");
+        	Matcher m = p.matcher(className);
+        	className =  m.replaceAll("<");
+    	}
+
+    	
+    	return className;
+    }
     
     
     /**
