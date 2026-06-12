@@ -1805,7 +1805,7 @@ public class DefaultCodegen implements CodegenConfig {
      */    
 	@Override
 	public String toModelEnumFilename(String name) {
-		String className = null;
+		String className = name;
     	if (name.toLowerCase().contains("dto")){ 
         	Pattern p = Pattern.compile("(?i)dto");
         	Matcher m = p.matcher(name);
