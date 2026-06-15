@@ -263,7 +263,7 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
         modelTemplateFiles.put("model.mustache", ".java");
         apiTemplateFiles.put("api.mustache", ".java");
 
-        apiTestTemplateFiles.put("api_test.mustache", ".java");
+        apiTestTemplateFiles.put("api_test.mustache", "Test.java");
         modelDocTemplateFiles.put("model_doc.mustache", ".md");
         apiDocTemplateFiles.put("api_doc.mustache", ".md");
 
