@@ -3323,6 +3323,8 @@ public class DefaultCodegen implements CodegenConfig {
         if (parent != null && composed.getAllOf() != null) { // set parent for allOf only
             m.parentSchema = parentName;
             m.parent = toModelName(parentName);
+            m.parentBean = toModelNameBean(parentName);
+            m.parentEntity = toModelNameEntity(parentName);
 
             if (supportsMultipleInheritance) {
                 m.allParents = new ArrayList<>();
