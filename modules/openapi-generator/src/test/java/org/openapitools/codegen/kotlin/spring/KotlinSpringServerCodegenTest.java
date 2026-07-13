@@ -788,24 +788,31 @@ public class KotlinSpringServerCodegenTest {
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@Schema(example = \"null\", description = \"\")"
         );
-        assertFileContains(
+        assertFileNotContains(
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@get:Schema(example = \"null\", description = \"\")"
+        );
+        assertFileContains(
+                Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
+                "@get:Schema(description = \"\")"
         );
         assertFileNotContains(
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@Schema(example = \"null\", requiredMode = Schema.RequiredMode.REQUIRED, description = \"\")"
         );
-        assertFileContains(
+        assertFileNotContains(
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@get:Schema(example = \"null\", requiredMode = Schema.RequiredMode.REQUIRED, description = \"\")"
+        );
+        assertFileContains(
+                Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
+                "@get:Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = \"\")"
         );
     }
 
     @Test(description = "use get Annotation use-site target on kotlin interface attributes (swagger1)")
     public void useTargetOnInterfaceAnnotationsWithSwagger1() throws IOException {
         File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
-        output.deleteOnExit();
         String outputPath = output.getAbsolutePath().replace('\\', '/');
 
         KotlinSpringServerCodegen codegen = new KotlinSpringServerCodegen();
@@ -823,17 +830,25 @@ public class KotlinSpringServerCodegenTest {
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@ApiModelProperty(example = \"null\", value = \"\")"
         );
-        assertFileContains(
+        assertFileNotContains(
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@get:ApiModelProperty(example = \"null\", value = \"\")"
+        );
+        assertFileContains(
+                Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
+                "@get:ApiModelProperty(value = \"\")"
         );
         assertFileNotContains(
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@ApiModelProperty(example = \"null\", required = true, value = \"\")"
         );
-        assertFileContains(
+        assertFileNotContains(
                 Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
                 "@get:ApiModelProperty(example = \"null\", required = true, value = \"\")"
+        );
+        assertFileContains(
+                Paths.get(outputPath + "/src/main/kotlin/org/openapitools/model/Animal.kt"),
+                "@get:ApiModelProperty(required = true, value = \"\")"
         );
     }
 
@@ -6476,7 +6491,7 @@ public class KotlinSpringServerCodegenTest {
         String content = Files.readString(modelFile);
         int idx = content.indexOf("val optionalNonNullableWithDefault:");
         Assert.assertTrue(idx >= 0, "optionalNonNullableWithDefault property must exist");
-        String context = content.substring(Math.max(0, idx - 200), idx);
+        String context = content.substring(Math.max(0, idx - 300), idx);
         Assert.assertTrue(context.contains("@field:JsonInclude(JsonInclude.Include.NON_NULL)"),
                 "optionalNonNullableWithDefault must have @JsonInclude(NON_NULL)");
         Assert.assertTrue(context.contains("@field:JsonSetter(nulls = Nulls.SKIP)"),
@@ -6559,6 +6574,51 @@ public class KotlinSpringServerCodegenTest {
                 "import com.fasterxml.jackson.annotation.Nulls");
         // Must be nullable type with null default
         assertFileContains(modelFile, "val optionalNonNullable: kotlin.String? = null");
+    }
+
+    /**
+     * Scenario 4 (openApiNullable=true): optional+nullable field must carry
+     * {@code @field:JsonInclude(JsonInclude.Include.NON_ABSENT)} so that Jackson
+     * excludes {@code JsonNullable.undefined()} from serialized output.
+     */
+    @Test(description = "Scenario 4 – optional+nullable with openApiNullable=true: @JsonInclude(NON_ABSENT) guards undefined from serialization")
+    public void requiredNullable_scenario4_optionalNullable_hasNonAbsentAnnotation() throws IOException {
+        Map<String, File> files = generateFromContract(
+                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
+                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true"));
+
+        Path modelFile = files.get("TestModel.kt").toPath();
+        String content = Files.readString(modelFile);
+        int idx = content.indexOf("val optionalNullable:");
+        Assert.assertTrue(idx >= 0, "optionalNullable property must exist");
+        // Annotations appear before the val declaration
+        String context = content.substring(Math.max(0, idx - 300), idx);
+        Assert.assertTrue(context.contains("@field:JsonInclude(JsonInclude.Include.NON_ABSENT)"),
+                "optionalNullable must have @field:JsonInclude(NON_ABSENT) to suppress JsonNullable.undefined() from output");
+        // Must NOT have NON_NULL — that annotation is only for non-nullable optional fields
+        Assert.assertFalse(context.contains("@field:JsonInclude(JsonInclude.Include.NON_NULL)"),
+                "optionalNullable must NOT have @field:JsonInclude(NON_NULL); only non-nullable optionals use NON_NULL");
+        assertFileContains(modelFile, "import com.fasterxml.jackson.annotation.JsonInclude");
+    }
+
+    /**
+     * Without openApiNullable the optional+nullable field is a plain {@code Type?} — no
+     * {@code @field:JsonInclude(NON_ABSENT)} should be emitted because {@code JsonNullable} is
+     * not used and the legacy nullable-type path doesn't need the annotation.
+     */
+    @Test(description = "Scenario 4 – optional+nullable without openApiNullable: no @JsonInclude(NON_ABSENT)")
+    public void requiredNullable_scenario4_optionalNullable_noNonAbsentWithoutOpenApiNullable() throws IOException {
+        Map<String, File> files = generateFromContract(
+                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
+                new HashMap<>());
+
+        Path modelFile = files.get("TestModel.kt").toPath();
+        String content = Files.readString(modelFile);
+        int idx = content.indexOf("val optionalNullable:");
+        Assert.assertTrue(idx >= 0, "optionalNullable property must exist");
+        String context = content.substring(Math.max(0, idx - 200), idx);
+        Assert.assertFalse(context.contains("@field:JsonInclude(JsonInclude.Include.NON_ABSENT)"),
+                "optionalNullable must NOT have NON_ABSENT when openApiNullable=false (no JsonNullable wrapping)");
     }
 
     /**
@@ -6776,5 +6836,73 @@ public class KotlinSpringServerCodegenTest {
         assertThat(myObjectFile).isNotNull();
         String content = Files.readString(myObjectFile.toPath());
         assertThat(content).contains("com.example.ExternalModel?");
+    }
+
+    @Test(description = "nameMappings: @param:JsonProperty must use the original JSON field name for deserialization")
+    public void paramJsonPropertyAnnotationWithNameMappings() throws IOException {
+        // When a property is renamed via nameMappings, @param:JsonProperty must carry the
+        // original JSON field name so Jackson can deserialize from the correct JSON key.
+        Map<String, File> files = generateFromContract(
+                "src/test/resources/3_0/kotlin/param-json-property.yaml",
+                new HashMap<>(),
+                new HashMap<>(),
+                configurator -> configurator.addNameMapping("snake_case_value", "mappedValue")
+        );
+
+        File itemFile = files.get("Item.kt");
+        assertThat(itemFile).isNotNull();
+        assertFileContains(
+                itemFile.toPath(),
+                "@param:JsonProperty(\"snake_case_value\")\n    @get:JsonProperty(\"snake_case_value\", required = true) val mappedValue"
+        );
+    }
+
+    @Test(description = "auto-renamed digit-starting property: @param:JsonProperty must use the original JSON field name")
+    public void paramJsonPropertyAnnotationWithDigitStartingPropertyName() throws IOException {
+        // When a property name starts with a digit, the Kotlin codegen wraps it in backticks
+        // (e.g. "2nd_field" -> `2ndField`). @param:JsonProperty must still carry the original
+        // JSON field name so that Jackson can deserialize it correctly.
+        Map<String, File> files = generateFromContract(
+                "src/test/resources/3_0/kotlin/param-json-property.yaml"
+        );
+
+        File itemFile = files.get("Item.kt");
+        assertThat(itemFile).isNotNull();
+        assertFileContains(
+                itemFile.toPath(),
+                "@param:JsonProperty(\"2nd_field\")\n    @get:JsonProperty(\"2nd_field\") val `2ndField`"
+        );
+    }
+
+
+    /**
+     * Regression test for https://github.com/OpenAPITools/openapi-generator/issues/24139
+     * A property that $ref's an OAS 3.1 schema with type:[object,"null"] is nullable and must
+     * NOT receive @field:JsonSetter(nulls = Nulls.FAIL).
+     */
+    @Test(description = "issue 24139: nullable $ref (type:[object,null]) must not get @JsonSetter(nulls = Nulls.FAIL)")
+    public void testIssue24139NullableRefNoJsonSetterNullsFail() throws IOException {
+        Map<String, Object> additionalProperties = new HashMap<>();
+        additionalProperties.put("useBeanValidation", true);
+        additionalProperties.put("openApiNullable", "true");
+
+        Map<String, File> files = generateFromContract(
+                "src/test/resources/3_1/issue_24139.yaml",
+                additionalProperties
+        );
+
+        File itemFile = files.get("Item.kt");
+        assertThat(itemFile).isNotNull();
+
+        // nestedNullable: $ref to NestedNullable (type:[object,"null"]) — nullable, no @JsonSetter(nulls = Nulls.FAIL)
+        assertFileNotContains(itemFile.toPath(), "nestedNullable: NestedNullable");
+        // The field must NOT have @JsonSetter(nulls = Nulls.FAIL) because the referenced schema is nullable
+        String content = org.apache.commons.io.FileUtils.readFileToString(itemFile, StandardCharsets.UTF_8);
+        // Extract the nestedNullable field block and verify annotation absence
+        Assert.assertFalse(
+                content.contains("@field:JsonSetter(nulls = Nulls.FAIL)\n    @param:JsonProperty(\"nestedNullable\")") ||
+                content.contains("@field:JsonSetter(nulls = Nulls.FAIL)\n    @get:JsonProperty(\"nestedNullable\")"),
+                "nestedNullable ($ref to nullable schema) must not have @JsonSetter(nulls = Nulls.FAIL)"
+        );
     }
 }

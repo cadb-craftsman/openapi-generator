@@ -83,6 +83,9 @@ public class CodeGenMojo extends AbstractMojo {
     @Parameter(name = "verbose", defaultValue = "false")
     private boolean verbose;
 
+    @Parameter(name = "quiet", property = "openapi.generator.maven.plugin.quiet", defaultValue = "false")
+    private boolean quiet;
+
     /**
      * The name of the generator to use.
      */
@@ -394,6 +397,13 @@ public class CodeGenMojo extends AbstractMojo {
     private List<String> schemaMappings;
 
     /**
+     * A list of schema names that must be generated even when listed in schemaMappings or importMappings.
+     * Use {@code <param>*</param>} as a wildcard to force-generate all mapped schemas at once.
+     */
+    @Parameter(name = "forcedGenerateSchemas", property = "openapi.generator.maven.plugin.forcedGenerateSchemas")
+    private List<String> forcedGenerateSchemas;
+
+    /**
      * A map of inline scheme names and the new names
      */
     @Parameter(name = "inlineSchemaNameMappings", property = "openapi.generator.maven.plugin.inlineSchemaNameMappings")
@@ -689,6 +699,7 @@ public class CodeGenMojo extends AbstractMojo {
             }
 
             configurator.setVerbose(verbose);
+            configurator.setQuiet(quiet);
 
             if (skipOverwrite != null) {
                 configurator.setSkipOverwrite(skipOverwrite);
@@ -886,6 +897,13 @@ public class CodeGenMojo extends AbstractMojo {
                             configurator);
                 }
 
+                // Retained for backwards-compatibility with configOptions -> forced-generate-schemas
+                if (forcedGenerateSchemas == null && configOptions.containsKey("forced-generate-schemas")) {
+                    applyForcedGenerateSchemasKvpList(
+                            Arrays.asList(configOptions.get("forced-generate-schemas").toString().split(",")),
+                            configurator);
+                }
+
                 // Retained for backwards-compatibility with configOptions -> inline-schema-name-mappings
                 if (inlineSchemaNameMappings == null && configOptions.containsKey("inline-schema-name-mappings")) {
                     applyInlineSchemaNameMappingsKvp(configOptions.get("inline-schema-name-mappings").toString(),
@@ -951,6 +969,11 @@ public class CodeGenMojo extends AbstractMojo {
             // Apply Schema Mappings
             if (schemaMappings != null && (configOptions == null || !configOptions.containsKey("schema-mappings"))) {
                 applySchemaMappingsKvpList(schemaMappings, configurator);
+            }
+
+            // Apply Forced Generate Schemas
+            if (forcedGenerateSchemas != null && (configOptions == null || !configOptions.containsKey("forced-generate-schemas"))) {
+                applyForcedGenerateSchemasKvpList(forcedGenerateSchemas, configurator);
             }
 
             // Apply Inline Schema Name Mappings
