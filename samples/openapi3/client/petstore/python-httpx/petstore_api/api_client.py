@@ -305,6 +305,12 @@ class ApiClient:
             # if not found, look for '1XX', '2XX', etc.
             response_type = response_types_map.get(str(response_data.status)[0] + "XX", None)
 
+        # If the response_type has not matched (eg. did not match the previous if statements) and the default response is available, use it.
+        if response_type is None and str(response_data.status) not in response_types_map \
+            and (not isinstance(response_data.status, int) or not 100 <= response_data.status <= 599 or str(response_data.status)[0] + "XX" not in response_types_map) \
+            and 'default' in response_types_map:
+            response_type = response_types_map['default']
+
         # deserialize response data
         response_text = None
         return_data = None
@@ -679,11 +685,8 @@ class ApiClient:
                 headers['Cookie'] = ""
             else:
                 headers['Cookie'] += "; "
-            # Account for cookie value containing spaces and special characters
-            cookie_value = str(auth_setting['value'])
-            if not re.match("^\".*\"$", cookie_value):
-                cookie_value = cookie_value.replace("\"", "\\\"")
-                cookie_value = f"\"{cookie_value}\""
+            # Account for cookie value containing spaces and special characters, excluding base64 delimiters
+            cookie_value = quote(str(auth_setting['value']), safe="!#$%&'()*+-./:<=>?@[]^_`{|}~%+/=")
             headers['Cookie'] += f"{auth_setting['key']}={cookie_value}"
         elif auth_setting['in'] == 'header':
             if auth_setting['type'] != 'http-signature':
