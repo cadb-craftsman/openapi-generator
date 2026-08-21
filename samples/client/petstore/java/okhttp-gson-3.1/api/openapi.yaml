@@ -325,6 +325,7 @@ paths:
                 additionalProperties:
                   format: int32
                   type: integer
+                type: object
           description: successful operation
       security:
       - api_key: []
@@ -1203,6 +1204,8 @@ components:
       properties:
         first_property:
           $ref: "#/components/schemas/Pet"
+        second_property:
+          description: just null type
     updatePetWithForm_request:
       properties:
         name:

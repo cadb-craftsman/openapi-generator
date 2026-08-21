@@ -494,7 +494,7 @@ public class SpringCodegenTest {
                 .containsWithNameAndAttributes("RequestParam", ImmutableMap.of("value", "\"format\""));
     }
 
-    //@Test
+    @Test
     public void shouldGenerateRequestParamForRefParams_3248_RegressionDates() throws IOException {
         File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
         output.deleteOnExit();
@@ -1129,7 +1129,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_NAME_SUFFIX, "Controller");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -1164,7 +1164,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
 
@@ -1216,7 +1216,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -1250,7 +1250,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_TAGS, "false");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -1512,7 +1512,7 @@ public class SpringCodegenTest {
     public void testNoRequestMappingAnnotation() throws IOException {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary("spring-cloud");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.none);
 
         final Map<String, File> files = generateFiles(codegen, "src/test/resources/2_0/petstore.yaml");
@@ -1741,7 +1741,7 @@ public class SpringCodegenTest {
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, "true");
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SKIP_DEFAULT_INTERFACE, "true");
         codegen.additionalProperties().put(IMPLICIT_HEADERS, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -1773,7 +1773,7 @@ public class SpringCodegenTest {
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, "true");
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SKIP_DEFAULT_INTERFACE, "true");
         codegen.additionalProperties().put(IMPLICIT_HEADERS, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -1806,7 +1806,7 @@ public class SpringCodegenTest {
 
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SKIP_DEFAULT_INTERFACE, "true");
         codegen.additionalProperties().put(IMPLICIT_HEADERS, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -2861,7 +2861,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_TAGS, "true");
         codegen.additionalProperties().put(BeanValidationFeatures.USE_BEANVALIDATION, "true");
 
@@ -3277,7 +3277,7 @@ public class SpringCodegenTest {
     @Test
     public void shouldUseTheSameTagNameForTheInterfaceAndTheMethod_issue11570() throws IOException {
         final Map<String, File> output = generateFromContract(
-                "src/test/resources/bugs/issue_11570.yml", SPRING_BOOT, Map.of(INTERFACE_ONLY, "true")
+                "src/test/resources/bugs/issue_11570.yml", SPRING_BOOT, Map.of(SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         final String expectedTagName = "\"personTagWithExclamation!\"";
@@ -3468,7 +3468,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
@@ -3513,7 +3513,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
@@ -3559,7 +3559,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "false");
         codegen.additionalProperties().put(ASYNC, "true");
@@ -3598,7 +3598,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "false");
         codegen.additionalProperties().put(ASYNC, "false");
@@ -3636,7 +3636,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -3674,7 +3674,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -3712,7 +3712,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
@@ -3754,7 +3754,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_BEANVALIDATION, "true");
@@ -3809,7 +3809,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_ENUM_CASE_INSENSITIVE, "true");
@@ -3842,7 +3842,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_ENUM_CASE_INSENSITIVE, "false");
@@ -3875,7 +3875,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -3920,7 +3920,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.toString());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -3955,7 +3955,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -3990,7 +3990,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4027,7 +4027,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -5084,7 +5084,7 @@ public class SpringCodegenTest {
     public void multiLineOperationDescription() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(DOCUMENTATION_PROVIDER, DocumentationProvider.SPRINGDOC.name());
 
         Map<String, File> files = generateFromContract("src/test/resources/3_0/spring/issue12474-multiline-description.yaml", SPRING_BOOT, additionalProperties);
@@ -5098,7 +5098,7 @@ public class SpringCodegenTest {
     public void multiLineTagDescription() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(DOCUMENTATION_PROVIDER, DocumentationProvider.SPRINGDOC.name());
 
         Map<String, File> files = generateFromContract("src/test/resources/3_0/spring/issue12474-multiline-description.yaml", SPRING_BOOT, additionalProperties);
@@ -5120,7 +5120,7 @@ public class SpringCodegenTest {
 
         codegen.additionalProperties().put(SSE, "true");
         codegen.additionalProperties().put(REACTIVE, "true");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "false");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
         ClientOptInput input = new ClientOptInput();
@@ -5180,7 +5180,7 @@ public class SpringCodegenTest {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, "true");
 
         ClientOptInput input = new ClientOptInput();
@@ -5207,7 +5207,7 @@ public class SpringCodegenTest {
 
         final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/spring/petstore-with-tags.yaml");
         final SpringCodegen codegen = new SpringCodegen();
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
 
@@ -5230,7 +5230,7 @@ public class SpringCodegenTest {
     @Test
     public void testAllArgsConstructor_16797() throws IOException {
         final Map<String, File> output = generateFromContract("src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 codegen -> codegen.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", "false"));
         JavaFileAssert.assertThat(output.get("Object4.java"))
                 .assertConstructor("String", "Type1", "String", "String", "Boolean")
@@ -5245,7 +5245,7 @@ public class SpringCodegenTest {
     @Test
     public void testAllArgsConstructor_16797_REFACTOR_ALLOF_WITH_PROPERTIES_ONLY() throws IOException {
         final Map<String, File> output = generateFromContract("src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 codegen -> codegen.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", "true"));
         JavaFileAssert.assertThat(output.get("Object4.java"))
                 .assertConstructor("String", "Type1", "String", "String", "Boolean")
@@ -5259,7 +5259,7 @@ public class SpringCodegenTest {
     @Test
     public void testMultiInheritanceParentRequiredParams_issue16797() throws IOException {
         final Map<String, File> output = generateFromContract(
-                "src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT, Map.of(INTERFACE_ONLY, "true")
+                "src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT, Map.of(SpringCodegen.INTERFACE_ONLY, "true")
         );
         // constructor should as
         //       public Object4(Type1 pageInfo, String responseType, String requestId, Boolean success) {
@@ -5277,7 +5277,7 @@ public class SpringCodegenTest {
     @Test
     public void testMultiInheritanceParentRequiredParams_issue15796() throws IOException {
         final Map<String, File> output = generateFromContract(
-                "src/test/resources/3_0/spring/issue_15796.yaml", SPRING_BOOT, Map.of(INTERFACE_ONLY, "true")
+                "src/test/resources/3_0/spring/issue_15796.yaml", SPRING_BOOT, Map.of(SpringCodegen.INTERFACE_ONLY, "true")
         );
         // constructor should as this
         //public Poodle(String race, String type) {
@@ -5293,7 +5293,7 @@ public class SpringCodegenTest {
     @Test
     public void testAllArgsConstructor_defaultOrder_15796() throws IOException {
         final Map<String, File> output = generateFromContract("src/test/resources/3_0/spring/issue_15796.yaml", SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 config -> config.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", " true"));
         // constructors should as this
         //public Poodle(String race, String type) {
@@ -5321,7 +5321,7 @@ public class SpringCodegenTest {
     @Test
     public void generateAllArgsConstructor() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/java/all_args_constructor.yaml", null,
-                Map.of(AbstractJavaCodegen.GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(AbstractJavaCodegen.GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 codegenConfig -> codegenConfig.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", " true"));
         JavaFileAssert.assertThat(files.get("Pet.java"))
                 .assertConstructor("String")
@@ -5354,7 +5354,7 @@ public class SpringCodegenTest {
         Map<String, File> output = generateFromContract(
                 "src/test/resources/3_0/allOfDuplicatedProperties.yaml",
                 SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true, INTERFACE_ONLY, "true")
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true, SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         JavaFileAssert.assertThat(output.get("ModelC.java"))
@@ -5365,7 +5365,7 @@ public class SpringCodegenTest {
     public void testLombokAnnotations() throws IOException {
         final Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Data;@lombok.NoArgsConstructor;@lombok.AllArgsConstructor");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         Map<String, File> output = generateFromContract("src/test/resources/3_0/petstore.yaml", SPRING_BOOT, additionalProperties);
         JavaFileAssert.assertThat(output.get("Pet.java"))
                 .hasNoConstructor()
@@ -5415,7 +5415,7 @@ public class SpringCodegenTest {
                         GENERATE_BUILDERS, true,
                         SpringCodegen.OPENAPI_NULLABLE, false,
                         SpringCodegen.USE_OPTIONAL, false,
-                        INTERFACE_ONLY, "true"
+                        SpringCodegen.INTERFACE_ONLY, "true"
                 )
         );
 
@@ -5444,7 +5444,7 @@ public class SpringCodegenTest {
                         GENERATE_BUILDERS, true,
                         SpringCodegen.OPENAPI_NULLABLE, true,
                         SpringCodegen.USE_OPTIONAL, true,
-                        INTERFACE_ONLY, "true"
+                        SpringCodegen.INTERFACE_ONLY, "true"
                 )
         );
 
@@ -5474,7 +5474,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_NAME_SUFFIX, "Controller");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -5952,7 +5952,7 @@ public class SpringCodegenTest {
 
         final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/spring/issue_9530.yaml");
         final SpringCodegen codegen = new SpringCodegen();
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_OPTIONAL, "true");
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
@@ -6166,7 +6166,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
         codegen.setLibrary("spring-boot");
 
-        codegen.additionalProperties().put(INTERFACE_ONLY, "false");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(SPRING_CONTROLLER, "true");
         codegen.additionalProperties().put(RETURN_SUCCESS_CODE, "true");
@@ -6643,7 +6643,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_BEANVALIDATION, "true");
@@ -6689,7 +6689,7 @@ public class SpringCodegenTest {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, "true");
 
         ClientOptInput input = new ClientOptInput();
@@ -7045,7 +7045,7 @@ public class SpringCodegenTest {
                         CONTAINER_DEFAULT_TO_NULL, true,
                         SpringCodegen.OPENAPI_NULLABLE, false,
                         USE_BEANVALIDATION, true,
-                        INTERFACE_ONLY, false,
+                        SpringCodegen.INTERFACE_ONLY, false,
                         springVersionProperty, springBootVersion > 2
                 ),
                 codegenConfigurator ->
@@ -8045,7 +8045,7 @@ public class SpringCodegenTest {
     @Test(dataProvider = "replaceOneOf" )
     void replaceOneOfByDiscriminatorMapping(String file) throws IOException {
         Map<String, File> files = generateFromContract(file, SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
 
         JavaFileAssert.assertThat(files.get("GeoJsonObject.java"))
@@ -8071,7 +8071,7 @@ public class SpringCodegenTest {
     @Test
     void oneOf_issue_19261() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_19261.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("Product.java"))
                 .isNormalClass()
@@ -8089,7 +8089,7 @@ public class SpringCodegenTest {
     @Test
     void oneOf_issue_22013() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_22013.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("Main.java"))
                 .isNormalClass()
@@ -8108,7 +8108,7 @@ public class SpringCodegenTest {
     @Test
     void oneOf_issue_23577() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_23577.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("Event.java"))
                 .isNormalClass()
@@ -8131,7 +8131,7 @@ public class SpringCodegenTest {
         // a member schema that already declares its own x-implements must still be able to
         // receive the oneOf interface, i.e. the user-supplied x-implements value must remain mutable.
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_23577.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true));
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true));
         JavaFileAssert.assertThat(files.get("CreatedEvent.java"))
                 .implementsInterfaces("com.example.Notification", "Event");
         JavaFileAssert.assertThat(files.get("UpdatedEvent.java"))
@@ -8142,7 +8142,7 @@ public class SpringCodegenTest {
     void oneof_polymorphism_and_inheritance() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneof_polymorphism_and_inheritance.yaml", SPRING_BOOT,
                 Map.of(MODEL_NAME_SUFFIX, "Dto",
-                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("FruitDto.java"))
                 .isNormalClass()
@@ -8159,7 +8159,7 @@ public class SpringCodegenTest {
     void oneOf_issue_14769() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_14769.yaml", SPRING_BOOT,
                 Map.of(MODEL_NAME_SUFFIX, "Dto",
-                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
 
         JavaFileAssert.assertThat(files.get("VehicleDto.java"))
@@ -8280,7 +8280,7 @@ public class SpringCodegenTest {
     void issue24003() throws IOException {
         Map<String, File> files = generateFromContract(
                 "src/test/resources/3_0/spring/issue_24003.yaml", SPRING_BOOT,
-                Map.of(USE_SPRING_BOOT4, true, MODEL_NAME_SUFFIX, "DTO", INTERFACE_ONLY, "true"));
+                Map.of(USE_SPRING_BOOT4, true, MODEL_NAME_SUFFIX, "DTO", SpringCodegen.INTERFACE_ONLY, "true"));
         JavaFileAssert.assertThat(files.get("BrLockDTO.java")).isInterface()
                 .assertTypeAnnotations()
                 .containsWithNameAndAttributes("JsonTypeInfo", Map.of("use", "JsonTypeInfo.Id.NAME", "include", "JsonTypeInfo.As.PROPERTY", "property", "\"lockType\"", "visible", "true"))

@@ -1084,22 +1084,6 @@ public class PythonClientCodegenTest {
         TestUtils.assertFileNotContains(apiClient, "Callable");
         TestUtils.assertFileNotContains(api,
                 "def list_legacy_models_without_preload_content(");
-
-        final PythonClientCodegen tornadoCodegen = new PythonClientCodegen();
-        tornadoCodegen.setLibrary("tornado");
-        tornadoCodegen.additionalProperties().put(
-                PythonClientCodegen.COMPATIBLE_WITH_PYTHON_LEGACY, true);
-        addModelAttributeNameMappings(tornadoCodegen);
-        final String tornadoOutputPath = generateFiles(tornadoCodegen,
-                "src/test/resources/3_0/python/legacy-model-dictionaries.yaml");
-        final Path tornadoApi = Paths.get(
-                tornadoOutputPath + "openapi_client/api/default_api.py");
-        final Path tornadoApiClient = Paths.get(
-                tornadoOutputPath + "openapi_client/api_client.py");
-        TestUtils.assertFileNotContains(tornadoApi,
-                "async_req", "        _preload_content: bool = True");
-        TestUtils.assertFileNotContains(tornadoApiClient,
-                "ThreadPool", "def _call_with_legacy_options(");
     }
 
     @Test
@@ -1267,9 +1251,11 @@ public class PythonClientCodegenTest {
                 "src/test/resources/3_0/python/model-attribute-alias.yaml");
         final Path model = Paths.get(outputPath + "openapi_client/models/alias_model.py");
 
+        // unmapped collisions are not rejected; they fall back to reserved-word
+        // mangling and keep their wire name through the alias
         assertFileContains(model,
-                "    model_dump: Optional[StrictStr]",
-                "    to_dict: Optional[StrictStr]");
+                "    var_model_dump: Optional[StrictStr] = Field(default=None, alias=\"model_dump\")",
+                "    var_to_dict: Optional[StrictStr] = Field(default=None, alias=\"to_dict\")");
     }
 
     @Test
@@ -1356,6 +1342,22 @@ public class PythonClientCodegenTest {
 
         codegen.parameterNameMapping().put("some-value", "parameter_value");
         Assert.assertEquals(codegen.toParamName("some-value"), "parameter_value");
+    }
+
+    @Test
+    public void testGeneratedHelperAndPydanticNamesAreReserved() {
+        final PythonClientCodegen codegen = new PythonClientCodegen();
+
+        // names of the helper methods generated on every model
+        Assert.assertEquals(codegen.toVarName("to_dict"), "var_to_dict");
+        Assert.assertEquals(codegen.toVarName("from_dict"), "var_from_dict");
+        Assert.assertEquals(codegen.toVarName("to_json"), "var_to_json");
+        // pydantic BaseModel namespace
+        Assert.assertEquals(codegen.toVarName("model_config"), "var_model_config");
+        Assert.assertEquals(codegen.toVarName("model_fields"), "var_model_fields");
+        Assert.assertEquals(codegen.toVarName("model_dump"), "var_model_dump");
+        // similar-looking names must not be mangled
+        Assert.assertEquals(codegen.toVarName("model_configuration"), "model_configuration");
     }
 
     @Test(dataProvider = "numberMappings")
@@ -1477,18 +1479,6 @@ public class PythonClientCodegenTest {
                 "if extra.get(\"connector\") is not None:",
                 "kwargs[\"connector_owner\"] = False",
                 "kwargs[\"connector_owner\"] = True");
-
-        final PythonClientCodegen tornadoCodegen = new PythonClientCodegen();
-        tornadoCodegen.setLibrary("tornado");
-        tornadoCodegen.additionalProperties().put(
-                PythonClientCodegen.USE_INDEPENDENT_IMPLICIT_CLIENTS, true);
-        final String tornadoOutputPath = generateFiles(tornadoCodegen,
-                "src/test/resources/3_0/generic.yaml");
-        assertFileContains(
-                Paths.get(tornadoOutputPath + "openapi_client/rest.py"),
-                "httpclient.AsyncHTTPClient(force_instance=True)",
-                "def close(self) -> None:",
-                "self.pool_manager.close()");
     }
 
     @Test

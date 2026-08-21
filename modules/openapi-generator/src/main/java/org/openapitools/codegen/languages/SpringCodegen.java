@@ -24,6 +24,8 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import lombok.Getter;
@@ -40,8 +42,11 @@ import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.templating.mustache.SplitStringLambda;
 import org.openapitools.codegen.templating.mustache.SpringHttpStatusLambda;
 import org.openapitools.codegen.templating.mustache.TrimWhitespaceLambda;
+import org.openapitools.codegen.utils.JsonAnnotationPolicyUtils;
+import org.openapitools.codegen.utils.JsonIncludePolicy;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.ProcessUtils;
+import org.openapitools.codegen.utils.TriStateBoolean;
 import org.openapitools.codegen.utils.URLPathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +59,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.openapitools.codegen.CodegenConstants.USE_DEDUCTION_FOR_ONE_OF_INTERFACES;
-import static org.openapitools.codegen.CodegenConstants.USE_DEDUCTION_FOR_ONE_OF_INTERFACES_DESC;
+import static org.openapitools.codegen.CodegenConstants.*;
 import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
@@ -65,7 +69,7 @@ import static org.openapitools.codegen.utils.StringUtils.camelize;
  * {@code src/main/resources/JavaSpring/libraries/} (library-specific overrides).
  * A library-specific template shadows a root-level template of the same name.
  */
-public class SpringCodegen extends AbstractJavaCodegen
+public class SpringCodegen extends AbstractJavaCodegen 
 		implements BeanValidationFeatures, PerformBeanValidationFeatures, OptionalFeatures, SwaggerUIFeatures {
 	private final Logger LOGGER = LoggerFactory.getLogger(SpringCodegen.class);
 	public static final String TITLE = "title";
@@ -134,22 +138,24 @@ public class SpringCodegen extends AbstractJavaCodegen
     public static final String GENERATE_PAGEABLE_CONSTRAINT_VALIDATION = "generatePageableConstraintValidation";
     public static final String SUBSTITUTE_GENERIC_PAGED_MODEL = "substituteGenericPagedModel";
     public static final String CLIENT_REGISTRATION_ID = "clientRegistrationId";
+    public static final String USE_SPRING_SECURITY_PRE_AUTHORIZE = "useSpringSecurityPreAuthorize";
+    public static final String SPRING_SECURITY_AUTHORITY_PREFIX = "springSecurityAuthorityPrefix";
 
     public static final String COMPANY = "company";
     public static final String COMPANY_CRAFTSMAN = "craftsman";
 
     @Getter
-	public enum RequestMappingMode {
-		api_interface("Generate the @RequestMapping annotation on the generated Api Interface."),
-		controller("Generate the @RequestMapping annotation on the generated Api Controller Implementation."),
-		none("Do not add a class level @RequestMapping annotation.");
+    public enum RequestMappingMode {
+        api_interface("Generate the @RequestMapping annotation on the generated Api Interface."),
+        controller("Generate the @RequestMapping annotation on the generated Api Controller Implementation."),
+        none("Do not add a class level @RequestMapping annotation.");
 
-		private String description;
+        private final String description;
 
-		RequestMappingMode(String description) {
-			this.description = description;
-		}
-	}
+        RequestMappingMode(String description) {
+            this.description = description;
+        }
+    }
 	public static final String OPEN_BRACE = "{";
 	public static final String CLOSE_BRACE = "}";
     @Setter protected String title = "OpenAPI Spring";
@@ -180,6 +186,10 @@ public class SpringCodegen extends AbstractJavaCodegen
     @Setter protected boolean apiFirst = false;
     protected boolean useOptional = false;
     @Setter protected boolean useSealed = false;
+    @Getter @Setter protected JsonIncludePolicy optionalNonNullPropertyJsonInclude = JsonIncludePolicy.NON_NULL;
+    @Getter @Setter protected JsonAnnotationPolicyUtils.JsonSetterNullsMode optionalNonNullPropertyJsonSetterNulls = null;
+    @Getter @Setter protected TriStateBoolean generateJsonIncludeAnnotations = TriStateBoolean.UNSET;
+    @Getter @Setter protected TriStateBoolean generateJsonSetterNullsAnnotations = TriStateBoolean.UNSET;
     @Setter protected boolean virtualService = false;
     @Setter protected boolean hateoas = false;
     @Setter protected boolean returnSuccessCode = false;
@@ -221,6 +231,9 @@ public class SpringCodegen extends AbstractJavaCodegen
     @Setter protected boolean substituteGenericPagedModel = false;
     @Getter @Setter
     protected String clientRegistrationId = null;
+    @Setter protected boolean useSpringSecurityPreAuthorize = false;
+    @Getter @Setter
+    protected String springSecurityAuthorityPrefix = "SCOPE_";
     @Setter protected boolean useEnumValueInterface = false;
     private String valuedEnumClassName = "ValuedEnum";
 
@@ -325,6 +338,31 @@ public class SpringCodegen extends AbstractJavaCodegen
                 "Use Bean Validation Impl. to perform BeanValidation", performBeanValidation));
         cliOptions.add(CliOption.newBoolean(USE_SEALED,
                 "Whether to generate sealed model interfaces and classes"));
+
+        CliOption optionalNonNullPropertyJsonIncludeOpt = CliOption.newString(CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_INCLUDE,
+                JsonAnnotationPolicyUtils.OPTIONAL_NON_NULL_PROPERTY_JSON_INCLUDE_DESC);
+        for (JsonIncludePolicy policy : JsonIncludePolicy.OPTIONAL_NON_NULL_POLICIES) {
+            optionalNonNullPropertyJsonIncludeOpt.addEnum(policy.name(), policy.getDescription());
+        }
+        optionalNonNullPropertyJsonIncludeOpt.setDefault(optionalNonNullPropertyJsonInclude.name());
+        cliOptions.add(optionalNonNullPropertyJsonIncludeOpt);
+
+        CliOption optionalNonNullPropertyJsonSetterNullsOpt = CliOption.newString(CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS,
+                JsonAnnotationPolicyUtils.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS_DESC);
+        optionalNonNullPropertyJsonSetterNullsOpt.addEnum(JsonAnnotationPolicyUtils.JsonSetterNullsMode.SKIP.name(),
+                "Emit @JsonSetter(nulls = Nulls.SKIP): silently ignore an explicit JSON null, keeping the field's default.");
+        optionalNonNullPropertyJsonSetterNullsOpt.addEnum(JsonAnnotationPolicyUtils.JsonSetterNullsMode.FAIL.name(),
+                "Emit @JsonSetter(nulls = Nulls.FAIL): reject an explicit JSON null.");
+        cliOptions.add(optionalNonNullPropertyJsonSetterNullsOpt);
+
+        cliOptions.add(CliOption.newBoolean(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS,
+                JsonAnnotationPolicyUtils.GENERATE_JSON_INCLUDE_ANNOTATIONS_DESC, false));
+        cliOptions.add(CliOption.newBoolean(CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS,
+                "Whether to generate @JsonSetter(nulls = ...) annotations on optional non-nullable model properties. "
+                        + "When true, emits @JsonSetter so an explicit null in the payload does not overwrite the field. "
+                        + "When false, none are generated and deserialization null-handling defers to the global ObjectMapper. "
+                        + "When left unset it defaults to false (7.23.0-equivalent output) and logs a warning; set it "
+                        + "explicitly to silence the warning.", false));
         cliOptions.add(CliOption.newBoolean(API_FIRST,
                 "Generate the API from the OAI spec at server compile time (API first approach)", apiFirst));
         cliOptions
@@ -337,13 +375,13 @@ public class SpringCodegen extends AbstractJavaCodegen
         cliOptions.add(CliOption.newString(X_IMPLEMENTS_SKIP, "Ability to choose interfaces that should NOT be implemented in the models despite their presence in vendor extension `x-implements`. Takes a list of fully qualified interface names. Example: yaml `xImplementsSkip: [com.some.pack.WithPhotoUrls]` skips implementing the interface `com.some.pack.WithPhotoUrls` in any schema", "empty list"));
         cliOptions.add(CliOption.newString(SCHEMA_IMPLEMENTS, "Ability to supply interfaces per schema that should be implemented (serves similar purpose as vendor extension `x-implements`, but is fully decoupled from the api spec). Example: yaml `schemaImplements: {Pet: com.some.pack.WithId, Category: [com.some.pack.CategoryInterface], Dog: [com.some.pack.Canine, com.some.pack.OtherInterface]}` implements interfaces in schemas `Pet` (interface `com.some.pack.WithId`), `Category` (interface `com.some.pack.CategoryInterface`), `Dog`(interfaces `com.some.pack.Canine`, `com.some.pack.OtherInterface`)", "empty map"));
 
-		CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION,
-				"Where to generate the class level @RequestMapping annotation.")
-				.defaultValue(requestMappingMode.name());
-		for (RequestMappingMode mode : RequestMappingMode.values()) {
-			requestMappingOpt.addEnum(mode.name(), mode.getDescription());
-		}
-		cliOptions.add(requestMappingOpt);
+        CliOption requestMappingOpt = new CliOption(REQUEST_MAPPING_OPTION,
+                "Where to generate the class level @RequestMapping annotation.")
+                .defaultValue(requestMappingMode.name());
+        for (RequestMappingMode mode : RequestMappingMode.values()) {
+            requestMappingOpt.addEnum(mode.name(), mode.getDescription());
+        }
+        cliOptions.add(requestMappingOpt);
 
         cliOptions.add(CliOption.newBoolean(UNHANDLED_EXCEPTION_HANDLING,
                 "Declare operation methods to throw a generic exception and allow unhandled exceptions (useful for Spring `@ControllerAdvice` directives).",
@@ -400,6 +438,12 @@ public class SpringCodegen extends AbstractJavaCodegen
         );
         cliOptions.add(CliOption.newBoolean(USE_JSPECIFY, "Use Jspecify for null checks", useJspecify));
         cliOptions.add(CliOption.newString(CLIENT_REGISTRATION_ID, "Client registration ID for OAuth2 in Spring HTTP Interface (@ClientRegistrationId annotation). Requires library=spring-http-interface and useSpringBoot4=true (Spring Security 7)."));
+        cliOptions.add(CliOption.newBoolean(USE_SPRING_SECURITY_PRE_AUTHORIZE,
+                "Generate Spring Security @PreAuthorize annotations from OAuth2/OpenID Connect security scopes.",
+                useSpringSecurityPreAuthorize));
+        cliOptions.add(CliOption.newString(SPRING_SECURITY_AUTHORITY_PREFIX,
+                "Prefix added to OAuth2/OpenID Connect scopes when generating Spring Security authorities.",
+                springSecurityAuthorityPrefix));
         supportedLibraries.put(SPRING_BOOT, "Spring-boot Server application.");
         supportedLibraries.put(SPRING_CLOUD_LIBRARY,
                 "Spring-Cloud-Feign client with Spring-Boot auto-configured settings.");
@@ -441,45 +485,45 @@ public class SpringCodegen extends AbstractJavaCodegen
                 CodegenConstants.USE_ENUM_VALUE_INTERFACE_DESC,
                 useEnumValueInterface));
 
-	}
+    }
 
-	@Override
-	public CodegenType getTag() {
-		return CodegenType.SERVER;
-	}
+    @Override
+    public CodegenType getTag() {
+        return CodegenType.SERVER;
+    }
 
-	@Override
-	public String getName() {
-		return "spring";
-	}
+    @Override
+    public String getName() {
+        return "spring";
+    }
 
-	@Override
-	public String getHelp() {
-		return "Generates a Java SpringBoot Server application using the SpringDoc integration.";
-	}
+    @Override
+    public String getHelp() {
+        return "Generates a Java SpringBoot Server application using the SpringDoc integration.";
+    }
 
-	@Override
-	public DocumentationProvider defaultDocumentationProvider() {
-		return isLibrary(SPRING_HTTP_INTERFACE) ? null : DocumentationProvider.SPRINGDOC;
-	}
+    @Override
+    public DocumentationProvider defaultDocumentationProvider() {
+        return isLibrary(SPRING_HTTP_INTERFACE) ? null : DocumentationProvider.SPRINGDOC;
+    }
 
-	@Override
-	public List<DocumentationProvider> supportedDocumentationProvider() {
-		List<DocumentationProvider> supportedProviders = new ArrayList<>();
-		supportedProviders.add(DocumentationProvider.NONE);
-		supportedProviders.add(DocumentationProvider.SOURCE);
-		supportedProviders.add(DocumentationProvider.SPRINGDOC);
-		return supportedProviders;
-	}
+    @Override
+    public List<DocumentationProvider> supportedDocumentationProvider() {
+        List<DocumentationProvider> supportedProviders = new ArrayList<>();
+        supportedProviders.add(DocumentationProvider.NONE);
+        supportedProviders.add(DocumentationProvider.SOURCE);
+        supportedProviders.add(DocumentationProvider.SPRINGDOC);
+        return supportedProviders;
+    }
 
-	@Override
-	public List<AnnotationLibrary> supportedAnnotationLibraries() {
-		List<AnnotationLibrary> supportedLibraries = new ArrayList<>();
-		supportedLibraries.add(AnnotationLibrary.NONE);
-		supportedLibraries.add(AnnotationLibrary.SWAGGER1);
-		supportedLibraries.add(AnnotationLibrary.SWAGGER2);
-		return supportedLibraries;
-	}
+    @Override
+    public List<AnnotationLibrary> supportedAnnotationLibraries() {
+        List<AnnotationLibrary> supportedLibraries = new ArrayList<>();
+        supportedLibraries.add(AnnotationLibrary.NONE);
+        supportedLibraries.add(AnnotationLibrary.SWAGGER1);
+        supportedLibraries.add(AnnotationLibrary.SWAGGER2);
+        return supportedLibraries;
+    }
 
     /**
      * Whether the selected {@link DocumentationProviderFeatures.DocumentationProvider} requires us to bootstrap and
@@ -619,6 +663,38 @@ public class SpringCodegen extends AbstractJavaCodegen
 			convertPropertyToBooleanAndWriteBack(REACTIVE, this::setReactive);
 			convertPropertyToBooleanAndWriteBack(SSE, this::setSse);
 		}
+        convertPropertyToStringAndWriteBack(RESPONSE_WRAPPER, this::setResponseWrapper);
+        convertPropertyToBooleanAndWriteBack(USE_TAGS, this::setUseTags);
+        convertPropertyToBooleanAndWriteBack(USE_BEANVALIDATION, this::setUseBeanValidation);
+        convertPropertyToBooleanAndWriteBack(PERFORM_BEANVALIDATION, this::setPerformBeanValidation);
+        convertPropertyToBooleanAndWriteBack(USE_OPTIONAL, this::setUseOptional);
+        convertPropertyToBooleanAndWriteBack(API_FIRST, this::setApiFirst);
+        convertPropertyToBooleanAndWriteBack(HATEOAS, this::setHateoas);
+        convertPropertyToBooleanAndWriteBack(SPRING_CONTROLLER, this::setUseSpringController);
+        convertPropertyToBooleanAndWriteBack(GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS, value -> this.generatedConstructorWithRequiredArgs = value);
+        convertPropertyToBooleanAndWriteBack(RETURN_SUCCESS_CODE, this::setReturnSuccessCode);
+        convertPropertyToBooleanAndWriteBack(USE_SWAGGER_UI, this::setUseSwaggerUI);
+        convertPropertyToBooleanAndWriteBack(USE_SEALED, this::setUseSealed);
+        convertPropertyToBooleanAndWriteBack(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS,
+                value -> this.generateJsonIncludeAnnotations = TriStateBoolean.fromNullableBoolean(value));
+        convertPropertyToBooleanAndWriteBack(CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS,
+                value -> this.generateJsonSetterNullsAnnotations = TriStateBoolean.fromNullableBoolean(value));
+        this.optionalNonNullPropertyJsonInclude = JsonAnnotationPolicyUtils.resolveOptionalNonNullPropertyJsonInclude(
+                additionalProperties, optionalNonNullPropertyJsonInclude);
+        additionalProperties.put(CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_INCLUDE, optionalNonNullPropertyJsonInclude.name());
+        this.optionalNonNullPropertyJsonSetterNulls = JsonAnnotationPolicyUtils.resolveOptionalNonNullPropertyJsonSetterNulls(
+                additionalProperties, optionalNonNullPropertyJsonSetterNulls);
+        if (optionalNonNullPropertyJsonSetterNulls != null) {
+            additionalProperties.put(CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS, optionalNonNullPropertyJsonSetterNulls.name());
+        }
+        if (jackson) {
+            JsonAnnotationPolicyUtils.warnIfUnset(LOGGER, generateJsonIncludeAnnotations, generateJsonSetterNullsAnnotations);
+            JsonAnnotationPolicyUtils.warnIfJsonSetterNullsDefaultRisky(LOGGER, generateJsonSetterNullsAnnotations,
+                    optionalNonNullPropertyJsonSetterNulls, openApiNullable, false);
+        }
+        if (DocumentationProvider.NONE.equals(getDocumentationProvider())) {
+            this.setUseSwaggerUI(false);
+        }
 
         convertPropertyToBooleanAndWriteBack(UNHANDLED_EXCEPTION_HANDLING, this::setUnhandledException);
         convertPropertyToBooleanAndWriteBack(USE_RESPONSE_ENTITY, this::setUseResponseEntity);
@@ -630,6 +706,9 @@ public class SpringCodegen extends AbstractJavaCodegen
         convertPropertyToBooleanAndWriteBack(OPTIONAL_ACCEPT_NULLABLE, this::setOptionalAcceptNullable);
         convertPropertyToBooleanAndWriteBack(USE_SPRING_BUILT_IN_VALIDATION, this::setUseSpringBuiltInValidation);
         convertPropertyToBooleanAndWriteBack(CodegenConstants.USE_DEDUCTION_FOR_ONE_OF_INTERFACES, this::setUseDeductionForOneOfInterfaces);
+        convertPropertyToStringAndWriteBack(CLIENT_REGISTRATION_ID, this::setClientRegistrationId);
+        convertPropertyToBooleanAndWriteBack(USE_SPRING_SECURITY_PRE_AUTHORIZE, this::setUseSpringSecurityPreAuthorize);
+        convertPropertyToStringAndWriteBack(SPRING_SECURITY_AUTHORITY_PREFIX, this::setSpringSecurityAuthorityPrefix);
 
 		convertPropertyToStringAndWriteBack(RESPONSE_WRAPPER, this::setResponseWrapper);
 		convertPropertyToBooleanAndWriteBack(USE_TAGS, this::setUseTags);
@@ -677,6 +756,10 @@ public class SpringCodegen extends AbstractJavaCodegen
                 throw new IllegalArgumentException(CLIENT_REGISTRATION_ID + " requires " + USE_SPRING_BOOT4 + "=true because @ClientRegistrationId is provided by Spring Security 7");
             }
         }
+        if (useSpringSecurityPreAuthorize && !SPRING_BOOT.equals(library)) {
+            throw new IllegalArgumentException(USE_SPRING_SECURITY_PRE_AUTHORIZE
+                    + " is only supported with the " + SPRING_BOOT + " library");
+        }
 
         if (isUseSpringBoot3() || isUseSpringBoot4()) {
             if (AnnotationLibrary.SWAGGER1.equals(getAnnotationLibrary())) {
@@ -693,6 +776,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         } else {
             this.applyJackson2Package();
         }
+
         convertPropertyToStringAndWriteBack(RESOURCE_FOLDER, this::setResourceFolder);
         convertPropertyToStringAndWriteBack(RESOURCE_TEST_FOLDER, this::setResourceTestFolder);
         convertPropertyToBooleanAndWriteBack(USE_HTTP_SERVICE_PROXY_FACTORY_INTERFACES_CONFIGURATOR, this::setUseHttpServiceProxyFactoryInterfacesConfigurator);
@@ -729,9 +813,9 @@ public class SpringCodegen extends AbstractJavaCodegen
         }
 
         if (isUseSpringBoot4()) {
-        	supportingFiles.add(new SupportingFile("pom-sb4.mustache", "", "pom.xml"));	
+            supportingFiles.add(new SupportingFile("pom-sb4.mustache", "", "pom.xml"));
         } else if (isUseSpringBoot3()) {
-        	supportingFiles.add(new SupportingFile("pom-sb3.mustache", "", "pom.xml"));
+            supportingFiles.add(new SupportingFile("pom-sb3.mustache", "", "pom.xml"));
         } else {
             supportingFiles.add(new SupportingFile("pom.mustache", "", "pom.xml"));
         }
@@ -1009,8 +1093,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         if (useJspecify) {
             applyJspecify();
         }
-
-	}
+    }
 
     protected void applyJackson2Package() {
         writePropertyBack(JACKSON_PACKAGE, JACKSON2_PACKAGE);
@@ -1140,7 +1223,6 @@ public class SpringCodegen extends AbstractJavaCodegen
 
         if (openAPI.getPaths() != null) {
             for (final Map.Entry<String, PathItem> openAPIGetPathsEntry : openAPI.getPaths().entrySet()) {
-                final String pathname = openAPIGetPathsEntry.getKey();
                 final PathItem path = openAPIGetPathsEntry.getValue();
                 if (path.readOperations() != null) {
                     for (final Operation operation : path.readOperations()) {
@@ -1151,9 +1233,9 @@ public class SpringCodegen extends AbstractJavaCodegen
                                 value.put("tag", escapeText(tag));
                                 tags.add(value);
                             }
-                            if (operation.getTags().size() > 0) {
+                            if (!operation.getTags().isEmpty()) {
                                 final String tag = operation.getTags().get(0);
-                                operation.setTags(Arrays.asList(tag));
+                                operation.setTags(Collections.singletonList(tag));
                             }
                             operation.addExtension("x-tags", tags);
                         }
@@ -1222,6 +1304,10 @@ public class SpringCodegen extends AbstractJavaCodegen
                 normalizeVendorExtensionWithStringList(operation.vendorExtensions, VendorExtension.X_OPERATION_EXTRA_ANNOTATION.getName());
                 normalizeOperationParameterVendorExtensions(operation, VendorExtension.X_FIELD_EXTRA_ANNOTATION.getName());
 
+                if (useSpringSecurityPreAuthorize) {
+                    addSpringSecurityPreAuthorize(operation);
+                }
+
                 if (isLibrary(SPRING_HTTP_INTERFACE) || isLibrary(SPRING_BOOT)) {
                     if (operation.isArray && "string".equalsIgnoreCase(operation.returnBaseType)) {
                         operation.vendorExtensions.put(VendorExtension.X_REACTIVE_RETURN_EXCEPT_LIST_OF_STRING.getName(), true);
@@ -1246,172 +1332,232 @@ public class SpringCodegen extends AbstractJavaCodegen
 
         return objs;
     }
-	
-	private interface DataTypeAssigner {
-		void setReturnType(String returnType);
 
-		void setReturnContainer(String returnContainer);
+    /**
+     * Adds a Spring Security expression that preserves the OpenAPI security requirement semantics:
+     * entries in a {@code security} array are OR alternatives, while schemes and scopes in one
+     * entry are combined with AND.
+     */
+    private void addSpringSecurityPreAuthorize(CodegenOperation codegenOperation) {
+        String originalOperationId = codegenOperation.operationIdOriginal != null
+                ? codegenOperation.operationIdOriginal
+                : codegenOperation.operationId;
+        Operation rawOperation = findOperation(originalOperationId);
+        if (rawOperation == null) {
+            LOGGER.warn("Could not find OpenAPI operation '{}' while generating @PreAuthorize.", originalOperationId);
+            return;
+        }
 
-		void setIsVoid(boolean isVoid);
-	}
+        List<SecurityRequirement> requirements = rawOperation.getSecurity();
+        if (requirements == null) {
+            requirements = openAPI.getSecurity();
+        }
+        if (requirements == null || requirements.isEmpty()) {
+            return;
+        }
 
-	/**
-	 * @param returnType       The return type that needs to be converted
-	 * @param dataTypeAssigner An object that will assign the data to the respective
-	 *                         fields in the model.
-	 */
-	private void doDataTypeAssignment(String returnType, DataTypeAssigner dataTypeAssigner) {
-		final String rt = returnType;
-		if (rt == null) {
-			dataTypeAssigner.setReturnType("Void");
-			dataTypeAssigner.setIsVoid(true);
-		} else if (rt.startsWith("List") || rt.startsWith("java.util.List")) {
-			final int start = rt.indexOf("<");
-			final int end = rt.lastIndexOf(">");
-			if (start > 0 && end > 0) {
-				dataTypeAssigner.setReturnType(rt.substring(start + 1, end).trim());
-				dataTypeAssigner.setReturnContainer("List");
-			}
-		} else if (rt.startsWith("Map") || rt.startsWith("java.util.Map")) {
-			final int start = rt.indexOf("<");
-			final int end = rt.lastIndexOf(">");
-			if (start > 0 && end > 0) {
-				dataTypeAssigner.setReturnType(rt.substring(start + 1, end).split(",", 2)[1].trim());
-				dataTypeAssigner.setReturnContainer("Map");
-			}
-		} else if (rt.startsWith("Set") || rt.startsWith("java.util.Set")) {
-			final int start = rt.indexOf("<");
-			final int end = rt.lastIndexOf(">");
-			if (start > 0 && end > 0) {
-				dataTypeAssigner.setReturnType(rt.substring(start + 1, end).trim());
-				dataTypeAssigner.setReturnContainer("Set");
-			}
-		}
-	}
+        Map<String, SecurityScheme> schemes = openAPI.getComponents() != null
+                ? openAPI.getComponents().getSecuritySchemes() : null;
+        if (schemes == null || schemes.isEmpty()) {
+            return;
+        }
 
-	private void prepareVersioningParameters(List<CodegenOperation> operations) {
-		Object apiVersion = additionalProperties.get(SPRING_API_VERSION);
-		boolean hasApiVersion = apiVersion != null;
-		for (CodegenOperation operation : operations) {
-			if (operation.getHasHeaderParams()) {
-				List<CodegenParameter> versionParams = operation.headerParams.stream().filter(param -> {
-					String xVersionParam = Objects
-							.toString(param.vendorExtensions.get(VendorExtension.X_VERSION_PARAM.getName()), "false");
-					return Boolean.parseBoolean(xVersionParam);
-				}).collect(Collectors.toList());
-				operation.hasVersionHeaders = !versionParams.isEmpty();
-				operation.vendorExtensions.put("versionHeaderParamsList", versionParams);
-			}
+        List<String> alternatives = new ArrayList<>();
+        for (SecurityRequirement requirement : requirements) {
+            if (requirement.isEmpty()) {
+                return;
+            }
+            List<String> groupAuthorities = new ArrayList<>();
+            for (Map.Entry<String, List<String>> entry : requirement.entrySet()) {
+                SecurityScheme scheme = schemes.get(entry.getKey());
+                if (scheme == null || (scheme.getType() != SecurityScheme.Type.OAUTH2
+                        && scheme.getType() != SecurityScheme.Type.OPENIDCONNECT)) {
+                    return;
+                }
+                if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                    groupAuthorities.add("isAuthenticated()");
+                } else {
+                    for (String scope : entry.getValue()) {
+                        groupAuthorities.add("hasAuthority('" + escapeSpelStringLiteral(springSecurityAuthorityPrefix + scope) + "')");
+                    }
+                }
+            }
+            String group = String.join(" and ", groupAuthorities);
+            alternatives.add(groupAuthorities.size() > 1 && requirements.size() > 1 ? "(" + group + ")" : group);
+        }
 
-			if (operation.getHasQueryParams()) {
-				List<CodegenParameter> versionParams = operation.queryParams.stream().filter(param -> {
-					String xVersionParam = Objects
-							.toString(param.vendorExtensions.get(VendorExtension.X_VERSION_PARAM.getName()), "false");
-					return Boolean.parseBoolean(xVersionParam);
-				}).collect(Collectors.toList());
-				operation.hasVersionQueryParams = !versionParams.isEmpty();
-				operation.vendorExtensions.put("versionQueryParamsList", versionParams);
-			}
-			if (hasApiVersion) {
-				operation.vendorExtensions.putIfAbsent(VendorExtension.X_SPRING_API_VERSION.getName(), apiVersion);
-			}
-		}
-	}
+        if (!alternatives.isEmpty()) {
+            codegenOperation.vendorExtensions.put("x-spring-security-pre-authorize",
+                    escapeJavaStringLiteral(String.join(" or ", alternatives)));
+        }
+    }
 
-	@Override
-	public Map<String, Object> postProcessSupportingFileData(Map<String, Object> objs) {
-		generateYAMLSpecFile(objs);
-		if (SPRING_CLOUD_LIBRARY.equals(library)) {
-			final List<CodegenSecurity> authMethods = (List<CodegenSecurity>) objs.get("authMethods");
-			if (authMethods != null) {
-				for (final CodegenSecurity authMethod : authMethods) {
-					authMethod.name = camelize(sanitizeName(authMethod.name), LOWERCASE_FIRST_LETTER);
-				}
-			}
-		}
-		return objs;
-	}
+    private String escapeSpelStringLiteral(String value) {
+        return value.replace("'", "''");
+    }
 
-	@Override
-	public String toApiName(String name) {
-		if (name.length() == 0) {
-			return "DefaultApi";
-		}
-		name = sanitizeName(name);
-		return camelize(name) + apiNameSuffix;
-	}
-	
-	@Override
-	public String toServiceName(String name) {
-		if (name.length() == 0) {
-			return "DefaultSrv";
-		}
-		name = sanitizeName(name);
-		return camelize(name) + serviceNameSuffix;
-	}
-	
-	@Override
-	public String toRepositoryName(String name) {
-		if (name.length() == 0) {
-			return "DefaultRepository";
-		}
-		name = sanitizeName(name);
-		return camelize(name) + repositoryNameSuffix;
-	}
-	
-	@Override
-	public String toWebClientsName(String name) {
-		if (name.length() == 0) {
-			return "DefaultWebClients";
-		}
-		name = sanitizeName(name);
-		return camelize(name) + webClientsNameSuffix;
-	}	
+    private String escapeJavaStringLiteral(String value) {
+        return value.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n");
+    }
 
-	@Override
-	public void setParameterExampleValue(CodegenParameter p) {
-		String type = p.baseType;
-		if (type == null) {
-			type = p.dataType;
-		}
+    private Operation findOperation(String operationId) {
+        if (openAPI.getPaths() == null || operationId == null) {
+            return null;
+        }
+        for (PathItem pathItem : openAPI.getPaths().values()) {
+            if (pathItem.readOperations() == null) {
+                continue;
+            }
+            for (Operation operation : pathItem.readOperations()) {
+                if (operationId.equals(operation.getOperationId())) {
+                    return operation;
+                }
+            }
+        }
+        return null;
+    }
 
-		if ("File".equals(type)) {
-			String example;
+    private interface DataTypeAssigner {
+        void setReturnType(String returnType);
 
-			if (p.defaultValue == null) {
-				example = p.example;
-			} else {
-				example = p.defaultValue;
-			}
+        void setReturnContainer(String returnContainer);
 
-			if (example == null) {
-				example = "/path/to/file";
-			}
-			example = "new org.springframework.core.io.FileSystemResource(new java.io.File(\"" + escapeText(example)
-					+ "\"))";
-			p.example = example;
-		} else {
-			super.setParameterExampleValue(p);
-		}
-	}
+        void setIsVoid(boolean isVoid);
+    }
 
-	@Override
-	public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-		super.postProcessModelProperty(model, property);
+    /**
+     * @param returnType       The return type that needs to be converted
+     * @param dataTypeAssigner An object that will assign the data to the respective
+     *                         fields in the model.
+     */
+    private void doDataTypeAssignment(String returnType, DataTypeAssigner dataTypeAssigner) {
+        if (returnType == null) {
+            dataTypeAssigner.setReturnType("Void");
+            dataTypeAssigner.setIsVoid(true);
+        } else if (returnType.startsWith("List") || returnType.startsWith("java.util.List")) {
+            final int start = returnType.indexOf("<");
+            final int end = returnType.lastIndexOf(">");
+            if (start > 0 && end > 0) {
+                dataTypeAssigner.setReturnType(returnType.substring(start + 1, end).trim());
+                dataTypeAssigner.setReturnContainer("List");
+            }
+        } else if (returnType.startsWith("Map") || returnType.startsWith("java.util.Map")) {
+            final int start = returnType.indexOf("<");
+            final int end = returnType.lastIndexOf(">");
+            if (start > 0 && end > 0) {
+                dataTypeAssigner.setReturnType(returnType.substring(start + 1, end).split(",", 2)[1].trim());
+                dataTypeAssigner.setReturnContainer("Map");
+            }
+        } else if (returnType.startsWith("Set") || returnType.startsWith("java.util.Set")) {
+            final int start = returnType.indexOf("<");
+            final int end = returnType.lastIndexOf(">");
+            if (start > 0 && end > 0) {
+                dataTypeAssigner.setReturnType(returnType.substring(start + 1, end).trim());
+                dataTypeAssigner.setReturnContainer("Set");
+            }
+        }
+    }
 
-		// add org.springframework.format.annotation.DateTimeFormat when needed
-		if (property.isDate || property.isDateTime) {
-			model.imports.add("DateTimeFormat");
-		}
+    private void prepareVersioningParameters(List<CodegenOperation> operations) {
+        Object apiVersion = additionalProperties.get(SPRING_API_VERSION);
+        boolean hasApiVersion = apiVersion != null;
+        for (CodegenOperation operation : operations) {
+            if (operation.getHasHeaderParams()) {
+                List<CodegenParameter> versionParams = operation.headerParams.stream()
+                        .filter(param -> {
+                            String xVersionParam = Objects.toString(param.vendorExtensions.get(VendorExtension.X_VERSION_PARAM.getName()), "false");
+                            return Boolean.parseBoolean(xVersionParam);
+                        })
+                        .collect(Collectors.toList());
+                operation.hasVersionHeaders = !versionParams.isEmpty();
+                operation.vendorExtensions.put("versionHeaderParamsList", versionParams);
+            }
 
-		if ("null".equals(property.example)) {
-			property.example = null;
-		}
+            if (operation.getHasQueryParams()) {
+                List<CodegenParameter> versionParams = operation.queryParams.stream()
+                        .filter(param -> {
+                            String xVersionParam = Objects.toString(param.vendorExtensions.get(VendorExtension.X_VERSION_PARAM.getName()), "false");
+                            return Boolean.parseBoolean(xVersionParam);
+                        })
+                        .collect(Collectors.toList());
+                operation.hasVersionQueryParams = !versionParams.isEmpty();
+                operation.vendorExtensions.put("versionQueryParamsList", versionParams);
+            }
+            if (hasApiVersion) {
+                operation.vendorExtensions.putIfAbsent(VendorExtension.X_SPRING_API_VERSION.getName(), apiVersion);
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Object> postProcessSupportingFileData(Map<String, Object> objs) {
+        generateYAMLSpecFile(objs);
+        if (SPRING_CLOUD_LIBRARY.equals(library)) {
+            final List<CodegenSecurity> authMethods = (List<CodegenSecurity>) objs.get("authMethods");
+            if (authMethods != null) {
+                for (final CodegenSecurity authMethod : authMethods) {
+                    authMethod.name = camelize(sanitizeName(authMethod.name), LOWERCASE_FIRST_LETTER);
+                }
+            }
+        }
+        return objs;
+    }
+
+    @Override
+    public String toApiName(String name) {
+        if (name.isEmpty()) {
+            return "DefaultApi";
+        }
+        name = sanitizeName(name);
+        return camelize(name) + apiNameSuffix;
+    }
+
+    @Override
+    public void setParameterExampleValue(CodegenParameter p) {
+        String type = p.baseType;
+        if (type == null) {
+            type = p.dataType;
+        }
+
+        if ("File".equals(type)) {
+            String example;
+
+            if (p.defaultValue == null) {
+                example = p.example;
+            } else {
+                example = p.defaultValue;
+            }
+
+            if (example == null) {
+                example = "/path/to/file";
+            }
+            example = "new org.springframework.core.io.FileSystemResource(new java.io.File(\"" + escapeText(example)
+                    + "\"))";
+            p.example = example;
+        } else {
+            super.setParameterExampleValue(p);
+        }
+    }
+
+    @Override
+    public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+        super.postProcessModelProperty(model, property);
+
+        // add org.springframework.format.annotation.DateTimeFormat when needed
+        if (property.isDate || property.isDateTime) {
+            model.imports.add("DateTimeFormat");
+        }
+
+        if ("null".equals(property.example)) {
+            property.example = null;
+        }
 
 		// Add imports for Jackson
 		if (!Boolean.TRUE.equals(model.isEnum)) {
 			model.imports.add("JsonProperty");
-
 			if (Boolean.TRUE.equals(model.hasEnums)) {
 				model.imports.add("JsonValue");
 			}
@@ -1421,37 +1567,47 @@ public class SpringCodegen extends AbstractJavaCodegen
 				model.imports.add("JsonCreator");
 			}
 		}
-
+        // Add imports for Jackson
+        if (!model.isEnum) {
+            model.imports.add("JsonProperty");
 		// Add imports for java.util.Arrays
 		if (property.isByteArray) {
 			model.imports.add("Arrays");
 		}
+            if (model.hasEnums) {
+                model.imports.add("JsonValue");
+            }
+        } else { // enum class
+            // Needed imports for Jackson's JsonCreator
+            if (additionalProperties.containsKey(JACKSON)) {
+                model.imports.add("JsonCreator");
+            }
+        }
 
-		if (model.getVendorExtensions().containsKey("x-jackson-optional-nullable-helpers")) {
-			model.imports.add("Arrays");
-		}
+        // Add imports for java.util.Arrays
+        if (property.isByteArray) {
+            model.imports.add("Arrays");
+        }
 
         if (model.getVendorExtensions().containsKey("x-jackson-optional-nullable-helpers")) {
             model.imports.add("Arrays");
         }
 
-        // Optional + non-nullable: always emit @JsonInclude(NON_NULL) so null fields are omitted from
-        // serialized output regardless of who deserializes on the other end — closer to spec.
-        // When openApiNullable=false, also add @JsonSetter(nulls = Nulls.SKIP) on the setter.
-        if (!property.required && !property.isNullable) {
-            model.imports.add("JsonInclude");
-            if (!openApiNullable) {
-                property.vendorExtensions.put("x-has-json-setter-nulls-skip", true);
-                model.imports.add("JsonSetter");
-                model.imports.add("Nulls");
-            }
-        }
-        // Optional + nullable with openApiNullable: emit @JsonInclude(NON_ABSENT) so that
-        // JsonNullable.undefined() is excluded from serialized output.
-        if (openApiNullable && !property.required && property.isNullable) {
-            model.imports.add("JsonInclude");
-        }
+        // Optional + non-nullable: emit @JsonSetter(nulls = ...) so an explicit null in the payload does not
+        // silently overwrite the field's default. Also honors a per-property x-jackson-json-setter-nulls override
+        // and the optionalNonNullPropertyJsonSetterNulls option; see JsonAnnotationPolicyUtils#resolveJsonSetterNulls.
+        // spring's default path never emits Nulls.FAIL (failModeSupported=false), but the option/extension can.
+        JsonAnnotationPolicyUtils.resolveJsonSetterNulls(model, property, generateJsonSetterNullsAnnotations,
+                optionalNonNullPropertyJsonSetterNulls, openApiNullable, false);
+
+        // Resolve the @JsonInclude policy into the x-jackson-json-include-policy vendor extension; see
+        // JsonAnnotationPolicyUtils#resolveJsonIncludePolicy for the full precedence/matrix rules. For spring,
+        // required properties resolve to NON_NULL when non-nullable (contract protection) and ALWAYS when
+        // nullable (explicit null is valid and must be serialized).
+        JsonAnnotationPolicyUtils.resolveJsonIncludePolicy(model, property, generateJsonIncludeAnnotations,
+                optionalNonNullPropertyJsonInclude, JsonIncludePolicy.NON_NULL, JsonIncludePolicy.ALWAYS);
     }
+
 
     @Override
     public CodegenModel fromModel(String name, Schema model) {
@@ -1468,7 +1624,7 @@ public class SpringCodegen extends AbstractJavaCodegen
         }
 
         // Only add Nullable import for non-enum models that may have nullable fields
-        if (!Boolean.TRUE.equals(codegenModel.isEnum)) {
+        if (!codegenModel.isEnum) {
             addSpringNullableImport(codegenModel.imports);
         }
 
@@ -1577,7 +1733,7 @@ public class SpringCodegen extends AbstractJavaCodegen
             if (schemaTypes.containsKey("array")) {
                 // we have a match with SSE pattern
                 // double check potential conflicting, multiple specs
-                if (schemaTypes.keySet().size() > 1) {
+                if (schemaTypes.size() > 1) {
                     throw new RuntimeException("only 1 response media type supported, when SSE is detected");
                 }
                 // double check schema format
@@ -1609,8 +1765,7 @@ public class SpringCodegen extends AbstractJavaCodegen
                 // Run through toModelName so that schemaMappings (e.g. User → com.example.MyUser)
                 // are honored: the mapped name is used both in the type arg and for import resolution.
                 String itemType = toModelName(detected.itemSchemaName);
-                String newBaseType = pagedModelClassName + "<" + itemType + ">";
-                codegenOperation.returnType = newBaseType;
+                codegenOperation.returnType = pagedModelClassName + "<" + itemType + ">";
                 codegenOperation.returnBaseType = pagedModelClassName;
                 // Clear any container flag — PagedModel is not itself a List/array
                 codegenOperation.returnContainer = null;
@@ -1657,7 +1812,7 @@ public class SpringCodegen extends AbstractJavaCodegen
                             }
                         }
                         String newArg = String.join(" ", newArgs);
-                        LOGGER.trace("new arg {} {}", newArg);
+                        LOGGER.trace("new arg {}", newArg);
                         formattedArgs.add(newArg);
                     }
                 }
@@ -1787,6 +1942,8 @@ public class SpringCodegen extends AbstractJavaCodegen
         extensions.add(VendorExtension.X_MINIMUM_MESSAGE);
         extensions.add(VendorExtension.X_MAXIMUM_MESSAGE);
         extensions.add(VendorExtension.X_SPRING_API_VERSION);
+        extensions.add(VendorExtension.X_JACKSON_JSON_INCLUDE_POLICY);
+        extensions.add(VendorExtension.X_JACKSON_JSON_SETTER_NULLS);
         return extensions;
     }
 

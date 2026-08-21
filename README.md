@@ -733,6 +733,7 @@ Here are some companies/projects (alphabetical order) using OpenAPI Generator in
 - [MailSlurp](https://www.mailslurp.com)
 - [Manticore Search](https://manticoresearch.com)
 - [Mastercard](https://developers.mastercard.com)
+- [MCP360](https://mcp360.ai/)
 - [Médiavision](https://www.mediavision.fr/)
 - [Metaswitch](https://www.metaswitch.com/)
 - [MoonVision](https://www.moonvision.io/)
@@ -1253,7 +1254,7 @@ If you want to join the committee, please kindly apply by sending an email to te
 | Bash                  | @frol (2017/07) @bkryza (2017/08) @kenjones-cisco (2017/09)                                                                                                                                                                                           |
 | C                     | @zhemant (2018/11) @ityuhui (2019/12) @michelealbano (2020/03) @eafer (2024/12)                                                                                                                                                                                        |
 | C++                   | @ravinikam (2017/07) @stkrwork (2017/07) @etherealjoy (2018/02) @martindelille (2018/03) @muttleyxd (2019/08) @aminya (2025/05)                                                                                                                                         |
-| C#                    | @mandrean (2017/08) @shibayan (2020/02) @Blackclaws (2021/03) @lucamazzanti (2021/05) @iBicha (2023/07)                                                                                                                                          |
+| C#                    | @mandrean (2017/08) @shibayan (2020/02) @Blackclaws (2021/03) @lucamazzanti (2021/05)                                                                                                                                          |
 | Clojure               |                                                                                                                                                                                                                                                       |
 | Crystal               | @cyangle (2021/01)                                                                                                                                                                                                                                    |
 | Dart                  | @jaumard (2018/09) @amondnet (2019/12) @sbu-WBT (2020/12) @kuhnroyal (2020/12) @agilob (2020/12) @ahmednfwela (2021/08)                                                                                                        |

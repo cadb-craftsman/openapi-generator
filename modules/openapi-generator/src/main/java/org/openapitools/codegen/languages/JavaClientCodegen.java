@@ -17,11 +17,16 @@
 
 package org.openapitools.codegen.languages;
 
+
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static java.util.Collections.sort;
+import static org.openapitools.codegen.CodegenConstants.USE_DEDUCTION_FOR_ONE_OF_INTERFACES;
+import static org.openapitools.codegen.CodegenConstants.USE_DEDUCTION_FOR_ONE_OF_INTERFACES_DESC;
 import static org.openapitools.codegen.CodegenConstants.X_IMPLEMENTS;
 import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
+import static org.openapitools.codegen.utils.ModelUtils.hasAnyOf;
+import static org.openapitools.codegen.utils.ModelUtils.hasOneOf;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 import java.io.File;
@@ -55,11 +60,13 @@ import org.openapitools.codegen.languages.features.PerformBeanValidationFeatures
 import org.openapitools.codegen.meta.features.DocumentationFeature;
 import org.openapitools.codegen.meta.features.GlobalFeature;
 import org.openapitools.codegen.meta.features.SecurityFeature;
+import org.openapitools.codegen.model.EnumVarMap;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.templating.mustache.CaseFormatLambda;
+import org.openapitools.codegen.utils.EnumUtils;
 import org.openapitools.codegen.utils.ProcessUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +77,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-import static java.util.Collections.sort;
-import static org.openapitools.codegen.CodegenConstants.*;
-import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
-import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 /**
  * <p>Mustache templates are located in
@@ -773,7 +773,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             // The flag below should be set for all Java libraries, but the templates need to be ported
             // one by one for each library.
             supportsAdditionalPropertiesWithComposedSchema = true;
+
         } else if (libWebClient || libWebClientCustom) {
+            supportingFiles.add(new SupportingFile("ExceptionProvider.mustache", invokerFolder, "ExceptionProvider.java"));
             forceSerializationLibrary(SERIALIZATION_LIBRARY_JACKSON);
 
             // Composed schemas can have the 'additionalProperties' keyword, as specified in JSON schema.
@@ -783,6 +785,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             // one by one for each library.
             supportsAdditionalPropertiesWithComposedSchema = true;
         } else if (libRestClient) {
+            supportingFiles.add(new SupportingFile("ExceptionProvider.mustache", invokerFolder, "ExceptionProvider.java"));
             forceSerializationLibrary(SERIALIZATION_LIBRARY_JACKSON);
             applyJakartaPackage();
 
@@ -1281,10 +1284,10 @@ public class JavaClientCodegen extends AbstractJavaCodegen
 
                         if (StringUtils.isNotEmpty(var.defaultValue)) { // has default value
                             String defaultValue = var.defaultValue.substring(var.defaultValue.lastIndexOf('.') + 1);
-                            for (Map<String, Object> enumVars : (List<Map<String, Object>>) var.getAllowableValues().get(ENUM_VARS)) {
-                                if (defaultValue.equals(enumVars.get(ENUM_NAME))) {
+                            for (EnumVarMap enumVars : EnumUtils.getEnumVars(var.allowableValues)) {
+                                if (defaultValue.equals(enumVars.getEnumName())) {
                                     // update default to use the string directly instead of enum string
-                                    var.defaultValue = (String) enumVars.get(ENUM_VALUE);
+                                    var.defaultValue = (String) enumVars.getEnumValue();
                                 }
                             }
                         }
@@ -1317,13 +1320,13 @@ public class JavaClientCodegen extends AbstractJavaCodegen
 
             cm.getVendorExtensions().putIfAbsent(X_IMPLEMENTS, new ArrayList<String>());
             if (isLibrary(JERSEY2) || isLibrary(JERSEY3) || isLibrary(NATIVE) || isLibrary(OKHTTP_GSON)) {
-                if (cm.oneOf != null && !cm.oneOf.isEmpty() && cm.oneOf.contains("ModelNull")) {
+                if (hasOneOf(cm) && cm.oneOf.contains("ModelNull")) {
                     // if oneOf contains "null" type
                     cm.isNullable = true;
                     cm.oneOf.remove("ModelNull");
                 }
 
-                if (cm.anyOf != null && !cm.anyOf.isEmpty() && cm.anyOf.contains("ModelNull")) {
+                if (hasAnyOf(cm) && cm.anyOf.contains("ModelNull")) {
                     // if anyOf contains "null" type
                     cm.isNullable = true;
                     cm.anyOf.remove("ModelNull");
@@ -1455,8 +1458,9 @@ public class JavaClientCodegen extends AbstractJavaCodegen
                     (sourceFolder + File.separator + invokerPackage).replace(".", java.io.File.separator),
                     "package-info.java"));
         }
+        String nullableAnnotation = "@" + additionalProperties.get(JAVAX_PACKAGE) + ".annotation.Nullable";
         //  nullable_var_annotations.mustache generates nullable annotations as @{{javaxPackage}}.annotation.Nullable
         // override the default pattern for the "find and replace"
-        jSpecifyNullableLambda.setNullableAnnotation("@" + additionalProperties.get(JAVAX_PACKAGE) + ".annotation.Nullable");
+        jSpecifyNullableLambda.setNullableAnnotation(nullableAnnotation);
     }
 }
