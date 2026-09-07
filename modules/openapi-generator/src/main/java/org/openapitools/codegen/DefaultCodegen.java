@@ -184,9 +184,6 @@ public class DefaultCodegen implements CodegenConfig {
     protected Map<String, String> importMapping = new HashMap<>();
     // a map to store the mapping between a schema and the new one
     protected Map<String, String> schemaMapping = new HashMap<>();
-    // a set of schema names that must be generated even when listed in schemaMappings or importMappings.
-    // Use CodegenConstants.FORCE_GENERATE_ALL_SCHEMAS ("*") to force-generate all mapped schemas.
-    protected Set<String> forcedGenerateSchemas = new HashSet<>();
     // a map to store the mapping between inline schema and the name provided by the user
     protected Map<String, String> inlineSchemaNameMapping = new HashMap<>();
     // a map to store the inline schema naming conventions
@@ -1677,11 +1674,6 @@ public class DefaultCodegen implements CodegenConfig {
     @Override
     public Map<String, String> schemaMapping() {
         return schemaMapping;
-    }
-
-    @Override
-    public Set<String> forcedGenerateSchemas() {
-        return forcedGenerateSchemas;
     }
 
     @Override
@@ -4355,9 +4347,93 @@ public class DefaultCodegen implements CodegenConfig {
      * @param discriminatorPropertyName The name of the discriminator property.
      */
     protected String getDiscriminatorPropertyType(Schema schema, String discriminatorPropertyName) {
-        return DiscriminatorUtils.getDiscriminatorPropertyType(schema, discriminatorPropertyName)
+        String type = DiscriminatorUtils.getDiscriminatorPropertyType(schema, discriminatorPropertyName)
                 .map(this::toModelName)
-                .orElseGet(() -> typeMapping.get("string"));
+                .orElse(null);
+        if (type != null) {
+            return type;
+        }
+        List<Schema> schemas = DiscriminatorUtils.getDistinctTypes(openAPI, schema, discriminatorPropertyName);
+        return getCommonSchemaType(schemas);
+    }
+
+    /**
+     * Get the most commons denominator schemaType for several schemas.
+     * <p>
+     * @param schemas  the list of schemas to compare.
+     *
+     * @Return the comman type
+     */
+    protected String getCommonSchemaType(List<Schema> schemas) {
+        switch (schemas.size()) {
+            case 0:
+                //. keep string for backward compatibility
+                return typeMapping.get("string");
+            case 1:
+
+                Schema first = schemas.get(0);
+                try {
+                    if (StringUtils.isNotEmpty(first.get$ref())) {
+                        return toModelName(ModelUtils.getSimpleRef(first.get$ref()));
+                    }
+                    if (ModelUtils.isEnumSchema(first)) {
+                        // inline enum, use the least common denominator
+                        String simpleType = typeMapping.get("enum");
+
+                        return simpleType != null? simpleType:  typeMapping.get("object");
+                    }
+                    return typeMapping.get(getPrimitiveType(first));
+                } catch (Exception e) {
+                    // fallback for some unit test misconfigurations...
+                    LOGGER.warn("Unable to model name for " + first, e);
+                    return typeMapping.get("string");
+                }
+            default:
+                break;
+        }
+
+//        boolean allRef = schemas.stream().allMatch(s -> s.get$ref() != null);
+//        if (allRef) {
+//            Set<String> modelNames = schemas.stream()
+//                    .map(s -> toModelName(ModelUtils.getSimpleRef(s.get$ref())))
+//                    .filter(Objects::nonNull)
+//                    .collect(Collectors.toSet());
+//            if (modelNames.size() == 1) {
+//                return modelNames.iterator().next();
+//            }
+//        }
+        schemas = schemas.stream().map(s -> ModelUtils.getReferencedSchema(openAPI, s)).collect(Collectors.toList());
+        return getCommonTypeMapping(schemas);
+    }
+
+    /**
+     * Find the common type between different schemas.
+     *
+     * @param schemas list of more than one schema.
+     * @return the common matching mapped type
+     */
+    protected String getCommonTypeMapping(List<Schema> schemas) {
+        String simpleType = "object";
+
+        boolean allEnums = schemas.stream().allMatch(ModelUtils::isEnumSchema);
+        if (allEnums) {
+            // non matching enums.  Use enum if if the langage can map it.
+            if (typeMapping.containsKey("enum")) {
+                simpleType = "enum";
+            }
+            return typeMapping.get(simpleType);
+        }
+        if (schemas.stream().noneMatch(ModelUtils::isEnumSchema)) {
+            Set<String> types = schemas.stream().map(this::getPrimitiveType).collect(Collectors.toSet());
+            if (types.size() == 1) {
+                String foundPrimitiveType = types.iterator().next();
+                if (typeMapping.containsKey(foundPrimitiveType)) {
+                    // matching simple type
+                    simpleType = foundPrimitiveType;
+                }
+            }
+        }
+        return typeMapping.get(simpleType);
     }
 
     /**
@@ -5347,6 +5423,8 @@ public class DefaultCodegen implements CodegenConfig {
         } else {
             op.path = path;
         }
+        // remove backslash from path, e.g. /api/v2/GetPetById\\(\\) => /api/v2/GetPetById()
+        op.path = op.path.replace("\\", "");
 
         op.summary = escapeText(operation.getSummary());
         op.unescapedNotes = operation.getDescription();
@@ -5385,6 +5463,9 @@ public class DefaultCodegen implements CodegenConfig {
                         !languageSpecificPrimitives.contains(r.baseType)) {
                     imports.add(r.baseType);
                 }
+
+                addImportMappedType(imports, r.dataType);
+                addImportMappedType(imports, r.baseType);
 
                 if ("set".equals(r.containerType) && typeMapping.containsKey(r.containerType)) {
                     op.uniqueItems = true;
@@ -5628,6 +5709,18 @@ public class DefaultCodegen implements CodegenConfig {
         op.nickname = op.operationId;
 
         return op;
+    }
+
+    /**
+     * Helper method to add an import for a data type if it exists in the importMapping.
+     *
+     * @param imports  The set of imports to add to.
+     * @param dataType The data type to check for a mapping.
+     */
+    protected void addImportMappedType(Set<String> imports, String dataType) {
+        if (imports != null && dataType != null && importMapping.containsKey(dataType)) {
+            imports.add(dataType);
+        }
     }
 
     public void SortParametersByRequiredFlag(List<CodegenParameter> parameters) {
@@ -6230,6 +6323,8 @@ public class DefaultCodegen implements CodegenConfig {
         if (codegenProperty.complexType != null) {
             imports.add(codegenProperty.complexType);
         }
+        addImportMappedType(imports, codegenParameter.dataType);
+        addImportMappedType(imports, codegenParameter.baseType);
 
         codegenParameter.pattern = toRegularExpression(parameterSchema.getPattern());
 
