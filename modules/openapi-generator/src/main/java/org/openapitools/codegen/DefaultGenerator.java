@@ -58,6 +58,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.removeStart;
@@ -117,6 +119,7 @@ public class DefaultGenerator implements Generator {
     public Generator opts(ClientOptInput opts) {
         this.opts = opts;
         this.openAPI = opts.getOpenAPI();
+        this.openAPI.setOpenapi("3.0.4");
         this.config = opts.getConfig();
 
         List<TemplateDefinition> userFiles = opts.getUserDefinedTemplates();
@@ -238,6 +241,7 @@ public class DefaultGenerator implements Generator {
 
         config.additionalProperties().put(CodegenConstants.GENERATE_APIS, generateApis);
         config.additionalProperties().put(CodegenConstants.GENERATE_MODELS, generateModels);
+
         config.additionalProperties().put(CodegenConstants.GENERATE_WEBHOOKS, generateWebhooks);
         config.additionalProperties().put(CodegenConstants.GENERATE_RECURSIVE_DEPENDENT_MODELS, generateRecursiveDependentModels);
 
@@ -416,6 +420,7 @@ public class DefaultGenerator implements Generator {
 
             File written = processTemplateToFile(models, templateName, filename, generateModelDocumentation, CodegenConstants.MODEL_DOCS);
             if (written != null) {
+            	//System.out.println("generateModelDocumentation: " + templateName + " " + docExtension + " " + suffix + " " + filename);
                 files.add(written);
                 if (config.isEnablePostProcessFile() && !dryRun) {
                     config.postProcessFile(written, "model-doc");
@@ -427,22 +432,97 @@ public class DefaultGenerator implements Generator {
     private void generateModel(List<File> files, Map<String, Object> models, String modelName) throws IOException {
         for (String templateName : config.modelTemplateFiles().keySet()) {
             File written;
-            if (config.templateOutputDirs().containsKey(templateName)) {
-                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
-                String filename = config.modelFilename(templateName, modelName, outputDir);
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
-            } else {
-                String filename = config.modelFilename(templateName, modelName);
-                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+            if(!isModelNameEnum(modelName)){
+	            if (config.templateOutputDirs().containsKey(templateName)) {
+	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+	                String filename = config.modelFilename(templateName, modelName, outputDir);
+	                //System.out.println("generateModel: " + templateName + " " + outputDir + " " + filename);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+	            } else {
+	                String filename = config.modelFilename(templateName, modelName);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+	                //System.out.println("generateModel: " + templateName + " " + filename);
+	
+	            }
+	
+	            if (written != null) {
+	                files.add(written);
+	                if (config.isEnablePostProcessFile() && !dryRun) {
+	                    config.postProcessFile(written, "model");
+	                }
+	            }
             }
+        }
+    }
+    
+    private void generateModelEnum(List<File> files, Map<String, Object> models, String modelName) throws IOException {
+        for (String templateName : config.modelTemplateFiles().keySet()) {
+            File written = null;
+            if(isModelNameEnum(modelName)){
+                String filename = config.modelEnumFilename(templateName,  modelName);
+                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+                //System.out.println("generateModelEnum: " + templateName + " " + filename);
+            }
+
             if (written != null) {
                 files.add(written);
                 if (config.isEnablePostProcessFile() && !dryRun) {
                     config.postProcessFile(written, "model");
                 }
             }
-        }
+        } 
+    }    
+    
+    private void generateModelService(List<File> files, Map<String, Object> models, String modelName) throws IOException {
+        for (String templateName : config.modelServiceTemplateFiles().keySet()) {
+            File written;
+            if(!isModelNameEnum(modelName)){
+	            if (config.templateOutputDirs().containsKey(templateName)) {
+	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+	                String filename = config.modelServiceFilename(templateName, modelName, outputDir);
+	                //System.out.println("generateModelService: " + templateName + " " + outputDir + " " + filename);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+	            } else {
+	                String filename = config.modelServiceFilename(templateName,  toModelNameBean(modelName));
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+	                //System.out.println("generateModelService: " + templateName + " " + filename);
+	            }
+	
+	            if (written != null) {
+	                files.add(written);
+	                if (config.isEnablePostProcessFile() && !dryRun) {
+	                    config.postProcessFile(written, "model");
+	                }
+	            }
+            }
+        } 
     }
+    
+    private void generateModelPersistence(List<File> files, Map<String, Object> models, String modelName) throws IOException {
+        for (String templateName : config.modelPersistenceTemplateFiles().keySet()) {
+            File written;
+            if(!isModelNameEnum(modelName)){
+	            if (config.templateOutputDirs().containsKey(templateName)) {
+	                String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+	                String filename = config.modelPersistenceFilename(templateName, modelName, outputDir);
+	                //System.out.println("generateModelPersistence: " + templateName + " " + outputDir + " " + filename);
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS, outputDir);
+	            } else {
+	                String filename = config.modelPersistenceFilename(templateName, toModelNameEntity(modelName));
+	                written = processTemplateToFile(models, templateName, filename, generateModels, CodegenConstants.MODELS);
+	                //System.out.println("generateModelPersistence: " + templateName + " " + filename);
+	            }
+	
+	            if (written != null) {
+	                files.add(written);
+	                if (config.isEnablePostProcessFile() && !dryRun) {
+	                    config.postProcessFile(written, "model");
+	                }
+	            }
+            }
+        } 
+    }
+    
 
     void generateModels(List<File> files, List<ModelMap> allModels, List<String> unusedModels, List<ModelMap> aliasModels) {
         generateModels(files, allModels, unusedModels, aliasModels, new ArrayList<>(), DefaultGenerator.this::modelKeys);
@@ -517,6 +597,8 @@ public class DefaultGenerator implements Generator {
                 schemaMap.put(name, schema);
                 ModelsMap models = processModels(config, schemaMap);
                 models.put("classname", config.toModelName(name));
+                models.put("classnameBean", toModelNameBean(name));
+                models.put("classnameEntity", toModelNameEntity(name));
                 models.putAll(config.additionalProperties());
                 allProcessedModels.put(name, models);
             } catch (Exception e) {
@@ -550,8 +632,12 @@ public class DefaultGenerator implements Generator {
 
         // generate files based on processed models
         for (String modelName : allProcessedModels.keySet()) {
+        	//System.out.println("modelName: " + modelName);
+	
             ModelsMap models = allProcessedModels.get(modelName);
+            
             models.put("modelPackage", config.modelPackage());
+
             try {
                 //don't generate models that have a schema mapping
                 if (config.schemaMapping().containsKey(modelName)) {
@@ -565,6 +651,7 @@ public class DefaultGenerator implements Generator {
                     if (modelTemplate != null && modelTemplate.getModel() != null) {
                         CodegenModel m = modelTemplate.getModel();
                         if (m.isAlias) {
+                        	System.out.println();
                             // alias to number, string, enum, etc, which should not be generated as model
                             // but aliases are still used to dereference models in some languages (such as in html2).
                             aliasModels.add(modelTemplate);  // Store aliases in the separate list.
@@ -590,6 +677,12 @@ public class DefaultGenerator implements Generator {
 
                 // to generate model files
                 generateModel(files, models, modelName);
+                
+                generateModelEnum(files, models, modelName);
+                
+                generateModelService(files, models, modelName);
+                
+                generateModelPersistence(files, models, modelName);
 
                 // to generate model test files
                 generateModelTests(files, models, modelName);
@@ -728,13 +821,22 @@ public class DefaultGenerator implements Generator {
                         .ifPresent(description -> operation.put("operationTagDescription", config.escapeText(description)));
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
+                operation.put("configPackage", config.configPackage());
                 operation.put("modelPackage", config.modelPackage());
+                operation.put("modelServicePackage", config.modelServicePackage());
+                operation.put("modelPersistencePackage", config.modelPersistencePackage());
+                operation.put("exceptionsPackage", config.exceptionsPackage());
+                operation.put("mappersPackage", config.mappersPackage());
+                operation.put("servicePackage", config.servicePackage());
+                operation.put("repositoryPackage", config.repositoryPackage());
+                operation.put("webClientsPackage", config.webClientsPackage());
                 operation.putAll(config.additionalProperties());
                 operation.put("classname", config.toApiName(tag));
                 operation.put("classVarName", config.toApiVarName(tag));
                 operation.put("importPath", config.toApiImport(tag));
                 operation.put("classFilename", config.toApiFilename(tag));
                 operation.put("strictSpecBehavior", config.isStrictSpecBehavior());
+                
                 Optional.ofNullable(openAPI.getInfo()).map(Info::getLicense).ifPresent(license -> operation.put("license", license));
                 Optional.ofNullable(openAPI.getInfo()).map(Info::getContact).ifPresent(contact -> operation.put("contact", contact));
 
@@ -777,20 +879,25 @@ public class DefaultGenerator implements Generator {
 
                 addAuthenticationSwitches(operation);
 
+                /***
+                 * @Craftsman generate classes depending in files templates
+                 * 
+                 */
+                // to generate api files
                 for (String templateName : config.apiTemplateFiles().keySet()) {
                     File written = null;
                     if (config.templateOutputDirs().containsKey(templateName)) {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.apiFilename(templateName, tag, outputDir);
                         // do not overwrite apiController file for spring server
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.APIS, outputDir);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
                         }
                     } else {
                         String filename = config.apiFilename(templateName, tag);
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.APIS);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
@@ -803,6 +910,237 @@ public class DefaultGenerator implements Generator {
                         }
                     }
                 }
+                
+                // to generate config files
+                for (String templateName : config.configTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.configFilename(templateName, tag, outputDir);
+                        // do not overwrite apiController file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.CONFIG, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.configFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.CONFIG);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "config");
+                        }
+                    }
+                }                
+                
+                // to generate mappers files
+                for (String templateName : config.mappersTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.mappersFilename(templateName, tag, outputDir);
+                        // do not overwrite service interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.mappersFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "exceptions");
+                        }
+                    }
+                }                 
+                
+                // to generate exceptions files
+                for (String templateName : config.exceptionsTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.exceptionsFilename(templateName, tag, outputDir);
+                        // do not overwrite service interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.exceptionsFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "mappers");
+                        }
+                    }
+                }                
+                
+                // to generate service files
+                for (String templateName : config.serviceTemplateFiles().keySet()) {
+                    File written = null;
+                    /*
+                    for(int i = 0; i < operation.getImportsBean().size(); i++) {
+                    	for(Map.Entry entry : operation.getImportsBean().get(i).entrySet()) {
+                    		if(entry.getKey().equals("import")) {
+                    			System.out.println("operation service: " + entry.getKey() + " , " + entry.getValue());
+                    			String oldTag = entry.getValue().toString();
+                    			String newTag = null;
+                    			System.out.println("Service oldTag: " + oldTag);
+                    			if(oldTag.contains(".dto.")) {
+                        			newTag = toModelNameBean(entry.getValue().toString().replace(".dto.", ".service."));
+                        			//System.out.println("newTag: " + newTag);
+                        			entry.setValue(newTag);
+                    			}
+                    		}
+                    	}
+                    }
+                    */
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.serviceFilename(templateName, tag, outputDir);
+                        // do not overwrite service interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.serviceFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.SERVICES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "service");
+                        }
+                    }
+                }
+                
+                // to generate repository files
+                for (String templateName : config.repositoryTemplateFiles().keySet()) {
+                	File written = null;
+                    /*
+                	for(int i = 0; i < operation.getImportsEntity().size(); i++) {
+                    	for(Map.Entry entry : operation.getImportsEntity().get(i).entrySet()) {
+                    		if(entry.getKey().equals("import")) {
+                    			System.out.println("operation repository: " + entry.getKey() + " , " + entry.getValue());
+                    			String oldTag = entry.getValue().toString();
+                    			String newTag = null;
+                    			System.out.println("Repository oldTag: " + oldTag);
+                    			if(oldTag.contains(".dto.")) {
+                        			newTag = toModelNameEntity(entry.getValue().toString().replace(".dto.", ".persistence."));
+                        			//System.out.println("newTag: " + newTag);
+                        			entry.setValue(newTag);
+                    			}
+                    		}
+                    	}
+                    }
+					*/
+
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.repositoryFilename(templateName, tag, outputDir);
+                        // do not overwrite repository interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.repositoryFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "repository");
+                        }
+                    }
+                }
+                
+                // to generate repository files
+                for (String templateName : config.repositoryMybatisTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.repositoryMybatisFilename(templateName, tag, outputDir);
+                        // do not overwrite repository interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.repositoryMybatisFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.REPOSITORIES);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "repository");
+                        }
+                    }
+                }                
+                
+                // to generate webclients files
+                for (String templateName : config.webClientsTemplateFiles().keySet()) {
+                    File written = null;
+                    if (config.templateOutputDirs().containsKey(templateName)) {
+                        String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
+                        String filename = config.webClientsFilename(templateName, tag, outputDir);
+                        // do not overwrite webclients interface file for spring server
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.WEBCLIENTS, outputDir);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    } else {
+                        String filename = config.webClientsFilename(templateName, tag);
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                            written = processTemplateToFile(operation, templateName, filename, generateApis, CodegenConstants.WEBCLIENTS);
+                        } else {
+                            LOGGER.info("Implementation file {} is not overwritten", filename);
+                        }
+                    }
+                    if (written != null) {
+                        files.add(written);
+                        if (config.isEnablePostProcessFile() && !dryRun) {
+                            config.postProcessFile(written, "webclients");
+                        }
+                    }
+                } 
 
                 // to generate api test files
                 for (String templateName : config.apiTestTemplateFiles().keySet()) {
@@ -887,7 +1225,15 @@ public class DefaultGenerator implements Generator {
                         .ifPresent(description -> operation.put("operationTagDescription", config.escapeText(description)));
                 Optional.ofNullable(config.additionalProperties().get("appVersion")).ifPresent(version -> operation.put("version", version));
                 operation.put("apiPackage", config.apiPackage());
+                operation.put("configPackage", config.configPackage());
                 operation.put("modelPackage", config.modelPackage());
+                operation.put("modelServicePackage", config.modelServicePackage());
+                operation.put("modelPersistencePackage", config.modelPersistencePackage());
+                operation.put("exceptionsPackage", config.exceptionsPackage());
+                operation.put("mappersPackage", config.mappersPackage());
+                operation.put("servicePackage", config.servicePackage());
+                operation.put("repositoryPackage", config.repositoryPackage());
+                operation.put("webClientsPackage", config.webClientsPackage());
                 operation.putAll(config.additionalProperties());
                 operation.put("classname", config.toApiName(tag));
                 operation.put("classVarName", config.toApiVarName(tag));
@@ -942,14 +1288,14 @@ public class DefaultGenerator implements Generator {
                         String outputDir = config.getOutputDir() + File.separator + config.templateOutputDirs().get(templateName);
                         String filename = config.apiFilename(templateName, tag, outputDir);
                         // do not overwrite apiController file for spring server
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateWebhooks, CodegenConstants.WEBHOOKS, outputDir);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
                         }
                     } else {
                         String filename = config.apiFilename(templateName, tag);
-                        if (apiFilePreCheck(filename, generatorCheck, templateName, templateCheck)) {
+                        if (filePreCheck(filename, generatorCheck, templateName, templateCheck)) {
                             written = processTemplateToFile(operation, templateName, filename, generateWebhooks, CodegenConstants.WEBHOOKS);
                         } else {
                             LOGGER.info("Implementation file {} is not overwritten", filename);
@@ -1009,6 +1355,12 @@ public class DefaultGenerator implements Generator {
         File apiFile = new File(filename);
         return !(apiFile.exists() && config.getName().equals(generator) && templateName.equals(apiControllerTemplate));
     }
+
+    // checking if repository interface file is already existed for spring generator
+    private boolean filePreCheck(String filename, String generator, String templateName, String template) {
+        File file = new File(filename);
+        return !(file.exists() && config.getName().equals(generator) && templateName.equals(template));
+    }      
 
     /*
      * Generate .openapi-generator-ignore if the option openapiGeneratorIgnoreFile is enabled.
@@ -1181,7 +1533,15 @@ public class DefaultGenerator implements Generator {
         bundle.put("models", allModels);
         bundle.put("aliasModels", aliasModels);
         bundle.put("apiFolder", config.apiPackage().replace('.', File.separatorChar));
+        bundle.put("configPackage", config.configPackage());
         bundle.put("modelPackage", config.modelPackage());
+        bundle.put("modelServicePackage", config.modelServicePackage());
+        bundle.put("modelPersistencePackage", config.modelPersistencePackage());
+        bundle.put("exceptionsPackage", config.exceptionsPackage());
+        bundle.put("mappersPackage", config.mappersPackage());
+        bundle.put("servicePackage", config.servicePackage());
+        bundle.put("repositoryPackage", config.repositoryPackage());
+        bundle.put("webClientsPackage", config.webClientsPackage());
         bundle.put("library", config.getLibrary());
         bundle.put("generatorLanguageVersion", config.generatorLanguageVersion());
         // todo verify support and operation bundles have access to the common variables
@@ -1420,9 +1780,18 @@ public class DefaultGenerator implements Generator {
                             case API:
                                 config.apiTemplateFiles().put(templateFile, templateExt);
                                 break;
+                            case Config:
+                                config.configTemplateFiles().put(templateFile, templateExt);
+                                break;                                
                             case Model:
                                 config.modelTemplateFiles().put(templateFile, templateExt);
                                 break;
+                            case ModelService:
+                                config.modelServiceTemplateFiles().put(templateFile, templateExt);
+                                break;
+                            case ModelPersistence:
+                                config.modelPersistenceTemplateFiles().put(templateFile, templateExt);
+                                break;                                
                             case APIDocs:
                                 config.apiDocTemplateFiles().put(templateFile, templateExt);
                                 break;
@@ -1438,6 +1807,23 @@ public class DefaultGenerator implements Generator {
                             case SupportingFiles:
                                 // excluded by filter
                                 break;
+							case Service:
+								config.serviceTemplateFiles().put(templateFile, templateExt);
+								break;
+							case ServiceTests:
+								config.serviceTestTemplateFiles().put(templateFile, templateExt);
+								break;
+                            case Repository:
+								config.repositoryTemplateFiles().put(templateFile, templateExt);
+								break;
+                            case RepositoryTests:
+								config.repositoryMybatisTemplateFiles().put(templateFile, templateExt);
+								break;
+							case WebClients:
+								config.webClientsTemplateFiles().put(templateFile, templateExt);
+								break;
+							default:
+								break;
                         }
                     });
         }
@@ -1675,10 +2061,14 @@ public class DefaultGenerator implements Generator {
 
         Map<String, String> mappings = getAllImportsMappings(allImports);
         Set<Map<String, String>> imports = toImportsObjects(mappings);
+        Set<Map<String, String>> importsBean = toImportsObjectsBean(mappings);
+        Set<Map<String, String>> importsEntity = toImportsObjectsEntity(mappings);
 
         //Some codegen implementations rely on a list interface for the imports
         operations.setImports(new ArrayList<>(imports));
-
+        operations.setImportsBean(new ArrayList<>(importsBean));
+        operations.setImportsEntity(new ArrayList<>(importsEntity));
+        
         // add a flag to indicate whether there's any {{import}}
         if (!imports.isEmpty()) {
             operations.put("hasImport", true);
@@ -1722,7 +2112,7 @@ public class DefaultGenerator implements Generator {
 
         //Some codegen implementations rely on a list interface for the imports
         operations.setImports(new ArrayList<>(imports));
-
+        
         // add a flag to indicate whether there's any {{import}}
         if (!imports.isEmpty()) {
             operations.put("hasImport", true);
@@ -1765,13 +2155,71 @@ public class DefaultGenerator implements Generator {
 
         mappedImports.forEach((key, value) -> {
             Map<String, String> im = new LinkedHashMap<>();
-            im.put("import", key);
+            im.put("import",  toImportNameEnum(key));
             im.put("classname", value);
+            //System.out.println("Dtos import: " + toImportNameEnum(key) + " classname: " + value);
             result.add(im);
         });
         return result;
     }
+    
+    /**
+     * Using an import map created via {@link #getAllImportsMappings(Set)} to build a list import objects.
+     * The import objects have two keys: import and classname which hold the key and value of the initial map entry.
+     *
+     * @param mappedImports Map of fully qualified import and import
+     * @return The set of unique imports
+     */
+    private Set<Map<String, String>> toImportsObjectsBean(Map<String, String> mappedImports) {
+        Set<Map<String, String>> result = new TreeSet<>(
+                Comparator.comparing(o -> o.get("classname"))
+        );
 
+        mappedImports.forEach((key, value) -> {
+            Map<String, String> im = new LinkedHashMap<>();
+            if(isModelNameEnum(key)) {
+                im.put("import",  toImportNameEnum(key));
+                im.put("classname", value);
+                //System.out.println("Beans import: " + toImportNameEnum(key) + " classname: " + value);
+            }else {
+                im.put("import",  toModelNameBean(toImportNameBeans(key)));
+                im.put("classname", toModelNameBean(value));
+                //System.out.println("Beans import: " + toModelNameBean(toImportNameBeans(key)) + " classname: " + toModelNameBean(value));
+            }
+            
+            result.add(im);
+        });
+        return result;
+    }    
+
+    /**
+     * Using an import map created via {@link #getAllImportsMappings(Set)} to build a list import objects.
+     * The import objects have two keys: import and classname which hold the key and value of the initial map entry.
+     *
+     * @param mappedImports Map of fully qualified import and import
+     * @return The set of unique imports
+     */
+    private Set<Map<String, String>> toImportsObjectsEntity(Map<String, String> mappedImports) {
+        Set<Map<String, String>> result = new TreeSet<>(
+                Comparator.comparing(o -> o.get("classname"))
+        );
+
+        mappedImports.forEach((key, value) -> {
+            Map<String, String> im = new LinkedHashMap<>();
+            if(isModelNameEnum(key)) {
+                im.put("import",  toImportNameEnum(key));
+                im.put("classname", value);
+                //System.out.println("Entities import: " + toImportNameEnum(key) + " classname: " + value);
+            }else {
+            	im.put("import",  toModelNameEntity(toImportNameEntity(key)));
+            	im.put("classname", toModelNameEntity(value));
+            	//System.out.println("Entities import: " + toModelNameEntity(toImportNameEntity(key)) + " classname: " + toModelNameEntity(value));
+            }
+            result.add(im);
+        });
+        return result;
+    }    
+    
     private ModelsMap processModels(CodegenConfig config, Map<String, Schema> definitions) {
         ModelsMap objs = new ModelsMap();
         objs.put("package", config.modelPackage());
@@ -1811,12 +2259,37 @@ public class DefaultGenerator implements Generator {
             }
         }
         List<Map<String, String>> imports = new ArrayList<>();
+        List<Map<String, String>> importsBean = new ArrayList<>();
+        List<Map<String, String>> importsEntity = new ArrayList<>();
+        
         for (String s : importSet) {
             Map<String, String> item = new HashMap<>();
-            item.put("import", s);
+            Map<String, String> itemBean = new HashMap<>();
+            Map<String, String> itemEntity = new HashMap<>();
+            
+            if(isModelNameEnum(s)) {
+                item.put("import", toImportNameEnum(s));
+                itemBean.put("import", toImportNameEnum(s));
+                itemEntity.put("import", toImportNameEnum(s));
+            }else {
+                item.put("import", s);
+                itemBean.put("import", toModelNameBean(toImportNameBeans(s)));
+                itemEntity.put("import", toModelNameEntity(toImportNameEntity(s)));
+            }
+
             imports.add(item);
+            importsBean.add(itemBean);
+            importsEntity.add(itemEntity);
+            
+            //System.out.println("item dto: " + item.get("import"));
+            //System.out.println("item bean: " + itemBean.get("import"));
+            //System.out.println("item entity: " + itemEntity.get("import"));
+
         }
         objs.setImports(imports);
+        objs.setImportsBean(importsBean);
+        objs.setImportsEntity(importsEntity);
+        
         config.postProcessModels(objs);
         return objs;
     }
@@ -2053,5 +2526,109 @@ public class DefaultGenerator implements Generator {
     private String removeTrailingSlash(String value) {
         return StringUtils.removeEnd(value, "/");
     }
+    
+    private boolean isModelNameDto(String name) {
+
+    	if (name.toLowerCase().contains(".dto.")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	return m.find();
+        } 
+
+        return false;
+    }
+    
+    private boolean isModelNameEnum(String name) {
+
+    	if (name.toLowerCase().contains("enum")){ 
+        	Pattern p = Pattern.compile("(?i)enum");
+        	Matcher m = p.matcher(name);
+        	return m.find();
+        } 
+
+        return false;
+    }    
+    
+    private String toModelNameBean(final String name) {
+    	String className = name;
+
+        if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Bean");
+        } else if (name.toLowerCase().contains("response")){ 
+        	Pattern p = Pattern.compile("(?i)response");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("RspBean");
+        } else if (name.toLowerCase().contains("request")){ 
+        	Pattern p = Pattern.compile("(?i)request");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("ReqBean");
+        }
+
+        return className;
+    }    
+
+    private String toModelNameEntity(final String name) {
+    	String className = name;
+
+    	if (name.toLowerCase().contains("dto")){ 
+        	Pattern p = Pattern.compile("(?i)dto");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("Entity");
+        } else if (name.toLowerCase().contains("response")){ 
+        	Pattern p = Pattern.compile("(?i)response");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("RspEntity");
+        } else if (name.toLowerCase().contains("request")){ 
+        	Pattern p = Pattern.compile("(?i)request");
+        	Matcher m = p.matcher(name);
+        	className = m.replaceAll("ReqEntity");
+        } 
+
+        return className;
+    } 
+
+    private String toImportNameEnum(String name) {
+    	String packageName = name;
+    	
+    	if(isModelNameEnum(name)) {
+        	if (name.toLowerCase().contains(".dto.")){ 
+            	Pattern p = Pattern.compile("(?i).dto.");
+            	Matcher m = p.matcher(name);
+            	packageName = m.replaceAll(".enums.");
+            } 
+    	}
+    	
+        return packageName;
+    }
+    
+    private String toImportNameBeans(String name) {
+    	String packageName = name;
+    	
+    	if(isModelNameDto(name)) {
+        	if (name.toLowerCase().contains(".dto.")){ 
+            	Pattern p = Pattern.compile("(?i).dto.");
+            	Matcher m = p.matcher(name);
+            	packageName = m.replaceAll(".service.");
+            } 
+    	}
+    	
+        return packageName;
+    } 
+    
+    private String toImportNameEntity(String name) {
+    	String packageName = name;
+    	
+    	if(isModelNameDto(name)) {
+        	if (name.toLowerCase().contains(".dto.")){ 
+            	Pattern p = Pattern.compile("(?i).dto.");
+            	Matcher m = p.matcher(name);
+            	packageName = m.replaceAll(".persistence.");
+            } 
+    	}
+    	
+        return packageName;
+    }     
 
 }
