@@ -8,11 +8,21 @@ import java.util.StringJoiner;
  */
 public enum TemplateFileType {
     API(Constants.APIS),
+    Config(Constants.CONFIG),
     Model(Constants.MODELS),
+    ModelService(Constants.MODELS_SERVICE),
+    ModelPersistence(Constants.MODELS_PERSISTENCE),
+    Exceptions(Constants.EXCEPTIONS),
+    Mappers(Constants.MAPPERS),
+    Service(Constants.SERVICES),
+    Repository(Constants.REPOSITORIES),
+    WebClients(Constants.WEBCLIENTS),
     APIDocs(Constants.API_DOCS),
     ModelDocs(Constants.MODEL_DOCS),
     APITests(Constants.API_TESTS),
     ModelTests(Constants.MODEL_TESTS),
+    ServiceTests(Constants.SERVICE_TESTS),
+    RepositoryTests(Constants.REPOSITORY_TESTS),
     SupportingFiles(Constants.SUPPORTING_FILES);
 
     private final String templateType;
@@ -57,9 +67,19 @@ public enum TemplateFileType {
 
     public static class Constants {
         public static final String APIS = "apis";
+        public static final String CONFIG = "config";
         public static final String MODELS = "models";
+        public static final String MODELS_SERVICE = "modelsService";
+        public static final String MODELS_PERSISTENCE = "modelsPersistence";
+        public static final String EXCEPTIONS = "exceptions";
+        public static final String MAPPERS = "mappers";
+        public static final String SERVICES = "services";
+        public static final String REPOSITORIES = "repositories";
+        public static final String WEBCLIENTS = "webclients";
         public static final String SUPPORTING_FILES = "supportingFiles";
         public static final String MODEL_TESTS = "modelTests";
+        public static final String SERVICE_TESTS = "serviceTests";
+        public static final String REPOSITORY_TESTS = "repositoryTests";
         public static final String MODEL_DOCS = "modelDocs";
         public static final String API_TESTS = "apiTests";
         public static final String API_DOCS = "apiDocs";

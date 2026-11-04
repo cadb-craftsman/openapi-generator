@@ -37,7 +37,7 @@ public class CodegenModel implements IJsonSchemaValidationProperties {
     // codegen returns the first one in the list, i.e. there is no obvious parent in the OpenAPI specification.
     // When possible, the mustache templates should use 'allParents' to handle multiple parents.
     @Getter @Setter
-    public String parent, parentSchema;
+    public String parent, parentSchema, parentBean, parentEntity;
     @Getter @Setter
     public List<String> interfaces;
     // The list of parent model name from the schemas. In order of preference, the parent is obtained
@@ -72,7 +72,7 @@ public class CodegenModel implements IJsonSchemaValidationProperties {
     // The name of the class is derived from the OpenAPI schema name with formatting rules applied.
     // The classname is derived from the OpenAPI schema name, with sanitization and escaping rules applied.
     @Getter @Setter
-    public String classname;
+    public String classname, classnameBean, classnameEntity;
     // The value of the 'title' attribute in the OpenAPI document.
     @Getter @Setter
     public String title;

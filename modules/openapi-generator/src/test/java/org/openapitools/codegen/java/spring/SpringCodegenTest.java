@@ -1223,7 +1223,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
@@ -1260,7 +1260,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_NAME_SUFFIX, "Controller");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -1295,7 +1295,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
 
@@ -1347,7 +1347,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -1381,7 +1381,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_TAGS, "false");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -1795,7 +1795,7 @@ public class SpringCodegenTest {
     public void testNoRequestMappingAnnotation() throws IOException {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary("spring-cloud");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.none);
 
         final Map<String, File> files = generateFiles(codegen, "src/test/resources/2_0/petstore.yaml");
@@ -2027,7 +2027,7 @@ public class SpringCodegenTest {
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, "true");
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SKIP_DEFAULT_INTERFACE, "true");
         codegen.additionalProperties().put(IMPLICIT_HEADERS, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -2059,7 +2059,7 @@ public class SpringCodegenTest {
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, "true");
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SKIP_DEFAULT_INTERFACE, "true");
         codegen.additionalProperties().put(IMPLICIT_HEADERS, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -2092,7 +2092,7 @@ public class SpringCodegenTest {
 
         codegen.additionalProperties().put(USE_TAGS, "true");
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SKIP_DEFAULT_INTERFACE, "true");
         codegen.additionalProperties().put(IMPLICIT_HEADERS, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -2212,7 +2212,7 @@ public class SpringCodegenTest {
     private void testConfigFileCommon(String documentationProvider, String destinationFile, String templateFileName) {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.additionalProperties().put(DOCUMENTATION_PROVIDER, documentationProvider);
-        codegen.additionalProperties().put(INTERFACE_ONLY, false);
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, false);
         codegen.additionalProperties().put(SpringCodegen.SPRING_CLOUD_LIBRARY, "spring-cloud");
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, false);
         codegen.additionalProperties().put(SpringCodegen.API_FIRST, false);
@@ -2827,7 +2827,7 @@ public class SpringCodegenTest {
     public void testResponseWithArray_issue11897() throws Exception {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         additionalProperties.put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         additionalProperties.put(SpringCodegen.SPRING_CONTROLLER, "true");
@@ -2852,7 +2852,7 @@ public class SpringCodegenTest {
     public void shouldGenerateMethodsWithoutUsingResponseEntityAndWithoutDelegation_issue11537() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         additionalProperties.put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         additionalProperties.put(SpringCodegen.SPRING_CONTROLLER, "true");
@@ -2966,7 +2966,7 @@ public class SpringCodegenTest {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
         additionalProperties.put(DOCUMENTATION_PROVIDER, "springdoc");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         additionalProperties.put("useSpringBoot3", false);
 
@@ -2997,7 +2997,7 @@ public class SpringCodegenTest {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
         additionalProperties.put(DOCUMENTATION_PROVIDER, "springdoc");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         additionalProperties.put(USE_SPRING_BOOT3, "true");
 
@@ -3014,7 +3014,7 @@ public class SpringCodegenTest {
     public void shouldIgnorePageableForSpringHttpInterface_issue24720() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         additionalProperties.put(USE_SPRING_BOOT3, "true");
         additionalProperties.put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -3035,7 +3035,7 @@ public class SpringCodegenTest {
         // treated as enabled. The individual page/size/sort query params must be retained and no
         // Pageable parameter added (the value must be checked, not just the key's presence).
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -3129,7 +3129,7 @@ public class SpringCodegenTest {
     public void shouldSetDefaultValueForMultipleArrayItems() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         additionalProperties.put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         additionalProperties.put(SpringCodegen.SPRING_CONTROLLER, "true");
@@ -3215,7 +3215,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_TAGS, "true");
         codegen.additionalProperties().put(BeanValidationFeatures.USE_BEANVALIDATION, "true");
 
@@ -3256,7 +3256,7 @@ public class SpringCodegenTest {
 
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "false");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "false");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -3280,7 +3280,7 @@ public class SpringCodegenTest {
 
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "false");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "false");
         codegen.additionalProperties().put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -3349,7 +3349,7 @@ public class SpringCodegenTest {
 
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -3390,7 +3390,7 @@ public class SpringCodegenTest {
 
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "false");
         codegen.additionalProperties().put(SpringCodegen.OPENAPI_NULLABLE, "false");
@@ -3421,7 +3421,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
@@ -3456,7 +3456,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
@@ -3487,7 +3487,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -3530,7 +3530,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setOutputDir(Files.createTempDirectory("collection-response-validation").toString());
         codegen.additionalProperties().put(USE_TAGS, true);
-        codegen.additionalProperties().put(INTERFACE_ONLY, true);
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, true);
         codegen.additionalProperties().put(USE_BEANVALIDATION, validation);
         codegen.additionalProperties().put(REACTIVE, reactive);
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, responseEntity);
@@ -3602,7 +3602,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -3638,7 +3638,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_BEANVALIDATION, "true");
         codegen.additionalProperties().put(SpringCodegen.PERFORM_BEANVALIDATION, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
@@ -3716,18 +3716,6 @@ public class SpringCodegenTest {
     }
 
     @Test
-    public void contractWithDeprecatedEnumGeneratesDeprecatedAnnotation() throws IOException {
-        Map<String, File> output = generateFromContract(
-                "src/test/resources/3_0/java/petstore-with-fake-endpoints-models-for-testing-okhttp-gson.yaml", SPRING_BOOT);
-
-        JavaFileAssert.assertThat(output.get("OuterEnumInteger.java"))
-                .fileContains("@Deprecated", "public enum OuterEnumInteger");
-
-        JavaFileAssert.assertThat(output.get("OuterEnum.java"))
-                .fileDoesNotContain("@Deprecated");
-    }
-
-    @Test
     public void contractWithResolvedInnerEnumContainsEnumConverter() throws IOException {
         File output = Files.createTempDirectory("test").toFile();
         output.deleteOnExit();
@@ -3762,7 +3750,7 @@ public class SpringCodegenTest {
     @Test
     public void shouldUseTheSameTagNameForTheInterfaceAndTheMethod_issue11570() throws IOException {
         final Map<String, File> output = generateFromContract(
-                "src/test/resources/bugs/issue_11570.yml", SPRING_BOOT, Map.of(INTERFACE_ONLY, "true")
+                "src/test/resources/bugs/issue_11570.yml", SPRING_BOOT, Map.of(SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         final String expectedTagName = "\"personTagWithExclamation!\"";
@@ -3953,7 +3941,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
@@ -3998,7 +3986,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
@@ -4044,7 +4032,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "false");
         codegen.additionalProperties().put(ASYNC, "true");
@@ -4083,7 +4071,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "false");
         codegen.additionalProperties().put(ASYNC, "false");
@@ -4121,7 +4109,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4159,7 +4147,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4197,7 +4185,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
@@ -4239,7 +4227,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_BEANVALIDATION, "true");
@@ -4294,7 +4282,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_ENUM_CASE_INSENSITIVE, "true");
@@ -4327,7 +4315,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_ENUM_CASE_INSENSITIVE, "false");
@@ -4360,7 +4348,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4405,7 +4393,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.toString());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4440,7 +4428,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4475,7 +4463,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4512,7 +4500,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, "api_interface");
@@ -4536,91 +4524,6 @@ public class SpringCodegenTest {
                 .containsWithName("javax.annotation.security.RolesAllowed")
                 .containsWithName("org.springframework.security.access.annotation.Secured")
                 .containsWithName("org.springframework.security.access.prepost.PreAuthorize");
-    }
-
-    @Test
-    public void testGeneratePreAuthorizeFromOAuth2Scopes() throws IOException {
-        File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
-        output.deleteOnExit();
-
-        final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/spring/preauthorize-scopes.yaml");
-        final SpringCodegen codegen = new SpringCodegen();
-        codegen.setOpenAPI(openAPI);
-        codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(USE_SPRING_SECURITY_PRE_AUTHORIZE, true);
-
-        ClientOptInput input = new ClientOptInput();
-        input.openAPI(openAPI);
-        input.config(codegen);
-
-        DefaultGenerator generator = new DefaultGenerator();
-        generator.setGenerateMetadata(false);
-        generator.setGeneratorPropertyDefault(CodegenConstants.APIS, "true");
-        generator.setGeneratorPropertyDefault(CodegenConstants.SUPPORTING_FILES, "true");
-
-        Map<String, File> files = generator.opts(input).generate().stream()
-                .collect(Collectors.toMap(File::getName, Function.identity()));
-
-        JavaFileAssert.assertThat(files.get("ApiApi.java"))
-                .assertMethod("getOverview")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("PreAuthorize", ImmutableMap.of("value",
-                        "\"hasAuthority('SCOPE_client-data:read') or hasAuthority('SCOPE_utility-data:read')\""));
-        JavaFileAssert.assertThat(files.get("ApiApi.java"))
-                .assertMethod("getCombined")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("PreAuthorize", ImmutableMap.of("value",
-                        "\"(hasAuthority('SCOPE_client-data:read') and hasAuthority('SCOPE_utility-data:read')) or hasAuthority('SCOPE_other-data:read')\""));
-        JavaFileAssert.assertThat(files.get("ApiApi.java"))
-                .assertMethod("getAuthenticated")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("PreAuthorize", ImmutableMap.of("value", "\"isAuthenticated()\""));
-        JavaFileAssert.assertThat(files.get("ApiApi.java"))
-                .assertMethod("getNormalized")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("PreAuthorize", ImmutableMap.of("value",
-                        "\"hasAuthority('SCOPE_client-data:read')\""));
-        assertThat(Files.readString(files.get("ApiApi.java").toPath()))
-                .contains("import org.springframework.security.access.prepost.PreAuthorize;")
-                .contains("@PreAuthorize(\"hasAuthority('SCOPE_client-data:read''quoted')\")");
-        assertThat(Files.readString(files.get("OpenApiGeneratorApplication.java").toPath()))
-                .contains("import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;")
-                .contains("@EnableMethodSecurity")
-                .doesNotContain("SecurityFilterChain")
-                .doesNotContain("HttpSecurity");
-        assertThat(Files.readString(files.get("pom.xml").toPath()))
-                .contains("<artifactId>spring-boot-starter-security</artifactId>")
-                .doesNotContain("<artifactId>spring-security-config</artifactId>");
-    }
-
-    @Test
-    public void testGeneratePreAuthorizeWithCustomAuthorityPrefix() throws IOException {
-        File output = Files.createTempDirectory("test").toFile().getCanonicalFile();
-        output.deleteOnExit();
-
-        final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/spring/preauthorize-scopes.yaml");
-        final SpringCodegen codegen = new SpringCodegen();
-        codegen.setOpenAPI(openAPI);
-        codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(USE_SPRING_SECURITY_PRE_AUTHORIZE, true);
-        codegen.additionalProperties().put(SPRING_SECURITY_AUTHORITY_PREFIX, "PERMISSION_");
-
-        ClientOptInput input = new ClientOptInput();
-        input.openAPI(openAPI);
-        input.config(codegen);
-
-        DefaultGenerator generator = new DefaultGenerator();
-        generator.setGenerateMetadata(false);
-        generator.setGeneratorPropertyDefault(CodegenConstants.APIS, "true");
-
-        Map<String, File> files = generator.opts(input).generate().stream()
-                .collect(Collectors.toMap(File::getName, Function.identity()));
-
-        JavaFileAssert.assertThat(files.get("ApiApi.java"))
-                .assertMethod("getOverview")
-                .assertMethodAnnotations()
-                .containsWithNameAndAttributes("PreAuthorize", ImmutableMap.of("value",
-                        "\"hasAuthority('PERMISSION_client-data:read') or hasAuthority('PERMISSION_utility-data:read')\""));
     }
 
     @Test
@@ -5654,7 +5557,7 @@ public class SpringCodegenTest {
     public void multiLineOperationDescription() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(DOCUMENTATION_PROVIDER, DocumentationProvider.SPRINGDOC.name());
 
         Map<String, File> files = generateFromContract("src/test/resources/3_0/spring/issue12474-multiline-description.yaml", SPRING_BOOT, additionalProperties);
@@ -5668,7 +5571,7 @@ public class SpringCodegenTest {
     public void multiLineTagDescription() throws IOException {
         Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(SpringCodegen.USE_TAGS, "true");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         additionalProperties.put(DOCUMENTATION_PROVIDER, DocumentationProvider.SPRINGDOC.name());
 
         Map<String, File> files = generateFromContract("src/test/resources/3_0/spring/issue12474-multiline-description.yaml", SPRING_BOOT, additionalProperties);
@@ -5690,7 +5593,7 @@ public class SpringCodegenTest {
 
         codegen.additionalProperties().put(SSE, "true");
         codegen.additionalProperties().put(REACTIVE, "true");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "false");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
 
         ClientOptInput input = new ClientOptInput();
@@ -5750,7 +5653,7 @@ public class SpringCodegenTest {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.REACTIVE, "true");
 
         ClientOptInput input = new ClientOptInput();
@@ -5777,7 +5680,7 @@ public class SpringCodegenTest {
 
         final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/spring/petstore-with-tags.yaml");
         final SpringCodegen codegen = new SpringCodegen();
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
 
@@ -5800,7 +5703,7 @@ public class SpringCodegenTest {
     @Test
     public void testUrlEncodedFormArraysUseRequestParam() throws IOException {
         final Map<String, File> files = generateFromContract("src/test/resources/3_0/spring/issue_14866.yaml", SPRING_BOOT,
-                Map.of(INTERFACE_ONLY, "true"));
+                Map.of(SpringCodegen.INTERFACE_ONLY, "true"));
         JavaFileAssert.assertThat(files.get("IssueApi.java"))
                 .assertMethod("reproduceIssue", "List<String>", "List<String>")
                 .assertParameter("listOfStrings").hasType("List<String>")
@@ -5815,7 +5718,7 @@ public class SpringCodegenTest {
     @Test
     public void testAllArgsConstructor_16797() throws IOException {
         final Map<String, File> output = generateFromContract("src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 codegen -> codegen.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", "false"));
         JavaFileAssert.assertThat(output.get("Object4.java"))
                 .assertConstructor("String", "Type1", "String", "String", "Boolean")
@@ -5830,7 +5733,7 @@ public class SpringCodegenTest {
     @Test
     public void testAllArgsConstructor_16797_REFACTOR_ALLOF_WITH_PROPERTIES_ONLY() throws IOException {
         final Map<String, File> output = generateFromContract("src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 codegen -> codegen.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", "true"));
         JavaFileAssert.assertThat(output.get("Object4.java"))
                 .assertConstructor("String", "Type1", "String", "String", "Boolean")
@@ -5844,7 +5747,7 @@ public class SpringCodegenTest {
     @Test
     public void testMultiInheritanceParentRequiredParams_issue16797() throws IOException {
         final Map<String, File> output = generateFromContract(
-                "src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT, Map.of(INTERFACE_ONLY, "true")
+                "src/test/resources/3_0/spring/issue_16797.yaml", SPRING_BOOT, Map.of(SpringCodegen.INTERFACE_ONLY, "true")
         );
         // constructor should as
         //       public Object4(Type1 pageInfo, String responseType, String requestId, Boolean success) {
@@ -5862,7 +5765,7 @@ public class SpringCodegenTest {
     @Test
     public void testMultiInheritanceParentRequiredParams_issue15796() throws IOException {
         final Map<String, File> output = generateFromContract(
-                "src/test/resources/3_0/spring/issue_15796.yaml", SPRING_BOOT, Map.of(INTERFACE_ONLY, "true")
+                "src/test/resources/3_0/spring/issue_15796.yaml", SPRING_BOOT, Map.of(SpringCodegen.INTERFACE_ONLY, "true")
         );
         // constructor should as this
         //public Poodle(String race, String type) {
@@ -5878,7 +5781,7 @@ public class SpringCodegenTest {
     @Test
     public void testAllArgsConstructor_defaultOrder_15796() throws IOException {
         final Map<String, File> output = generateFromContract("src/test/resources/3_0/spring/issue_15796.yaml", SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 config -> config.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", " true"));
         // constructors should as this
         //public Poodle(String race, String type) {
@@ -5906,7 +5809,7 @@ public class SpringCodegenTest {
     @Test
     public void generateAllArgsConstructor() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/java/all_args_constructor.yaml", null,
-                Map.of(AbstractJavaCodegen.GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, INTERFACE_ONLY, "true"),
+                Map.of(AbstractJavaCodegen.GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, Boolean.TRUE, SpringCodegen.INTERFACE_ONLY, "true"),
                 codegenConfig -> codegenConfig.addOpenapiNormalizer("REFACTOR_ALLOF_WITH_PROPERTIES_ONLY", " true"));
         JavaFileAssert.assertThat(files.get("Pet.java"))
                 .assertConstructor("String")
@@ -5941,7 +5844,7 @@ public class SpringCodegenTest {
                 SPRING_BOOT,
                 Map.of(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.AllArgsConstructor",
                         CodegenConstants.OPENAPI_NULLABLE, "false",
-                        INTERFACE_ONLY, "true")
+                        SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         // lombok generates Pet(Long, String), a generated one would be a duplicate
@@ -5962,7 +5865,7 @@ public class SpringCodegenTest {
                 SPRING_BOOT,
                 Map.of(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.AllArgsConstructor",
                         CodegenConstants.OPENAPI_NULLABLE, "true",
-                        INTERFACE_ONLY, "true")
+                        SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         // the field is JsonNullable<String> but the generated parameter is String, so lombok's constructor differs
@@ -5977,7 +5880,7 @@ public class SpringCodegenTest {
                 SPRING_BOOT,
                 Map.of(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.AllArgsConstructor",
                         CodegenConstants.OPENAPI_NULLABLE, "false",
-                        INTERFACE_ONLY, "true")
+                        SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         // lombok only covers the own field, the generated constructor also takes the inherited one
@@ -5997,7 +5900,7 @@ public class SpringCodegenTest {
                 SPRING_BOOT,
                 Map.of(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.AllArgsConstructor",
                         CodegenConstants.OPENAPI_NULLABLE, "false",
-                        INTERFACE_ONLY, "true")
+                        SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         // the additionalProperties map is a field too, so lombok's constructor takes it as a third parameter
@@ -6011,7 +5914,7 @@ public class SpringCodegenTest {
         Map<String, File> output = generateFromContract(
                 "src/test/resources/3_0/allOfDuplicatedProperties.yaml",
                 SPRING_BOOT,
-                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true, INTERFACE_ONLY, "true")
+                Map.of(GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true, SpringCodegen.INTERFACE_ONLY, "true")
         );
 
         JavaFileAssert.assertThat(output.get("ModelC.java"))
@@ -6022,7 +5925,7 @@ public class SpringCodegenTest {
     public void testLombokAnnotations() throws IOException {
         final Map<String, Object> additionalProperties = new HashMap<>();
         additionalProperties.put(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Data;@lombok.NoArgsConstructor;@lombok.AllArgsConstructor");
-        additionalProperties.put(INTERFACE_ONLY, "true");
+        additionalProperties.put(SpringCodegen.INTERFACE_ONLY, "true");
         Map<String, File> output = generateFromContract("src/test/resources/3_0/petstore.yaml", SPRING_BOOT, additionalProperties);
         JavaFileAssert.assertThat(output.get("Pet.java"))
                 .hasNoConstructor()
@@ -6079,7 +5982,7 @@ public class SpringCodegenTest {
                 specPath,
                 SPRING_BOOT,
                 Map.of(
-                        INTERFACE_ONLY, "true",
+                		SpringCodegen.INTERFACE_ONLY, "true",
                         CodegenConstants.HIDE_GENERATION_TIMESTAMP, "true"
                 )
         );
@@ -6087,7 +5990,7 @@ public class SpringCodegenTest {
                 specPath,
                 SPRING_BOOT,
                 Map.of(
-                        INTERFACE_ONLY, "true",
+                		SpringCodegen.INTERFACE_ONLY, "true",
                         CodegenConstants.HIDE_GENERATION_TIMESTAMP, "true",
                         AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Getter;@lombok.Setter"
                 )
@@ -6096,7 +5999,7 @@ public class SpringCodegenTest {
                 specPath,
                 SPRING_BOOT,
                 Map.of(
-                        INTERFACE_ONLY, "true",
+                		SpringCodegen.INTERFACE_ONLY, "true",
                         CodegenConstants.HIDE_GENERATION_TIMESTAMP, "true",
                         AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Getter"
                 )
@@ -6105,7 +6008,7 @@ public class SpringCodegenTest {
                 specPath,
                 SPRING_BOOT,
                 Map.of(
-                        INTERFACE_ONLY, "true",
+                		SpringCodegen.INTERFACE_ONLY, "true",
                         CodegenConstants.HIDE_GENERATION_TIMESTAMP, "true",
                         AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Setter"
                 )
@@ -6114,7 +6017,7 @@ public class SpringCodegenTest {
                 specPath,
                 SPRING_BOOT,
                 Map.of(
-                        INTERFACE_ONLY, "true",
+                		SpringCodegen.INTERFACE_ONLY, "true",
                         CodegenConstants.HIDE_GENERATION_TIMESTAMP, "true",
                         AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Data"
                 )
@@ -6395,7 +6298,7 @@ public class SpringCodegenTest {
                         GENERATE_BUILDERS, true,
                         SpringCodegen.OPENAPI_NULLABLE, false,
                         SpringCodegen.USE_OPTIONAL, false,
-                        INTERFACE_ONLY, "true"
+                        SpringCodegen.INTERFACE_ONLY, "true"
                 )
         );
 
@@ -6424,7 +6327,7 @@ public class SpringCodegenTest {
                         GENERATE_BUILDERS, true,
                         SpringCodegen.OPENAPI_NULLABLE, true,
                         SpringCodegen.USE_OPTIONAL, true,
-                        INTERFACE_ONLY, "true"
+                        SpringCodegen.INTERFACE_ONLY, "true"
                 )
         );
 
@@ -6454,7 +6357,7 @@ public class SpringCodegenTest {
         SpringCodegen codegen = new SpringCodegen();
         codegen.setLibrary(SPRING_CLOUD_LIBRARY);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "xyz.model");
         codegen.additionalProperties().put(CodegenConstants.API_NAME_SUFFIX, "Controller");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "xyz.controller");
@@ -6932,7 +6835,7 @@ public class SpringCodegenTest {
 
         final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/spring/issue_9530.yaml");
         final SpringCodegen codegen = new SpringCodegen();
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(SpringCodegen.USE_OPTIONAL, "true");
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
@@ -7147,7 +7050,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
         codegen.setLibrary("spring-boot");
 
-        codegen.additionalProperties().put(INTERFACE_ONLY, "false");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(SPRING_CONTROLLER, "true");
         codegen.additionalProperties().put(RETURN_SUCCESS_CODE, "true");
@@ -7624,7 +7527,7 @@ public class SpringCodegenTest {
         codegen.setOutputDir(output.getAbsolutePath());
 
         codegen.additionalProperties().put(SpringCodegen.DATE_LIBRARY, "java8-localdatetime");
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(USE_RESPONSE_ENTITY, "false");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(USE_BEANVALIDATION, "true");
@@ -7670,7 +7573,7 @@ public class SpringCodegenTest {
         final SpringCodegen codegen = new SpringCodegen();
         codegen.setOpenAPI(openAPI);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(CodegenConstants.GENERATE_ALIAS_AS_MODEL, "true");
 
         ClientOptInput input = new ClientOptInput();
@@ -8082,29 +7985,26 @@ public class SpringCodegenTest {
     @DataProvider(name = "jspecifyLibraries")
     public Object[][] jspecifyLibraries() {
         return new Object[][]{
-                {SPRING_BOOT, 2},
-                {SPRING_BOOT, 3},
-                {SPRING_BOOT, 4},
-                {SPRING_CLOUD_LIBRARY, 2},
-                {SPRING_CLOUD_LIBRARY, 3},
-                {SPRING_CLOUD_LIBRARY, 4},
-                {SPRING_HTTP_INTERFACE, 3},
-                {SPRING_HTTP_INTERFACE, 4}
+                {SPRING_BOOT, 2, "FooApi.java"},
+                {SPRING_BOOT, 3, "FooApi.java"},
+                {SPRING_BOOT, 4, "FooApi.java"},
+                {SPRING_CLOUD_LIBRARY, 2, "FooApi.java"},
+                {SPRING_CLOUD_LIBRARY, 3, "FooApi.java"},
+                {SPRING_CLOUD_LIBRARY, 4, "FooApi.java"},
+                {SPRING_HTTP_INTERFACE, 3, "DefaultApi.java"},
+                {SPRING_HTTP_INTERFACE, 4, "DefaultApi.java"}
         };
     }
 
     @Test(dataProvider = "jspecifyLibraries")
-    public void testJspecify(String library, int springBootVersion) throws IOException {
+    public void testJspecify(String library, int springBootVersion, String fooApiFilename) throws IOException {
         String springVersionProperty = springBootVersion == 4? USE_SPRING_BOOT4: USE_SPRING_BOOT3;
         final Map<String, File> files = generateFromContract("src/test/resources/3_0/java/jspecify.yaml", library,
                 Map.of(USE_JSPECIFY, true,
                         CONTAINER_DEFAULT_TO_NULL, true,
                         SpringCodegen.OPENAPI_NULLABLE, false,
                         USE_BEANVALIDATION, true,
-                        GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true,
-                        GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS, true,
-                        INTERFACE_ONLY, false,
-                        GENERATE_BUILDERS, true,
+                        SpringCodegen.INTERFACE_ONLY, false,
                         springVersionProperty, springBootVersion > 2
                 ),
                 codegenConfigurator ->
@@ -8128,224 +8028,15 @@ public class SpringCodegenTest {
                 .fileContains(
                         "private java.time.@Nullable Instant dt;",
                         "private org.springframework.core.io.@Nullable Resource binary",
-                        "setBinary(org.springframework.core.io.@Nullable Resource binary)",
-                        "public Foo(java.time.@Nullable Instant dt, java.time.@Nullable Instant nullableDt, org.springframework.core.io.@Nullable Resource binary, org.springframework.core.io.@Nullable Resource nullableBinary, @Nullable List<java.time.Instant> listOfDt, @Nullable List<java.time.Instant> listMinIntems, @Nullable List<java.time.Instant> nullableListMinIntems, java.time.Instant requiredDt, @Nullable BigDecimal number, @Nullable BigDecimal nullableNumber, @Nullable String color, String requiredColor, @Nullable String nullableColor) {",
-                        "Foo listOfDt(@Nullable List<java.time.Instant> listOfDt) {",
-                        "private @Nullable String color = \"red\";",
-                        "public @Nullable String getColor() {",
-                        "public void setColor(@Nullable String color) {",
-                        "Foo color(@Nullable String color) {",
-                        "private String toIndentedString(@Nullable Object o)",
-                        "Foo.Builder dt(java.time.@Nullable Instant dt)",
-                        "Foo.Builder requiredDt(java.time.Instant requiredDt)",
-                        "Foo.Builder nullableNumber(@Nullable BigDecimal nullableNumber)"
-                ).fileDoesNotContain(
-                        "javax.annotation.Nullable",
-                        "jakarta.annotation.Nullable")
-                .assertMethod("getRequiredDt").assertMethodAnnotations().containsWithName("NotNull").containsWithName("Valid");
-        JavaFileAssert.assertThat(files.get("FooApi.java"))
-                .assertTypeAnnotations().doesImportAnnotation("org.jspecify.annotations.Nullable").toType()
-                .fileContains(
-                        "java.time.@Nullable Instant dtParam",
-                        "java.time.@Nullable Instant dtQuery",
-                        "java.time.@Nullable Instant dtCookie",
-                        " @RequestParam(value = \"color\", required = false, defaultValue = \"red\") String color"
+                        "setBinary(org.springframework.core.io.@Nullable Resource binary)"
                 );
-        JavaFileAssert.assertThat(files.get("RequiredAndNullable.java"))
-                .fileContains(
-                        "private @Nullable String str = null;",
-                        "private @Nullable List<String> _list;",
-                        "RequiredAndNullable(@Nullable String str, org.springframework.core.io.@Nullable Resource file, @Nullable String color, String onlyRequired, @Nullable List<String> _list)",
-                        "@Nullable String getStr()",
-                        "void setStr(@Nullable String str)",
-                        "RequiredAndNullable str(@Nullable String str)",
-                        "RequiredAndNullable.Builder str(@Nullable String str)"
-                )
-                .assertMethod("getStr").assertMethodAnnotations().doesNotContainWithName("NotNull");
-        if (!library.equals(SPRING_HTTP_INTERFACE)) {
-            // SPRING_HTTP_INTERFACE does not support @Schema generation (yet)
-            JavaFileAssert.assertThat(files.get("RequiredAndNullable.java"))
-                    .fileContains(
-                            "@Schema(name = \"str\", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true)");
-        }
-        JavaFileAssert.assertThat(files.get("FileContent.java"))
-                .fileContains("VirusScanEnum getVirusScan()");
-        JavaFileAssert.assertThat(files.get("api/package-info.java"))
-                .fileContains("@org.jspecify.annotations.NullMarked");
-        JavaFileAssert.assertThat(files.get("model/package-info.java"))
-                .fileContains("@org.jspecify.annotations.NullMarked");
-
-        if (SPRING_BOOT.equals(library)) {
-            // Nullable annotation is not (yet) put on NativeWebRequest, but still present as import when useJspecify=true
-            JavaFileAssert.assertThat(files.get("UploadApiController.java").toPath())
-                    .assertTypeAnnotations()
-                    .doesNotContainWithName("Nullable")
-                    .doesImportAnnotation("org.jspecify.annotations.Nullable");
-        }
-    }
-
-    @Test(dataProvider = "jspecifyLibraries")
-    public void testJspecify_openapiNullable(String library, int springBootVersion) throws IOException {
-        String springVersionProperty = springBootVersion == 4? USE_SPRING_BOOT4: USE_SPRING_BOOT3;
-        final Map<String, File> files = generateFromContract("src/test/resources/3_0/java/jspecify.yaml", library,
-                Map.of(USE_JSPECIFY, true,
-                        CONTAINER_DEFAULT_TO_NULL, true,
-                        USE_BEANVALIDATION, true,
-                        GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true,
-                        GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS, true,
-                        CodegenConstants.OPENAPI_NULLABLE, true,
-                        INTERFACE_ONLY, false,
-                        GENERATE_BUILDERS, true,
-                        springVersionProperty, springBootVersion > 2
-                ),
-                codegenConfigurator ->
-                        codegenConfigurator
-                                .addTypeMapping("OffsetDateTime", "java.time.Instant"));
-
-        if (springBootVersion == 4) {
-            assertThat(files.get("pom.xml")).content()
-                    .doesNotContain("jspecify")
-                    .doesNotContain("findbugs");
-        } else {
-            assertThat(files.get("pom.xml")).content()
-                    .contains(
-                            "<groupId>org.jspecify</groupId>",
-                            "<artifactId>jspecify</artifactId>",
-                            "<version>1.0.0</version>")
-                    .doesNotContain("findbugs");
-        }
-        JavaFileAssert.assertThat(files.get("Foo.java"))
-                .assertTypeAnnotations().doesImportAnnotation("org.jspecify.annotations.Nullable").toType()
-                .fileContains(
-                        "private java.time.@Nullable Instant dt;",
-                        "private org.springframework.core.io.@Nullable Resource binary",
-                        "setBinary(org.springframework.core.io.@Nullable Resource binary)",
-                        "Foo nullableDt(java.time.@Nullable Instant nullableDt) {",
-                        "private @Nullable String color = \"red\";",
-                        "public Foo color(@Nullable String color) {",
-                        "public @Nullable String getColor() {",
-                        "public Foo(java.time.@Nullable Instant dt, java.time.@Nullable Instant nullableDt, org.springframework.core.io.@Nullable Resource binary, org.springframework.core.io.@Nullable Resource nullableBinary, @Nullable List<java.time.Instant> listOfDt, @Nullable List<java.time.Instant> listMinIntems, @Nullable List<java.time.Instant> nullableListMinIntems, java.time.Instant requiredDt, @Nullable BigDecimal number, @Nullable BigDecimal nullableNumber, @Nullable String color, String requiredColor, @Nullable String nullableColor) {",
-                        "Foo.Builder dt(java.time.@Nullable Instant dt)",
-                        "Foo.Builder requiredDt(java.time.Instant requiredDt)",
-                        "Foo.Builder nullableNumber(@Nullable BigDecimal nullableNumber)",
-                        "Foo.Builder nullableNumber(JsonNullable<BigDecimal> nullableNumber)"
-                ).fileDoesNotContain(
-                        "javax.annotation.Nullable",
-                        "jakarta.annotation.Nullable")
-                .assertMethod("getRequiredDt").assertMethodAnnotations().containsWithName("NotNull").containsWithName("Valid");
-        JavaFileAssert.assertThat(files.get("FooApi.java"))
+        JavaFileAssert.assertThat(files.get(fooApiFilename))
                 .assertTypeAnnotations().doesImportAnnotation("org.jspecify.annotations.Nullable").toType()
                 .fileContains(
                         "java.time.@Nullable Instant dtParam",
                         "java.time.@Nullable Instant dtQuery",
                         "java.time.@Nullable Instant dtCookie"
                 );
-        JavaFileAssert.assertThat(files.get("RequiredAndNullable.java"))
-                .fileContains(
-                        "private JsonNullable<String> str = JsonNullable.<String>undefined();",
-                        "private JsonNullable<List<String>> _list = JsonNullable.<List<String>>undefined();",
-                        "RequiredAndNullable(@Nullable String str, org.springframework.core.io.@Nullable Resource file, @Nullable String color, String onlyRequired, @Nullable List<String> _list)",
-                        "JsonNullable<String> getStr()",
-                        "void setStr(JsonNullable<String> str)",
-                        "RequiredAndNullable str(@Nullable String str)",
-                        "RequiredAndNullable.Builder str(@Nullable String str)",
-                        " /* @Present */"
-                ).assertMethod("getStr").assertMethodAnnotations().doesNotContainWithName("NotNull");
-        JavaFileAssert.assertThat(files.get("api/package-info.java"))
-                .fileContains("@org.jspecify.annotations.NullMarked");
-        JavaFileAssert.assertThat(files.get("model/package-info.java"))
-                .fileContains("@org.jspecify.annotations.NullMarked");
-
-        if (SPRING_BOOT.equals(library)) {
-            // Nullable annotation is not (yet) put on NativeWebRequest, but still present as import when useJspecify=true
-            JavaFileAssert.assertThat(files.get("UploadApiController.java").toPath())
-                    .assertTypeAnnotations()
-                    .doesNotContainWithName("Nullable")
-                    .doesImportAnnotation("org.jspecify.annotations.Nullable");
-        }
-    }
-
-    @DataProvider(name = "jspecifyLibrariesUseOptional")
-    public Object[][] jspecifyLibrariesUseOptional() {
-        return new Object[][]{
-                {SPRING_BOOT, 4, false},
-                {SPRING_BOOT, 4, true},
-                {SPRING_CLOUD_LIBRARY, 3, false},
-                {SPRING_CLOUD_LIBRARY, 3, true},
-                {SPRING_HTTP_INTERFACE, 4, false},
-                {SPRING_HTTP_INTERFACE, 4, true}
-        };
-    }
-    @Test(dataProvider = "jspecifyLibrariesUseOptional")
-    public void testJspecify_useOptional(String library, int springBootVersion, boolean optionalAcceptNullable) throws IOException {
-        String springVersionProperty = springBootVersion == 4? USE_SPRING_BOOT4: USE_SPRING_BOOT3;
-        final Map<String, File> files = generateFromContract("src/test/resources/3_0/java/jspecify.yaml", library,
-                Map.of(USE_JSPECIFY, true,
-                        CONTAINER_DEFAULT_TO_NULL, true,
-                        USE_BEANVALIDATION, true,
-                        GENERATE_CONSTRUCTOR_WITH_ALL_ARGS, true,
-                        GENERATE_CONSTRUCTOR_WITH_REQUIRED_ARGS, true,
-                        SpringCodegen.USE_OPTIONAL, true,
-                        OPTIONAL_ACCEPT_NULLABLE, optionalAcceptNullable,
-                        INTERFACE_ONLY, false,
-                        GENERATE_BUILDERS, true,
-                        springVersionProperty, springBootVersion > 2
-                ),
-                codegenConfigurator ->
-                        codegenConfigurator
-                                .addTypeMapping("OffsetDateTime", "java.time.Instant"));
-
-        if (springBootVersion == 4) {
-            assertThat(files.get("pom.xml")).content()
-                    .doesNotContain("jspecify")
-                    .doesNotContain("findbugs");
-        } else {
-            assertThat(files.get("pom.xml")).content()
-                    .contains(
-                            "<groupId>org.jspecify</groupId>",
-                            "<artifactId>jspecify</artifactId>",
-                            "<version>1.0.0</version>")
-                    .doesNotContain("findbugs");
-        }
-        JavaFileAssert fooAssert = JavaFileAssert.assertThat(files.get("Foo.java"));
-        fooAssert
-                .assertTypeAnnotations().doesImportAnnotation("org.jspecify.annotations.Nullable").toType()
-                .fileContains(
-                        "private Optional<java.time.Instant> dt = Optional.empty()",
-                        "private JsonNullable<org.springframework.core.io.Resource> nullableBinary = JsonNullable.<org.springframework.core.io.Resource>undefined();",
-                        "setBinary(Optional<org.springframework.core.io.Resource> binary)",
-                        "public Foo(java.time.@Nullable Instant dt, java.time.@Nullable Instant nullableDt, org.springframework.core.io.@Nullable Resource binary, org.springframework.core.io.@Nullable Resource nullableBinary, @Nullable List<java.time.Instant> listOfDt, @Nullable List<java.time.Instant> listMinIntems, @Nullable List<java.time.Instant> nullableListMinIntems, java.time.Instant requiredDt, @Nullable BigDecimal number, @Nullable BigDecimal nullableNumber, @Nullable String color, String requiredColor, @Nullable String nullableColor) {",
-                        "Foo.Builder requiredDt(java.time.Instant requiredDt)",
-                        "Foo.Builder nullableNumber(JsonNullable<BigDecimal> nullableNumber)"
-                ).fileDoesNotContain(
-                        "javax.annotation.Nullable",
-                        "jakarta.annotation.Nullable")
-                .assertMethod("getRequiredDt").assertMethodAnnotations().containsWithName("NotNull").containsWithName("Valid");
-        if (optionalAcceptNullable) {
-            fooAssert.fileContains(
-                    "Foo dt(java.time.@Nullable Instant dt) {\n    this.dt = Optional.ofNullable(dt);",
-                    "Foo.Builder dt(java.time.@Nullable Instant dt) {");
-        } else {
-            fooAssert.fileContains(
-                    "Foo dt(java.time.Instant dt) {\n    this.dt = Optional.of(dt);",
-                    "Foo.Builder dt(java.time.Instant dt) {");
-        }
-        JavaFileAssert.assertThat(files.get("FooApi.java"))
-                .assertTypeAnnotations().doesImportAnnotation("org.jspecify.annotations.Nullable").toType()
-                .fileContains(
-                        "Optional<java.time.Instant> dtParam",
-                        "Optional<java.time.Instant> dtQuery",
-                        "Optional<java.time.Instant> dtCookie"
-                );
-        JavaFileAssert.assertThat(files.get("RequiredAndNullable.java"))
-                .fileContains(
-                        "private JsonNullable<String> str = JsonNullable.<String>undefined();",
-                        "RequiredAndNullable(@Nullable String str, org.springframework.core.io.@Nullable Resource file, @Nullable String color, String onlyRequired, @Nullable List<String> _list)",
-                        "JsonNullable<String> getStr()",
-                        "void setStr(JsonNullable<String> str)",
-                        "RequiredAndNullable str(@Nullable String str)",
-                        "RequiredAndNullable.Builder str(@Nullable String str)"
-                ).assertMethod("getStr").assertMethodAnnotations().doesNotContainWithName("NotNull");
         JavaFileAssert.assertThat(files.get("api/package-info.java"))
                 .fileContains("@org.jspecify.annotations.NullMarked");
         JavaFileAssert.assertThat(files.get("model/package-info.java"))
@@ -8367,7 +8058,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedDetectsAllThreeParams() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8384,7 +8075,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedResolvesOas31ReferencedParameters() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8416,7 +8107,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedManualFalseTakesPrecedence() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8433,7 +8124,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedCaseSensitiveMatching() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8450,7 +8141,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedNoDetectionWhenMissingPage() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8467,7 +8158,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedNoDetectionWhenMissingSize() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8484,7 +8175,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedNoDetectionWhenMissingSort() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8501,7 +8192,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedWorksForSpringCloud_issue24720() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8522,7 +8213,7 @@ public class SpringCodegenTest {
         // parameter (Feign supports it via PageableSpringEncoder), and the matching page/size/sort
         // query params (#8315) are removed.
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.DOCUMENTATION_PROVIDER, "springdoc");
 
         Map<String, File> files = generateFromContract(
@@ -8544,7 +8235,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedDisabledByDefault() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         // NOT setting AUTO_X_SPRING_PAGINATED (defaults to false)
@@ -8561,7 +8252,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedWorksWithManualTrue() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8578,7 +8269,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedNoParamsDoesNotDetect() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "true");
@@ -8595,7 +8286,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedPageSizeMode_detectsPageAndSizeOnlyOperation() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "page-size");
@@ -8614,7 +8305,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedPageSizeMode_alsoDetectsPageSizeAndSortOperation() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "page-size");
@@ -8699,7 +8390,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationAddsAnnotationAndGeneratesFile() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8723,7 +8414,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationUsesJavaArraySyntax() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8740,7 +8431,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationWithAutoDetect() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8760,7 +8451,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationNotAppliedWhenNoSortEnum() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8780,7 +8471,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationWorksForArraySortEnum() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8807,7 +8498,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationWorksForArraySortRefEnum() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8833,7 +8524,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationWorksForExternalParamRefArraySort() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8860,7 +8551,7 @@ public class SpringCodegenTest {
     @Test
     public void generateSortValidationWorksForNonExplodedExternalParamRefArraySort() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8891,7 +8582,7 @@ public class SpringCodegenTest {
     @Test
     public void generatePageableConstraintValidationAddsAnnotationAndGeneratesFile() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8914,7 +8605,7 @@ public class SpringCodegenTest {
     @Test
     public void generatePageableConstraintValidationWithBothConstraints() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8934,7 +8625,7 @@ public class SpringCodegenTest {
     @Test
     public void generatePageableConstraintValidationResolvesMaximumFromAllOfRef() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8954,7 +8645,7 @@ public class SpringCodegenTest {
     @Test
     public void generatePageableConstraintValidationResolvesMinimumFromAllOfRef() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8978,7 +8669,7 @@ public class SpringCodegenTest {
     @Test
     public void pageableDefaultAnnotationApplied() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -8997,7 +8688,7 @@ public class SpringCodegenTest {
     @Test
     public void sortDefaultAnnotationApplied() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -9013,7 +8704,7 @@ public class SpringCodegenTest {
     @Test
     public void sortDefaultAndPageableDefaultBothApplied() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -9031,7 +8722,7 @@ public class SpringCodegenTest {
     @Test
     public void pageableAnnotationsUseOriginalOperationId_issue24721() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -9066,7 +8757,7 @@ public class SpringCodegenTest {
     public void substituteGenericPagedModel_isDisabledByDefault() throws IOException {
         // Without the option the paged schemas are generated as-is
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -9187,7 +8878,7 @@ public class SpringCodegenTest {
     /** Common properties shared by all substituteGenericPagedModel tests. */
     private Map<String, Object> commonPagedModelProps() {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.USE_SPRING_BOOT3, "true");
@@ -9473,7 +9164,7 @@ public class SpringCodegenTest {
     @Test(dataProvider = "replaceOneOf" )
     void replaceOneOfByDiscriminatorMapping(String file) throws IOException {
         Map<String, File> files = generateFromContract(file, SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
 
         JavaFileAssert.assertThat(files.get("GeoJsonObject.java"))
@@ -9499,7 +9190,7 @@ public class SpringCodegenTest {
     @Test
     void oneOf_issue_19261() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_19261.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("Product.java"))
                 .isNormalClass()
@@ -9517,7 +9208,7 @@ public class SpringCodegenTest {
     @Test
     void oneOf_issue_22013() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_22013.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("Main.java"))
                 .isNormalClass()
@@ -9536,7 +9227,7 @@ public class SpringCodegenTest {
     @Test
     void oneOf_issue_23577() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_23577.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("Event.java"))
                 .isNormalClass()
@@ -9559,7 +9250,7 @@ public class SpringCodegenTest {
         // a member schema that already declares its own x-implements must still be able to
         // receive the oneOf interface, i.e. the user-supplied x-implements value must remain mutable.
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_23577.yaml", SPRING_BOOT,
-                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true));
+                Map.of(GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true));
         JavaFileAssert.assertThat(files.get("CreatedEvent.java"))
                 .implementsInterfaces("com.example.Notification", "Event");
         JavaFileAssert.assertThat(files.get("UpdatedEvent.java"))
@@ -9570,7 +9261,7 @@ public class SpringCodegenTest {
     void oneof_polymorphism_and_inheritance() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneof_polymorphism_and_inheritance.yaml", SPRING_BOOT,
                 Map.of(MODEL_NAME_SUFFIX, "Dto",
-                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
         JavaFileAssert.assertThat(files.get("FruitDto.java"))
                 .isNormalClass()
@@ -9587,7 +9278,7 @@ public class SpringCodegenTest {
     void oneOf_issue_14769() throws IOException {
         Map<String, File> files = generateFromContract("src/test/resources/3_0/oneOf_issue_14769.yaml", SPRING_BOOT,
                 Map.of(MODEL_NAME_SUFFIX, "Dto",
-                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, INTERFACE_ONLY, true),
+                        GENERATE_MODEL_DOCS, false, GENERATE_APIS, false, SpringCodegen.INTERFACE_ONLY, true),
                 codegen -> codegen.addOpenapiNormalizer("REPLACE_ONE_OF_BY_DISCRIMINATOR_MAPPING", "true"));
 
         JavaFileAssert.assertThat(files.get("VehicleDto.java"))
@@ -9716,7 +9407,7 @@ public class SpringCodegenTest {
         codegen.setOpenAPI(openAPI);
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.api_interface.name());
 
@@ -9831,7 +9522,7 @@ public class SpringCodegenTest {
         codegen.setOpenAPI(openAPI);
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "false");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.api_interface.name());
 
@@ -9949,7 +9640,7 @@ public class SpringCodegenTest {
         Map<String, File> files = generateFromContract(
                 "src/test/resources/3_0/spring/x-spring-provide-args-pageable.yaml",
                 SPRING_BOOT,
-                Map.of(INTERFACE_ONLY, "true",
+                Map.of(SpringCodegen.INTERFACE_ONLY, "true",
                         DELEGATE_PATTERN, "true",
                         REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.api_interface.name(),
                         REACTIVE, Boolean.toString(reactive),
@@ -10010,7 +9701,7 @@ public class SpringCodegenTest {
     void issue24003() throws IOException {
         Map<String, File> files = generateFromContract(
                 "src/test/resources/3_0/spring/issue_24003.yaml", SPRING_BOOT,
-                Map.of(USE_SPRING_BOOT4, true, MODEL_NAME_SUFFIX, "DTO", INTERFACE_ONLY, "true"));
+                Map.of(USE_SPRING_BOOT4, true, MODEL_NAME_SUFFIX, "DTO", SpringCodegen.INTERFACE_ONLY, "true"));
         JavaFileAssert.assertThat(files.get("BrLockDTO.java")).isInterface()
                 .assertTypeAnnotations()
                 .containsWithNameAndAttributes("JsonTypeInfo", Map.of("use", "JsonTypeInfo.Id.NAME", "include", "JsonTypeInfo.As.PROPERTY", "property", "\"lockType\"", "visible", "true"))
@@ -10101,433 +9792,57 @@ public class SpringCodegenTest {
     }
 
     /**
-     * Issue #24401: the {@code @JsonInclude(NON_ABSENT)} annotation must no longer be emitted for
-     * {@code JsonNullable<T>} fields, as the JsonNullable module already governs their inclusion.
+     * Scenario 4 (openApiNullable=true): optional+nullable field must carry
+     * {@code @JsonInclude(JsonInclude.Include.NON_ABSENT)} so that Jackson
+     * excludes {@code JsonNullable.undefined()} from serialized output.
      */
     @Test
-    void optionalNullableField_withOpenApiNullable_hasNoJsonIncludeAnnotation() throws IOException {
+    void optionalNullableField_withOpenApiNullable_hasNonAbsentAnnotation() throws IOException {
         Map<String, File> files = generateFromContract(
                 "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
                 SPRING_BOOT,
                 Map.of(CodegenConstants.OPENAPI_NULLABLE, "true"));
 
         Path modelFile = files.get("TestModel.java").toPath();
-        assertFileNotContains(modelFile, "@JsonInclude(JsonInclude.Include.NON_ABSENT)");
-        JavaFileAssert.assertThat(files.get("TestModel.java"))
-                .assertProperty("optionalNullable").withType("JsonNullable<String>")
-                .assertPropertyAnnotations().doesNotContainWithName("JsonInclude");
+        // NON_ABSENT must be present — only optionalNullable (JsonNullable<T>) gets this annotation
+        assertFileContains(modelFile, "@JsonInclude(JsonInclude.Include.NON_ABSENT)");
+        // JsonNullable field must be present
+        assertFileContains(modelFile, "private JsonNullable<String> optionalNullable");
+        // NON_NULL must also be present (for optionalNonNullable fields)
+        assertFileContains(modelFile, "@JsonInclude(JsonInclude.Include.NON_NULL)");
+        assertFileContains(modelFile, "import com.fasterxml.jackson.annotation.JsonInclude");
     }
 
     /**
-     * Issue #24401 (safe-but-noisy): with no flags set, the generator defaults to weak/7.23.0 behavior —
-     * NO policy {@code @JsonInclude} or {@code @JsonSetter(nulls)} annotations are emitted, deferring
-     * entirely to the global ObjectMapper.
+     * Without openApiNullable the optional+nullable field is a plain nullable type —
+     * no {@code @JsonInclude(NON_ABSENT)} should be emitted.
      */
     @Test
-    void jsonInclude_unset_emitsNoPolicyAnnotations() throws IOException {
+    void optionalNullableField_withoutOpenApiNullable_hasNoNonAbsentAnnotation() throws IOException {
         Map<String, File> files = generateFromContract(
                 "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true"));
-
-        Path modelFile = files.get("TestModel.java").toPath();
-        assertFileNotContains(modelFile, "@JsonInclude(");
-        assertFileNotContains(modelFile, "@JsonSetter(");
-    }
-
-    /**
-     * Issue #24401: default matrix for JAVA-SPRING when {@code generateJsonIncludeAnnotations=true}
-     * (openApiNullable=true). required non-nullable -> NON_NULL, required nullable -> ALWAYS,
-     * optional non-nullable -> NON_NULL (default policy), optional nullable -> no annotation.
-     */
-    @Test
-    void jsonInclude_defaultMatrix() throws IOException {
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true"));
-
-        JavaFileAssert.assertThat(files.get("TestModel.java"))
-                .assertProperty("requiredNonNullable").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_NULL")).toProperty().toType()
-                .assertProperty("requiredNullable").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.ALWAYS")).toProperty().toType()
-                .assertProperty("optionalNonNullable").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_NULL")).toProperty().toType()
-                .assertProperty("optionalNullable").assertPropertyAnnotations()
-                .doesNotContainWithName("JsonInclude");
-    }
-
-    /**
-     * Issue #24401 (safe-but-noisy): {@code generateJsonSetterNullsAnnotations=true} emits
-     * {@code @JsonSetter(nulls = Nulls.SKIP)} on optional non-nullable fields (openApiNullable=false);
-     * leaving it unset emits none.
-     */
-    @Test
-    void jsonSetterNulls_generateFlag_controlsEmission() throws IOException {
-        Map<String, File> withFlag = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "false",
-                        CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true"));
-        assertFileContains(withFlag.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.SKIP)");
-
-        Map<String, File> unset = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
                 SPRING_BOOT,
                 Map.of(CodegenConstants.OPENAPI_NULLABLE, "false"));
-        assertFileNotContains(unset.get("OptionalNonNullable.java").toPath(), "@JsonSetter(");
-    }
-
-    /**
-     * Issue #24401 regression: when Lombok generates the setter ({@code lombok.Setter}), the manual
-     * setter method (and the {@code @JsonSetter} annotation that used to live only on it) is skipped
-     * entirely. {@code @JsonSetter(nulls = Nulls.SKIP)} must be emitted on the field itself so it is
-     * still honored by Jackson even though no explicit setter method is generated.
-     */
-    @Test
-    void jsonSetterNulls_generateFlag_appliesWithLombokSetter() throws IOException {
-        Map<String, Object> additionalProperties = new HashMap<>();
-        additionalProperties.put(CodegenConstants.OPENAPI_NULLABLE, "false");
-        additionalProperties.put(CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true");
-        additionalProperties.put(AbstractJavaCodegen.ADDITIONAL_MODEL_TYPE_ANNOTATIONS, "@lombok.Getter;@lombok.Setter");
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                additionalProperties);
-
-        JavaFileAssert.assertThat(files.get("OptionalNonNullable.java"))
-                .hasNoMethod("setOptionalNonNullable");
-        assertFileContains(files.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.SKIP)");
-    }
-
-    /**
-     * Issue #24491: {@code optionalNonNullPropertyJsonSetterNulls} decouples the SKIP/FAIL choice from
-     * {@code openApiNullable} on spring. With {@code openApiNullable=true} the default emits no
-     * {@code @JsonSetter}; SKIP and FAIL are now both reachable (FAIL via the new template branch).
-     */
-    @Test
-    void jsonSetterNulls_option_decouplesFromOpenApiNullable() throws IOException {
-        // openApiNullable=true + SKIP (previously unreachable): tolerate an explicit null
-        Map<String, File> skip = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true",
-                        CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true",
-                        CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS, "SKIP"));
-        assertFileContains(skip.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.SKIP)");
-        assertFileNotContains(skip.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.FAIL)");
-        // @JsonInclude is still emitted independently
-        assertFileContains(skip.get("OptionalNonNullable.java").toPath(), "@JsonInclude(JsonInclude.Include.NON_NULL)");
-
-        // openApiNullable=true + FAIL: reject an explicit null (uses the new -fail template branch)
-        Map<String, File> fail = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true",
-                        CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS, "FAIL"));
-        assertFileContains(fail.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.FAIL)");
-
-        // openApiNullable=false + FAIL: overrides the SKIP default
-        Map<String, File> failNoNullable = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "false",
-                        CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true",
-                        CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS, "FAIL"));
-        assertFileContains(failNoNullable.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.FAIL)");
-        assertFileNotContains(failNoNullable.get("OptionalNonNullable.java").toPath(), "@JsonSetter(nulls = Nulls.SKIP)");
-    }
-
-    /**
-     * Issue #24491: an invalid {@code optionalNonNullPropertyJsonSetterNulls} value fails fast with an
-     * actionable error naming the option and allowed values.
-     */
-    @Test
-    void jsonSetterNulls_option_invalidValueFailsFast() {
-        try {
-            generateFromContract(
-                    "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                    SPRING_BOOT,
-                    Map.of(CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true",
-                            CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS, "BOGUS"));
-            org.assertj.core.api.Assertions.fail("expected an IllegalArgumentException for an invalid optionalNonNullPropertyJsonSetterNulls value");
-        } catch (Exception e) {
-            Throwable root = e;
-            while (root.getCause() != null) {
-                root = root.getCause();
-            }
-            assertThat(root).isInstanceOf(IllegalArgumentException.class);
-            assertThat(root.getMessage()).contains("optionalNonNullPropertyJsonSetterNulls").contains("[SKIP, FAIL]");
-        }
-    }
-
-    /**
-     * Issue #24491: the per-property {@code x-jackson-json-setter-nulls} vendor extension overrides the
-     * mode precisely per field (SKIP/FAIL/NONE), winning over the option and unconditionally applying
-     * even to a required property.
-     */
-    @Test
-    void jsonSetterNulls_perPropertyExtension() throws IOException {
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                // openApiNullable=true + option SKIP: the extension must still win per property
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true",
-                        CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_SETTER_NULLS, "SKIP"));
-
-        assertFileContains(files.get("SetterNullsManualSkip.java").toPath(), "@JsonSetter(nulls = Nulls.SKIP)");
-        assertFileContains(files.get("SetterNullsManualFail.java").toPath(), "@JsonSetter(nulls = Nulls.FAIL)");
-        assertFileNotContains(files.get("SetterNullsManualNone.java").toPath(), "@JsonSetter(");
-        // forced FAIL on a required property is honored unconditionally
-        assertFileContains(files.get("SetterNullsForcedOnRequired.java").toPath(), "@JsonSetter(nulls = Nulls.FAIL)");
-    }
-
-    /**
-     * Issue #24491: the per-property {@code x-jackson-json-setter-nulls} override is honored even when
-     * {@code generateJsonSetterNullsAnnotations} is not enabled (mirrors the JsonInclude manual override).
-     */
-    @Test
-    void jsonSetterNulls_perPropertyExtension_honoredWhenFlagDisabled() throws IOException {
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of());
-        assertFileContains(files.get("SetterNullsManualFail.java").toPath(), "@JsonSetter(nulls = Nulls.FAIL)");
-        assertFileContains(files.get("SetterNullsManualFail.java").toPath(),
-                "com.fasterxml.jackson.annotation.JsonSetter", "com.fasterxml.jackson.annotation.Nulls");
-    }
-
-    /**
-     * Issue #24401: {@code optionalNonNullPropertyJsonInclude} changes the policy emitted for
-     * optional non-nullable properties (when {@code generateJsonIncludeAnnotations=true}).
-     */
-    @Test
-    void jsonInclude_optionalNonNullPolicy_nonEmpty() throws IOException {
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true",
-                        CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_INCLUDE, "NON_EMPTY"));
-
-        JavaFileAssert.assertThat(files.get("TestModel.java"))
-                .assertProperty("optionalNonNullable").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_EMPTY")).toProperty().toType()
-                // required-field protection is unaffected by the optional policy
-                .assertProperty("requiredNonNullable").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_NULL"));
-    }
-
-    /**
-     * Issue #24401: {@code optionalNonNullPropertyJsonInclude=NONE} emits no annotation on optional
-     * non-nullable properties, deferring to the global ObjectMapper. Required-field protection stays.
-     */
-    @Test
-    void jsonInclude_optionalNonNullPolicy_none() throws IOException {
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true",
-                        CodegenConstants.OPTIONAL_NON_NULL_PROPERTY_JSON_INCLUDE, "NONE"));
-
-        JavaFileAssert.assertThat(files.get("TestModel.java"))
-                .assertProperty("optionalNonNullable").assertPropertyAnnotations()
-                .doesNotContainWithName("JsonInclude").toProperty().toType()
-                .assertProperty("requiredNonNullable").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_NULL"));
-    }
-
-    /**
-     * Issue #24401: {@code generateJsonIncludeAnnotations=false} removes ALL policy @JsonInclude
-     * annotations, including the required-field protection, letting the global ObjectMapper win.
-     */
-    @Test
-    void jsonInclude_generateJsonIncludeAnnotations_false() throws IOException {
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "false"));
 
         Path modelFile = files.get("TestModel.java").toPath();
-        assertFileNotContains(modelFile, "@JsonInclude(");
+        // Without openApiNullable the field is String optionalNullable, not JsonNullable
+        assertFileNotContains(modelFile, "@JsonInclude(JsonInclude.Include.NON_ABSENT)");
     }
 
     /**
-     * Issue #24401: a manual per-property {@code x-jackson-json-include-policy} vendor extension
-     * always overrides the automatic behavior, even when {@code generateJsonIncludeAnnotations=false}.
+     * Optional+non-nullable fields must still have {@code @JsonInclude(NON_NULL)} regardless
+     * of the openApiNullable setting.
      */
     @Test
-    void jsonInclude_manualOverride_winsOverGenerateFlag() throws IOException {
+    void optionalNonNullableField_alwaysHasNonNullAnnotation() throws IOException {
         Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_override.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "false"));
-
-        JavaFileAssert.assertThat(files.get("TestModel.java"))
-                .assertProperty("overridden").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_EMPTY")).toProperty().toType()
-                // no automatic annotation on the non-overridden optional field
-                .assertProperty("plain").assertPropertyAnnotations()
-                .doesNotContainWithName("JsonInclude");
-    }
-
-    /**
-     * Issue #24401: with one property per schema, each generated model must import exactly the
-     * Jackson annotations its single property needs — no more, no less.
-     */
-    @Test
-    void jsonInclude_perSchemaImports() throws IOException {
-        final String jsonInclude = "com.fasterxml.jackson.annotation.JsonInclude";
-        final String jsonSetter = "com.fasterxml.jackson.annotation.JsonSetter";
-        final String nulls = "com.fasterxml.jackson.annotation.Nulls";
-        final String jsonNullable = "org.openapitools.jackson.nullable.JsonNullable";
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "true",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true"));
-
-        // required non-nullable -> @JsonInclude(NON_NULL); no setter machinery
-        JavaFileAssert.assertThat(files.get("RequiredNonNullable.java"))
-                .hasImports(jsonInclude).hasNoImports(jsonSetter, nulls);
-        // required nullable -> @JsonInclude(ALWAYS)
-        JavaFileAssert.assertThat(files.get("RequiredNullable.java"))
-                .hasImports(jsonInclude).hasNoImports(jsonSetter, nulls);
-        // optional non-nullable with openApiNullable=true -> @JsonInclude(NON_NULL), no @JsonSetter
-        JavaFileAssert.assertThat(files.get("OptionalNonNullable.java"))
-                .hasImports(jsonInclude).hasNoImports(jsonSetter, nulls);
-        // optional nullable with openApiNullable=true -> JsonNullable<T>, NO @JsonInclude
-        JavaFileAssert.assertThat(files.get("OptionalNullable.java"))
-                .hasImports(jsonNullable).hasNoImports(jsonInclude, jsonSetter, nulls);
-    }
-
-    /**
-     * Issue #24401: with openApiNullable=false, optional non-nullable adds @JsonSetter(Nulls.SKIP);
-     * optional nullable is a plain type needing none of the Jackson import machinery.
-     */
-    @Test
-    void jsonInclude_perSchemaImports_withoutOpenApiNullable() throws IOException {
-        final String jsonInclude = "com.fasterxml.jackson.annotation.JsonInclude";
-        final String jsonSetter = "com.fasterxml.jackson.annotation.JsonSetter";
-        final String nulls = "com.fasterxml.jackson.annotation.Nulls";
-        final String jsonNullable = "org.openapitools.jackson.nullable.JsonNullable";
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.OPENAPI_NULLABLE, "false",
-                        CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true",
-                        CodegenConstants.GENERATE_JSON_SETTER_NULLS_ANNOTATIONS, "true"));
-
-        // optional non-nullable -> @JsonInclude(NON_NULL) + @JsonSetter(Nulls.SKIP)
-        JavaFileAssert.assertThat(files.get("OptionalNonNullable.java"))
-                .hasImports(jsonInclude, jsonSetter, nulls).hasNoImports(jsonNullable);
-        // optional nullable (plain String) -> no policy annotation, no import machinery
-        JavaFileAssert.assertThat(files.get("OptionalNullable.java"))
-                .hasNoImports(jsonInclude, jsonSetter, nulls, jsonNullable);
-    }
-
-    /**
-     * Issue #24401: even with {@code generateJsonIncludeAnnotations=false}, a manual per-property
-     * vendor extension must still emit its annotation AND the JsonInclude import must be present.
-     */
-    @Test
-    void jsonInclude_manualOverride_emitsImport_whenAnnotationsDisabled() throws IOException {
-        final String jsonInclude = "com.fasterxml.jackson.annotation.JsonInclude";
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "false"));
-
-        JavaFileAssert.assertThat(files.get("ManualOverride.java"))
-                .hasImports(jsonInclude)
-                .assertProperty("value").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_EMPTY"));
-        // A schema without the override must not import JsonInclude when annotations are disabled
-        JavaFileAssert.assertThat(files.get("OptionalNonNullable.java")).hasNoImports(jsonInclude);
-    }
-
-    /**
-     * Issue #24401: a forced override on an optional+nullable ({@code JsonNullable<T>}) property must be
-     * respected — the annotation is emitted and the JsonInclude import is added, even though the
-     * automatic path emits nothing for JsonNullable fields.
-     */
-    @Test
-    void jsonInclude_forcedOverride_onJsonNullable_emitsAnnotationAndImport() throws IOException {
-        final String jsonInclude = "com.fasterxml.jackson.annotation.JsonInclude";
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
+                "src/test/resources/3_0/kotlin/required-nullable-4-states.yaml",
                 SPRING_BOOT,
                 Map.of(CodegenConstants.OPENAPI_NULLABLE, "true"));
 
-        JavaFileAssert.assertThat(files.get("ForcedOnJsonNullable.java"))
-                .hasImports(jsonInclude)
-                .assertProperty("value").withType("JsonNullable<String>").assertPropertyAnnotations()
-                .containsWithNameAndAttributes("JsonInclude", Map.of("value", "JsonInclude.Include.NON_NULL"));
-    }
-
-    /**
-     * Issue #24401: a manual per-property override of {@code NONE} means "emit no annotation". Neither the
-     * {@code @JsonInclude} annotation nor its import may be generated, otherwise the output fails to compile.
-     */
-    @Test
-    void jsonInclude_manualOverride_none_emitsNoAnnotationOrImport() throws IOException {
-        final String jsonInclude = "com.fasterxml.jackson.annotation.JsonInclude";
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true"));
-
-        JavaFileAssert.assertThat(files.get("ManualNone.java"))
-                .hasNoImports(jsonInclude)
-                .assertProperty("value").assertPropertyAnnotations()
-                .doesNotContainWithName("JsonInclude");
-    }
-
-    /**
-     * Issue #24401: a whitespace-padded {@code NONE} override must be treated identically to a bare
-     * {@code NONE} — the sentinel comparison must trim before checking, otherwise it falls through to
-     * validation and generation fails for a value that should simply suppress the annotation.
-     */
-    @Test
-    void jsonInclude_manualOverride_paddedNone_emitsNoAnnotationOrImport() throws IOException {
-        final String jsonInclude = "com.fasterxml.jackson.annotation.JsonInclude";
-
-        Map<String, File> files = generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_per_schema.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true"));
-
-        JavaFileAssert.assertThat(files.get("ManualNonePadded.java"))
-                .hasNoImports(jsonInclude)
-                .assertProperty("value").assertPropertyAnnotations()
-                .doesNotContainWithName("JsonInclude");
-    }
-
-    /**
-     * Issue #24401: an invalid manual per-property override must fail fast with an actionable error
-     * during generation rather than emitting uncompilable Java.
-     */
-    @Test
-    void jsonInclude_manualOverride_invalid_failsWithActionableError() {
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> generateFromContract(
-                "src/test/resources/3_0/spring/issue_24401_json_include_invalid_override.yaml",
-                SPRING_BOOT,
-                Map.of(CodegenConstants.GENERATE_JSON_INCLUDE_ANNOTATIONS, "true")))
-                .hasStackTraceContaining("x-jackson-json-include-policy")
-                .hasStackTraceContaining("NOT_A_REAL_POLICY");
+        Path modelFile = files.get("TestModel.java").toPath();
+        assertFileContains(modelFile, "@JsonInclude(JsonInclude.Include.NON_NULL)");
+        assertFileContains(modelFile, "private String optionalNonNullable");
     }
 
     @Test
@@ -10712,6 +10027,7 @@ public class SpringCodegenTest {
                 "Mono<Set<String>> getUserIdSet"
         );
     }
+
 
     @Test
     public void issue_24232() throws IOException {

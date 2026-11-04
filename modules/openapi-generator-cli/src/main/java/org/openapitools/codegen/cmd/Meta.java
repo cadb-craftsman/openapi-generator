@@ -97,14 +97,14 @@ public class Meta extends OpenApiGeneratorCommand {
                         new SupportingFile("kotlin/generatorClass.mustache", on(File.separator).join("src/main/kotlin", asPath(targetPackage)), mainClass.concat(".kt")),
                         new SupportingFile("kotlin/generatorClassTest.mustache", on(File.separator).join("src/test/kotlin", asPath(targetPackage)), mainClass.concat("Test.kt")),
                         new SupportingFile("kotlin/README.mustache", "", "README.md"),
-
                         new SupportingFile("api.template", "src/main/resources" + File.separator + name, "api.mustache"),
                         new SupportingFile("model.template", "src/main/resources" + File.separator + name, "model.mustache"),
                         new SupportingFile("myFile.template", String.join(File.separator, "src", "main", "resources", name), "myFile.mustache"),
                         new SupportingFile("services.mustache", "src/main/resources/META-INF/services", CodegenConfig.class.getCanonicalName()))
                 : ImmutableList.of(
                 new SupportingFile("pom.mustache", "", "pom.xml"),
-                new SupportingFile("generatorClass.mustache", on(File.separator).join("src/main/java", asPath(targetPackage)), mainClass.concat(".java")),
+						new SupportingFile(
+								"generatorClass.mustache", on(File.separator).join("src/main/java", asPath(targetPackage)), mainClass.concat(".java")),
                 new SupportingFile("generatorClassTest.mustache", on(File.separator).join("src/test/java", asPath(targetPackage)), mainClass.concat("Test.java")),
                 new SupportingFile("README.mustache", "", "README.md"),
                 new SupportingFile("api.template", "src/main/resources" + File.separator + name, "api.mustache"),

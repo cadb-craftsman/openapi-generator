@@ -49,6 +49,10 @@ public class CodegenProperty implements Cloneable, IJsonSchemaValidationProperti
     @Getter @Setter
     public String datatypeWithEnum;
     @Getter @Setter
+    public String datatypeWithEnumBean;
+    @Getter @Setter
+    public String datatypeWithEnumEntity;    
+    @Getter @Setter
     public String dataFormat;
     /**
      * The name of this property in the OpenAPI schema.
