@@ -7682,7 +7682,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedPageSizeMode_detectsPageAndSizeOnlyOperation() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "page-size");
@@ -7701,7 +7701,7 @@ public class SpringCodegenTest {
     @Test
     public void autoXSpringPaginatedPageSizeMode_alsoDetectsPageSizeAndSortOperation() throws IOException {
         Map<String, Object> props = new HashMap<>();
-        props.put(INTERFACE_ONLY, "true");
+        props.put(SpringCodegen.INTERFACE_ONLY, "true");
         props.put(SpringCodegen.SKIP_DEFAULT_INTERFACE, "true");
         props.put(SpringCodegen.USE_TAGS, "true");
         props.put(SpringCodegen.AUTO_X_SPRING_PAGINATED, "page-size");
@@ -8803,7 +8803,7 @@ public class SpringCodegenTest {
         codegen.setOpenAPI(openAPI);
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "true");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.api_interface.name());
 
@@ -8918,7 +8918,7 @@ public class SpringCodegenTest {
         codegen.setOpenAPI(openAPI);
         codegen.setLibrary(SPRING_BOOT);
         codegen.setOutputDir(output.getAbsolutePath());
-        codegen.additionalProperties().put(INTERFACE_ONLY, "true");
+        codegen.additionalProperties().put(SpringCodegen.INTERFACE_ONLY, "true");
         codegen.additionalProperties().put(DELEGATE_PATTERN, "false");
         codegen.additionalProperties().put(REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.api_interface.name());
 
@@ -9036,7 +9036,7 @@ public class SpringCodegenTest {
         Map<String, File> files = generateFromContract(
                 "src/test/resources/3_0/spring/x-spring-provide-args-pageable.yaml",
                 SPRING_BOOT,
-                Map.of(INTERFACE_ONLY, "true",
+                Map.of(SpringCodegen.INTERFACE_ONLY, "true",
                         DELEGATE_PATTERN, "true",
                         REQUEST_MAPPING_OPTION, SpringCodegen.RequestMappingMode.api_interface.name(),
                         REACTIVE, Boolean.toString(reactive),
